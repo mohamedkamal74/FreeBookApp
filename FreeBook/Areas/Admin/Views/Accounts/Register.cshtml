@@ -1,0 +1,240 @@
+﻿@model RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+
+
+<div class="content-wrapper">
+    <!--Content Header-->
+
+<div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+          <h1 class="m-0 text-dark">@ResourceWeb.lbUser </h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class=" breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="/Admin/Home/Index"> @ResourceWeb.lbHomePage</a></li>
+              <li class="breadcrumb-item active">@ResourceWeb.lbManageBook</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+<!--End content Header-->
+<div class="card">
+            <div class="card-header d-flex align-items-center justify-content-start">
+              <h3 class="card-title">@ResourceWeb.lbUser</h3>
+            </div>
+            <div class="card-tools">
+                <!-- Button trigger modal -->
+        
+<button type="button" class="btn btn-outline-primary rounded-pill mr-5 mt-2" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="Rest()">
+@ResourceWeb.lbBtnSaveNewUser
+</button>
+ <!-- Button trigger modal -->
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+              <table id="tableRoles" class="table table-bordered table-hover table-striped">
+                  <thead>
+                      <tr>
+                        <td style="width:15%">@ResourceWeb.lbNameUser</td>
+                        <td style="width:15%">@ResourceWeb.lbNameRole</td>
+                        <td style="width:15%">@ResourceWeb.lbImageUser</td>
+                        <td style="width:15%">@ResourceWeb.lbEmailUser</td>
+                        <td style="width:10%">@ResourceWeb.lbActiveUser</td>
+                        <td style="width:30%">@ResourceWeb.lbEvents</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model.Users)
+                    {
+                        <tr>
+                            <td>@user.Name</td>
+                            <td>
+                                            @switch (@user.Role)
+                                            {
+                                                    case "SupperAdmin":
+                                                    <span class="badge badge-danger" style="width:100px;height:25px">@user.Role</span>
+                                                    break;
+                                                    case "Admin":
+                                                    <span class="badge badge-success" style="width:100px;height:25px">@user.Role</span>
+                                                    break;
+                                                    default:
+                                                    <span class="badge badge-warning" style="width:100px;height:25px">@user.Role</span>
+                                                    break;
+                                            }
+                                        </td>
+                            <td><img src="@Helper.PathImageUser/@user.ImageUser" class="img-bordered img-circle"  style="width:50px;height:50px"/></td>
+                            <td>@user.Email</td>
+                        <td><input type="checkbox" disabled checked="@user.ActiveUser" style="width:30px;height:30px"/></td>
+                            <td>
+                                 <input type="button" class="btn btn-info btn-sm" onclick="Edit('@user.Id','@user.Name','@user.Email','@user.ImageUser','@user.Role','@user.ActiveUser')"
+                                 value="@ResourceWeb.lbBtnEdit" data-bs-toggle="modal" data-bs-target="#exampleModal" />
+                                <input type="button" class="btn btn-danger btn-sm" onclick="DeleteUser('@user.Id')" value="@ResourceWeb.lbbtnDelete"/>
+                                <input type="button" class="btn btn-dark btn-sm" onclick="ChangePassword('@user.Id')" value="@ResourceWeb.lbbtnChangePassword"
+                                 data-bs-toggle="modal" data-bs-target="#ChangePasswordModal"/>
+                            </td>
+                         
+
+                        </tr>
+                        
+                    }
+                 
+               
+                </tbody>
+             
+            
+              </table>  
+            <!-- /.card-body -->
+          </div>
+</div>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="title">@ResourceWeb.lbBtnSaveNewUser</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+       <form asp-action="Register" asp-controller="Accounts" method="post" enctype="multipart/form-data">
+           <div class="form-group">
+          <input type="text" asp-for="NewRegister.Id" hidden class="form-control" id="userId"/>
+          <input type="text" asp-for="NewRegister.ImageUser" hidden class="form-control" id="imagehidden"/>
+
+           <label class="control-label" asp-for="NewRegister.Name">@ResourceWeb.lbNameUser</label>
+           <input type="text" asp-for="NewRegister.Name" class="form-control" id="userName"/>
+           <span asp-validation-for="NewRegister.Name" class="text-danger"></span>
+           </div>
+            <div class="form-group">
+           <label class="control-label" asp-for="NewRegister.Email">@ResourceWeb.lbEmailUser</label>
+           <input type="text" asp-for="NewRegister.Email" class="form-control" id="userEmail"/>
+           <span asp-validation-for="NewRegister.Email" class="text-danger"></span>
+           </div>
+           <div class="form-group">
+               <img src="@Helper.PathImageUser/@Model.NewRegister.ImageUser"
+               class="img-circle" style="width:35px;height:35px" hidden id="image" />
+           </div>
+            <div class="form-group">
+           <label class="control-label" asp-for="NewRegister.ImageUser">@ResourceWeb.lbImageUser</label>
+           <input type="file" asp-for="NewRegister.ImageUser" class="form-control" id="userImage"/>
+           <span asp-validation-for="NewRegister.ImageUser" class="text-danger"></span>
+           </div>
+            <div class="form-group">
+           <label class="control-label" asp-for="NewRegister.RoleName">@ResourceWeb.lbNameRole</label>
+           <select asp-for="NewRegister.RoleName" class="form-control" id="ddluserRole"
+           asp-items="@(new SelectList(Model.Roles,"Name","Name"))">
+               <option value="">@ResourceWeb.lbSelectUserRole</option>
+           </select>
+           <span asp-validation-for="NewRegister.RoleName" class="text-danger"></span>
+           </div>
+            <div class="form-group">
+           <label class="control-label" asp-for="NewRegister.ActiveUser">@ResourceWeb.lbActiveUser</label>
+           <input type="checkbox"  asp-for="NewRegister.ActiveUser" style="height:30px;width:30px" id="userActive"/>
+
+
+           </div>
+             <div class="form-group" id="grPassword">
+           <label class="control-label" asp-for="NewRegister.Password">@ResourceWeb.lbPassword</label>
+           <input type="password" asp-for="NewRegister.Password" class="form-control" id="userPassword"/>
+           <span asp-validation-for="NewRegister.Password" class="text-danger"></span>
+           </div>
+             <div class="form-group" id="confPassword">
+           <label class="control-label" asp-for="NewRegister.ConfirmPassword">@ResourceWeb.lbConfirmpassword</label>
+           <input type="password" asp-for="NewRegister.ConfirmPassword" class="form-control" id="userConfirm"/>
+           <span asp-validation-for="NewRegister.ConfirmPassword" class="text-danger"></span>
+           </div>
+            <input  type="submit" class="btn btn-success" value="@ResourceWeb.lbBtnSave" id="btnSave"/>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+       </form>
+      </div>
+      <div class="modal-footer">
+       
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--Modal Change Password-->
+
+<div class="modal fade" id="ChangePasswordModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="title">@ResourceWeb.lbbtnChangePassword</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+       <form asp-action="ChangePassword" asp-controller="Accounts" method="post" enctype="multipart/form-data">
+           <div class="form-group">
+          <input type="text" asp-for="changePassword.Id" hidden class="form-control" id="userPassId"/>
+
+           <label class="control-label" asp-for="changePassword.NewPassword">@ResourceWeb.lbPassword</label>
+           <input type="password" asp-for="changePassword.NewPassword" class="form-control" />
+           <span asp-validation-for="changePassword.NewPassword" class="text-danger"></span>
+           </div>
+            <div class="form-group">
+           <label class="control-label" asp-for="changePassword.ConfirmPassword">@ResourceWeb.lbConfirmpassword</label>
+           <input type="password" asp-for="changePassword.ConfirmPassword" class="form-control" />
+           <span asp-validation-for="changePassword.ConfirmPassword" class="text-danger"></span>
+           </div>
+          
+             
+            <input  type="submit" class="btn btn-success" value="@ResourceWeb.lbBtnSave" id="btnSave"/>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+       </form>
+      </div>
+      <div class="modal-footer">
+       
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Script{
+@if(!string.IsNullOrEmpty(Context.Session.GetString("msgType")))
+{
+    if(Context.Session.GetString("msgType")=="success")
+    {
+        <script>
+        Swal.fire({
+
+  icon: 'success',
+  title:'@Context.Session.GetString("title")',
+  text:' @Html.Raw(Context.Session.GetString("msg"))',
+   confirmButtonText:'حسنا'
+ 
+})
+        </script>
+    }
+    else{
+        <script>
+            Swal.fire({
+  icon: 'error',
+  title: '@Context.Session.GetString("title")',
+  text: '@Html.Raw(Context.Session.GetString("msg"))',
+  confirmButtonText:'حسنا',
+ 
+})
+        </script>
+    }
+Context.Session.SetString("msgType","");
+}
+
+<script src="~/Models/Register.js"></script>
+
+}
+
+
+
