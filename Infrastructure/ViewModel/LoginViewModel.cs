@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.ViewModel
 {
-    public class LoginViewModel
-    {
-        [Required(ErrorMessageResourceType =typeof(ResourceData),ErrorMessageResourceName = "RegisterEmail")]
-        [EmailAddress]
-        public string? Email { get; set; }
-        [Required(ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "Password")]
+	public class LoginViewModel
+	{
+		[Required(ErrorMessageResourceType =typeof(ResourceData),ErrorMessageResourceName = "RegisterEmail")]
+		[EmailAddress]
+		public string? Email { get; set; }
+		[Required(ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "Password")]
 
-        public string? Password { get; set; }
-        public bool RememberMe { get; set; }
-    }
+		public string? Password { get; set; }
+		public bool RememberMe { get; set; }
+	}
 }
