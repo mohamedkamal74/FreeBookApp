@@ -61,6 +61,15 @@ namespace FreeBook.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        public static string k {
+            get {
+                return ResourceManager.GetString("k", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to تفعيل المستخدم.
         /// </summary>
         public static string lbActiveUser {
@@ -129,6 +138,24 @@ namespace FreeBook.Resources {
         public static string lbConfirmpassword {
             get {
                 return ResourceManager.GetString("lbConfirmpassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to تعديل.
+        /// </summary>
+        public static string lbEdit {
+            get {
+                return ResourceManager.GetString("lbEdit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to اضف مجموعة مستخدم جديد.
+        /// </summary>
+        public static string lbEditNewRole {
+            get {
+                return ResourceManager.GetString("lbEditNewRole", resourceCulture);
             }
         }
         
@@ -300,6 +327,15 @@ namespace FreeBook.Resources {
         public static string lbSelectUserRole {
             get {
                 return ResourceManager.GetString("lbSelectUserRole", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to تعديل مجموعة المستخدم.
+        /// </summary>
+        public static string lbTitleEdit {
+            get {
+                return ResourceManager.GetString("lbTitleEdit", resourceCulture);
             }
         }
         
