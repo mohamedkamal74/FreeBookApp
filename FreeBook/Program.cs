@@ -12,7 +12,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddSession();
 builder.Services.AddDbContext<FreeBookDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("BookConnection")));
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false).AddEntityFrameworkStores<FreeBookDbContext>();
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<FreeBookDbContext>();
 builder.Services.AddRazorPages();
 builder.Services.Configure<IdentityOptions>(options =>
 {
@@ -23,6 +23,10 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.Password.RequireUppercase = false;
     options.Password.RequiredLength = 5;
 
+});
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Admin";
 });
 
 

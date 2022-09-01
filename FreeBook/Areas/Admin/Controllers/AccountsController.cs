@@ -1,6 +1,7 @@
 ﻿using Domin.Entity;
 using Infrastructure.Data;
 using Infrastructure.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.IO;
@@ -8,6 +9,7 @@ using System.IO;
 namespace FreeBook.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize]
     public class AccountsController : Controller
     {
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -275,12 +277,16 @@ namespace FreeBook.Areas.Admin.Controllers
 
         }
 
+     
+        [AllowAnonymous]
         public IActionResult Login()
             {
                 return View();
             }
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [AllowAnonymous]
+
         public async Task<IActionResult>Login(LoginViewModel model)
         {
             if (ModelState.IsValid)
@@ -294,6 +300,15 @@ namespace FreeBook.Areas.Admin.Controllers
             }
             return View(model);
         }
+
+         [HttpPost]
+         [ValidateAntiForgeryToken]
+         public async Task<IActionResult>LogOut(LoginViewModel model)
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction(nameof(Login));
+        }
+
         }
     }
 

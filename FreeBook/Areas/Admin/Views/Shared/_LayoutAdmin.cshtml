@@ -186,11 +186,15 @@
 
                     @if (signinmanager.IsSignedIn(User))
                     {
-                          <div class="image">
-                        <img src="@Helper.PathImageUser+@((await usermanager.GetUserAsync(User)).ImageUser)" class="img-circle elevation-2" alt="User Image">
+                     <div class="image">
+                        <img src="@Helper.PathImageUser/@((await usermanager.GetUserAsync(User)).ImageUser)" style="border-radius:50%" class="img-circle elevation-2" alt="User Image">
                     </div>
                     <div class="info">
                         <a href="#" class="d-block">@((await usermanager.GetUserAsync(User)).Name)</a>
+
+                        <form asp-action="LogOut" asp-controller="Accounts" method="post">
+                        <input type="submit" style="border:none;background-color:#343a40;color:orange" value="تسجيل الخروج"/>
+                        </form>
                     </div>
 
                     }
