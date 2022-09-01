@@ -18,13 +18,14 @@ namespace FreeBook.Areas.Admin.Controllers
         private readonly FreeBookDbContext _context;
 
         public AccountsController(RoleManager<IdentityRole> roleManager,
-            UserManager<ApplicationUser> userManager,SignInManager<ApplicationUser> signInManager ,FreeBookDbContext context)
+            UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, FreeBookDbContext context)
         {
             _roleManager = roleManager;
             _userManager = userManager;
-           _signInManager = signInManager;
+            _signInManager = signInManager;
             _context = context;
         }
+        [Authorize(Roles = "Admin")]
         public IActionResult Roles()
         {
             var model = new RolesViewModel()
@@ -37,6 +38,8 @@ namespace FreeBook.Areas.Admin.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> Roles(RolesViewModel model)
         {
             if (ModelState.IsValid)
@@ -51,22 +54,11 @@ namespace FreeBook.Areas.Admin.Controllers
                     role.Id = Guid.NewGuid().ToString();
                     var Result = await _roleManager.CreateAsync(role);
                     if (Result.Succeeded)
-                    {
-                        HttpContext.Session.SetString("msgType", "success");
-                        HttpContext.Session.SetString("title", Resources.ResourceWeb.lbSave);
-                        HttpContext.Session.SetString("msg", Resources.ResourceWeb.lbSaveMsgRole);
-
-                        return RedirectToAction(nameof(Roles));
-                    }
-                    else
-                    {
+                        // succeeded
+                        SessuinMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbSaveMsgRole);
+                    else                
                         //not succeeded
-                        HttpContext.Session.SetString("msgType", "error");
-                        HttpContext.Session.SetString("title", Resources.ResourceWeb.lbNotSave);
-                        HttpContext.Session.SetString("msg", Resources.ResourceWeb.lbNotSaveMsgRole);
-                        return RedirectToAction(nameof(Roles));
-
-                    }
+                        SessuinMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbNotSaveMsgRole)
                 }
                 else
                 {   //update
@@ -93,6 +85,15 @@ namespace FreeBook.Areas.Admin.Controllers
             return RedirectToAction(nameof(Roles));
         }
 
+        private void SessuinMsg(string MsgType, string Title, string Msg)
+        {
+            HttpContext.Session.SetString(Helper.MsgType, MsgType);
+            HttpContext.Session.SetString(Helper.Title, Title);
+            HttpContext.Session.SetString(Helper.Msg, Msg);
+        }
+
+        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> DeleteRole(string Id)
         {
             var role = _roleManager.Roles.FirstOrDefault(x => x.Id == Id);
@@ -105,6 +106,7 @@ namespace FreeBook.Areas.Admin.Controllers
 
 
         }
+        [Authorize(Roles = "Admin,User")]
 
         public IActionResult Register()
         {
@@ -121,6 +123,8 @@ namespace FreeBook.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,User")]
+
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (ModelState.IsValid)
@@ -223,6 +227,7 @@ namespace FreeBook.Areas.Admin.Controllers
             }
             return RedirectToAction("Register", "Accounts");
         }
+        [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> DeleteUser(string userId)
         {
@@ -250,14 +255,16 @@ namespace FreeBook.Areas.Admin.Controllers
 
         }
 
-       [HttpPost]
-       [ValidateAntiForgeryToken]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,User")]
+
         public async Task<IActionResult> ChangePassword(RegisterViewModel model)
         {
-            var user=await _userManager.FindByIdAsync(model.changePassword.Id);
-            if(user != null)
+            var user = await _userManager.FindByIdAsync(model.changePassword.Id);
+            if (user != null)
             {
-              await  _userManager.RemovePasswordAsync(user);
+                await _userManager.RemovePasswordAsync(user);
                 var AddNewPassword = await _userManager.AddPasswordAsync(user, model.changePassword.NewPassword);
                 if (AddNewPassword.Succeeded)
                 {
@@ -277,21 +284,24 @@ namespace FreeBook.Areas.Admin.Controllers
 
         }
 
-     
+
         [AllowAnonymous]
+        [Authorize(Roles = "Admin,User")]
+
         public IActionResult Login()
-            {
-                return View();
-            }
+        {
+            return View();
+        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         [AllowAnonymous]
+        [Authorize(Roles = "Admin,User")]
 
-        public async Task<IActionResult>Login(LoginViewModel model)
+        public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var result =await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
+                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
                 if (result.Succeeded)
                     return RedirectToAction("Index", "Home");
                 else
@@ -301,14 +311,14 @@ namespace FreeBook.Areas.Admin.Controllers
             return View(model);
         }
 
-         [HttpPost]
-         [ValidateAntiForgeryToken]
-         public async Task<IActionResult>LogOut(LoginViewModel model)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LogOut(LoginViewModel model)
         {
             await _signInManager.SignOutAsync();
             return RedirectToAction(nameof(Login));
         }
 
-        }
     }
+}
 
