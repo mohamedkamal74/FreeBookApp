@@ -117,9 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="k" xml:space="preserve">
-    <value />
-  </data>
   <data name="lbActiveUser" xml:space="preserve">
     <value>تفعيل المستخدم</value>
   </data>
@@ -194,6 +191,12 @@
   </data>
   <data name="lbPassword" xml:space="preserve">
     <value>كلمة المرور</value>
+  </data>
+  <data name="lbRegisters" xml:space="preserve">
+    <value>المستخدمين</value>
+  </data>
+  <data name="lbRoles" xml:space="preserve">
+    <value>مجموعة المستخدمين</value>
   </data>
   <data name="lbRoleUser" xml:space="preserve">
     <value>مجموعة المستخدمين</value>

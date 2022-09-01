@@ -1,6 +1,9 @@
 ﻿
 $(document).ready(function () {
-    $('#tableRoles').DataTable();
+    $('#tableRoles').DataTable({
+        "autoWidth": false,
+        "responsive": true
+    });
 });
 
 function DeleteUser(id) {

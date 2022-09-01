@@ -61,15 +61,6 @@ namespace FreeBook.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        public static string k {
-            get {
-                return ResourceManager.GetString("k", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to تفعيل المستخدم.
         /// </summary>
         public static string lbActiveUser {
@@ -291,6 +282,24 @@ namespace FreeBook.Resources {
         public static string lbPassword {
             get {
                 return ResourceManager.GetString("lbPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to المستخدمين.
+        /// </summary>
+        public static string lbRegisters {
+            get {
+                return ResourceManager.GetString("lbRegisters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to مجموعة المستخدمين.
+        /// </summary>
+        public static string lbRoles {
+            get {
+                return ResourceManager.GetString("lbRoles", resourceCulture);
             }
         }
         
