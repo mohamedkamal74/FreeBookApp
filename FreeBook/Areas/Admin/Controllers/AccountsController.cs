@@ -56,9 +56,9 @@ namespace FreeBook.Areas.Admin.Controllers
                     if (Result.Succeeded)
                         // succeeded
                         SessuinMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbSaveMsgRole);
-                    else                
+                    else
                         //not succeeded
-                        SessuinMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbNotSaveMsgRole)
+                        SessuinMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbNotSaveMsgRole);
                 }
                 else
                 {   //update
@@ -66,20 +66,11 @@ namespace FreeBook.Areas.Admin.Controllers
                     RoleUpdate.Id = role.Id;
                     RoleUpdate.Name = role.Name;
                     var result = await _roleManager.UpdateAsync(RoleUpdate);
-                    if (result.Succeeded)
-                    {
-                        HttpContext.Session.SetString("msgType", "success");
-                        HttpContext.Session.SetString("title", Resources.ResourceWeb.lbUpdate);
-                        HttpContext.Session.SetString("msg", Resources.ResourceWeb.lbUpdateMsgRole);
-
-                    }
+                    if (result.Succeeded)                  
+                        SessuinMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbUpdateMsgRole);
+                        
                     else
-                    {
-                        HttpContext.Session.SetString("msgType", "error");
-                        HttpContext.Session.SetString("title", Resources.ResourceWeb.lbNotUpdate);
-                        HttpContext.Session.SetString("msg", Resources.ResourceWeb.lbNotUpdateMsgRole);
-                    }
-
+                        SessuinMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbNotUpdateMsgRole);
                 }
             }
             return RedirectToAction(nameof(Roles));
@@ -163,25 +154,15 @@ namespace FreeBook.Areas.Admin.Controllers
                     {
                         //Succeded
                         var role = await _userManager.AddToRoleAsync(user, model.NewRegister.RoleName);
-                        if (role.Succeeded)
-                        {
-                            HttpContext.Session.SetString("msgType", "success");
-                            HttpContext.Session.SetString("title", Resources.ResourceWeb.lbSave);
-                            HttpContext.Session.SetString("msg", Resources.ResourceWeb.lbSaveMsgRole);
-                        }
+                        if (role.Succeeded)  
+                            SessuinMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbSaveMsgRole);      
                         else
-                        {
-                            HttpContext.Session.SetString("msgType", "error");
-                            HttpContext.Session.SetString("title", Resources.ResourceWeb.lbNotSave);
-                            HttpContext.Session.SetString("msg", Resources.ResourceWeb.lbNotSaveMsgRole);
-                        }
+                            SessuinMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbNotSaveMsgRole);
                     }
                     else
                     {
                         //Not Succeded
-                        HttpContext.Session.SetString("msgType", "error");
-                        HttpContext.Session.SetString("title", Resources.ResourceWeb.lbNotSave);
-                        HttpContext.Session.SetString("msg", Resources.ResourceWeb.lbNotSaveMsgRole);
+                        SessuinMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbNotSaveMsgRole);
                     }
                 }
                 else
@@ -202,25 +183,16 @@ namespace FreeBook.Areas.Admin.Controllers
                         await _userManager.RemoveFromRolesAsync(userUpdate, oldRole);
                         var addRole = await _userManager.AddToRoleAsync(userUpdate, model.NewRegister.RoleName);
                         if (addRole.Succeeded)
-                        {
-                            HttpContext.Session.SetString("msgType", "success");
-                            HttpContext.Session.SetString("title", Resources.ResourceWeb.lbUpdate);
-                            HttpContext.Session.SetString("msg", Resources.ResourceWeb.lbUpdateMsgRole);
-                        }
+                        
+                            SessuinMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbUpdateMsgRole);  
                         else
-                        {
-                            HttpContext.Session.SetString("msgType", "error");
-                            HttpContext.Session.SetString("title", Resources.ResourceWeb.lbNotUpdate);
-                            HttpContext.Session.SetString("msg", Resources.ResourceWeb.lbNotSaveMsgRole);
-                        }
-
+                        
+                            SessuinMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbNotSaveMsgRole);
                     }
                     else
                     {
                         //Not Succeded
-                        HttpContext.Session.SetString("msgType", "error");
-                        HttpContext.Session.SetString("title", Resources.ResourceWeb.lbNotUpdate);
-                        HttpContext.Session.SetString("msg", Resources.ResourceWeb.lbNotSaveMsgRole);
+                        SessuinMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbNotSaveMsgRole);
                     }
                 }
                 return RedirectToAction("Register", "Accounts");
@@ -267,17 +239,9 @@ namespace FreeBook.Areas.Admin.Controllers
                 await _userManager.RemovePasswordAsync(user);
                 var AddNewPassword = await _userManager.AddPasswordAsync(user, model.changePassword.NewPassword);
                 if (AddNewPassword.Succeeded)
-                {
-                    HttpContext.Session.SetString("msgType", "success");
-                    HttpContext.Session.SetString("title", Resources.ResourceWeb.lbSave);
-                    HttpContext.Session.SetString("msg", Resources.ResourceWeb.lbMsgSaveChangePassword);
-                }
-                else
-                {
-                    HttpContext.Session.SetString("msgType", "error");
-                    HttpContext.Session.SetString("title", Resources.ResourceWeb.lbNotSave);
-                    HttpContext.Session.SetString("msg", Resources.ResourceWeb.lbMsgNotSaveChangePassword);
-                }
+                    SessuinMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbMsgSaveChangePassword);            
+               else
+                    SessuinMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSaveChangePassword);
                 return RedirectToAction("Register");
             }
             return RedirectToAction("Register");
