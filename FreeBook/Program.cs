@@ -27,6 +27,7 @@ builder.Services.Configure<IdentityOptions>(options =>
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Admin";
+    options.AccessDeniedPath = "/Admin/Home/Denied";
 });
 
 

@@ -196,6 +196,15 @@ namespace FreeBook.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ليس لديك صلاحية لهذة الصفحة.
+        /// </summary>
+        public static string lbMsgDenied {
+            get {
+                return ResourceManager.GetString("lbMsgDenied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to البريد الالكتروني او كلمة المرور غير صحيح.
         /// </summary>
         public static string lbMsgErrorLogin {
@@ -273,6 +282,15 @@ namespace FreeBook.Resources {
         public static string lbNotUpdateMsgRole {
             get {
                 return ResourceManager.GetString("lbNotUpdateMsgRole", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to حسنا.
+        /// </summary>
+        public static string lbOk {
+            get {
+                return ResourceManager.GetString("lbOk", resourceCulture);
             }
         }
         

@@ -203,17 +203,18 @@
 </div>
 
 @section Script{
-@if(!string.IsNullOrEmpty(Context.Session.GetString("msgType")))
+@if(!string.IsNullOrEmpty(Context.Session.GetString(Helper.MsgType)))
 {
-    if(Context.Session.GetString("msgType")=="success")
+    if(Context.Session.GetString("msgType")==Helper.Success)
     {
         <script>
         Swal.fire({
 
   icon: 'success',
-  title:'@Context.Session.GetString("title")',
-  text:' @Html.Raw(Context.Session.GetString("msg"))',
-   confirmButtonText:'حسنا'
+  title:'@Context.Session.GetString(Helper.Title)',
+  text:' @Html.Raw(Context.Session.GetString(Helper.Msg))',
+   confirmButtonText:'@ResourceWeb.lbOk'
+   
  
 })
         </script>
@@ -222,14 +223,14 @@
         <script>
             Swal.fire({
   icon: 'error',
-  title: '@Context.Session.GetString("title")',
-  text: '@Html.Raw(Context.Session.GetString("msg"))',
-  confirmButtonText:'حسنا',
+  title: '@Context.Session.GetString(Helper.Title)',
+  text: '@Html.Raw(Context.Session.GetString(Helper.Msg))',
+  confirmButtonText:'@ResourceWeb.lbOk'
  
 })
         </script>
     }
-Context.Session.SetString("msgType","");
+Context.Session.SetString(Helper.MsgType,"");
 }
 
 <script src="~/Models/Register.js"></script>

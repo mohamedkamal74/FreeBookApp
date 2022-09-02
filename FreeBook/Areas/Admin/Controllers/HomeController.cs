@@ -9,5 +9,10 @@ namespace FreeBook.Areas.Admin.Controllers
         {
             return View();
         }
+
+        public IActionResult Denied()
+        {
+            return View();
+        }
     }
 }

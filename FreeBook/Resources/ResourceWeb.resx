@@ -162,6 +162,9 @@
   <data name="lbManageBook" xml:space="preserve">
     <value>ادارة الكتب</value>
   </data>
+  <data name="lbMsgDenied" xml:space="preserve">
+    <value>ليس لديك صلاحية لهذة الصفحة</value>
+  </data>
   <data name="lbMsgErrorLogin" xml:space="preserve">
     <value>البريد الالكتروني او كلمة المرور غير صحيح</value>
   </data>
@@ -188,6 +191,9 @@
   </data>
   <data name="lbNotUpdateMsgRole" xml:space="preserve">
     <value>لم يتم تعديل مجموعة المستخدم</value>
+  </data>
+  <data name="lbOk" xml:space="preserve">
+    <value>حسنا</value>
   </data>
   <data name="lbPassword" xml:space="preserve">
     <value>كلمة المرور</value>
