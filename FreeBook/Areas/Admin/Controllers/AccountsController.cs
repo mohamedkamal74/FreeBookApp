@@ -12,20 +12,27 @@ namespace FreeBook.Areas.Admin.Controllers
     [Authorize]
     public class AccountsController : Controller
     {
+        #region Declration
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly FreeBookDbContext _context;
 
+        #endregion
+
+        #region Constructor
         public AccountsController(RoleManager<IdentityRole> roleManager,
-            UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, FreeBookDbContext context)
+           UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, FreeBookDbContext context)
         {
             _roleManager = roleManager;
             _userManager = userManager;
             _signInManager = signInManager;
             _context = context;
         }
-        [Authorize(Roles = "Admin")]
+        #endregion
+
+        #region Methods
+        [Authorize(Roles = "Admin,User")]
         public IActionResult Roles()
         {
             var model = new RolesViewModel()
@@ -283,6 +290,7 @@ namespace FreeBook.Areas.Admin.Controllers
             return RedirectToAction(nameof(Login));
         }
 
+        #endregion
     }
 }
 

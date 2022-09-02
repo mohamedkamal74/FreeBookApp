@@ -124,6 +124,24 @@ namespace FreeBook.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to الغاء.
+        /// </summary>
+        public static string lbCancelButtonText {
+            get {
+                return ResourceManager.GetString("lbCancelButtonText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to نعم احذفها.
+        /// </summary>
+        public static string lbconfirmButtonText {
+            get {
+                return ResourceManager.GetString("lbconfirmButtonText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to اعد كتابة كلمة المرور.
         /// </summary>
         public static string lbConfirmpassword {
@@ -358,6 +376,24 @@ namespace FreeBook.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;تم مسح مجموعة المستخدم بنجاح &apos;,.
+        /// </summary>
+        public static string lbTitleDeletedOk {
+            get {
+                return ResourceManager.GetString("lbTitleDeletedOk", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to هل انت متاكد ؟.
+        /// </summary>
+        public static string lbTitleDeleteMsg {
+            get {
+                return ResourceManager.GetString("lbTitleDeleteMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to تعديل مجموعة المستخدم.
         /// </summary>
         public static string lbTitleEdit {
@@ -390,6 +426,15 @@ namespace FreeBook.Resources {
         public static string lbUser {
             get {
                 return ResourceManager.GetString("lbUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to لن تتمكن من التراجع !.
+        /// </summary>
+        public static string lmTextMsgDelete {
+            get {
+                return ResourceManager.GetString("lmTextMsgDelete", resourceCulture);
             }
         }
     }

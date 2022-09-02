@@ -138,6 +138,12 @@
   <data name="lbBtnSaveNewUser" xml:space="preserve">
     <value>اضف مجموعة مستخدم جديد</value>
   </data>
+  <data name="lbCancelButtonText" xml:space="preserve">
+    <value>الغاء</value>
+  </data>
+  <data name="lbconfirmButtonText" xml:space="preserve">
+    <value>نعم احذفها</value>
+  </data>
   <data name="lbConfirmpassword" xml:space="preserve">
     <value>اعد كتابة كلمة المرور</value>
   </data>
@@ -216,6 +222,12 @@
   <data name="lbSelectUserRole" xml:space="preserve">
     <value>اختر مجموعة المستخدم -----</value>
   </data>
+  <data name="lbTitleDeletedOk" xml:space="preserve">
+    <value>'تم مسح مجموعة المستخدم بنجاح ',</value>
+  </data>
+  <data name="lbTitleDeleteMsg" xml:space="preserve">
+    <value>هل انت متاكد ؟</value>
+  </data>
   <data name="lbTitleEdit" xml:space="preserve">
     <value>تعديل مجموعة المستخدم</value>
   </data>
@@ -227,5 +239,8 @@
   </data>
   <data name="lbUser" xml:space="preserve">
     <value>المستخدمين الحاليين</value>
+  </data>
+  <data name="lmTextMsgDelete" xml:space="preserve">
+    <value>لن تتمكن من التراجع !</value>
   </data>
 </root>

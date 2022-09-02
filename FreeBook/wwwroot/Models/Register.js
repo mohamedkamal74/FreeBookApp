@@ -1,35 +1,36 @@
 ﻿
 $(document).ready(function () {
     $('#tableRoles').DataTable({
-        autoWidth: false,
+        "autoWidth": false,
         responsive: true
     });
 });
 
 function DeleteUser(id) {
     Swal.fire({
-        title: 'هل انت متاكد ؟',
-        text: "لن تتمكن من التراجع !",
+        title: lbTitleDeleteMsg,
+        text: lmTextMsgDelete,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
+        confirmButtonText: lbconfirmButtonText,
+        cancelButtonText: lbCancelButtonText
     }).then((result) => {
         if (result.isConfirmed) {
             window.location.href = `/Admin/Accounts/DeleteUser?userId=${id}`;
             Swal.fire(
-                'تم المسح',
-                'تم مسح مجموعة المستخدم بنجاح ',
-                'success'
+                lbTitleDeletedOk,
+                lbTitleDeleteMsg,
+                lbSuccess
             )
         }
     })
 }
 
 Edit = (id, name, email, image, role, active) => {
-    document.getElementById('title').innerHTML = "تعديل مجموعة المستخدم";
-    document.getElementById('btnSave').value = "تعديل";
+    document.getElementById('title').innerHTML = lbTitleEdit;
+    document.getElementById('btnSave').value = lbUpdate;
     document.getElementById('userId').value = id;
     document.getElementById('userName').value = name;
     document.getElementById('userEmail').value = email;
@@ -44,15 +45,15 @@ Edit = (id, name, email, image, role, active) => {
     document.getElementById('userPassword').value = "$$$$$$";
     document.getElementById('userConfirm').value = "$$$$$$";
     document.getElementById('image').hidden = false;
-    document.getElementById('image').src = "/Images/Users/" + image;
+    document.getElementById('image').src = lbPathImageUser + image;
     document.getElementById('imagehidden').value = image;
 
     
 }
 
 Rest = () => {
-    document.getElementById('title').innerHTML = "اضف مجموعة مستخدم جديد";
-    document.getElementById('btnSave').value = "حفظ";
+    document.getElementById('title').innerHTML = lbBtnSaveNewRole
+    document.getElementById('btnSave').value = lbBtnSave;
     document.getElementById('userId').value = "";
     document.getElementById('userName').value ="" ;
     document.getElementById('userEmail').value = "";
