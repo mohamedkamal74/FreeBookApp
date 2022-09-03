@@ -18,12 +18,32 @@ namespace Infrastructure.IRepository.ServiceRepository
         }
         public bool Delete(Guid Id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var result = FindById(Id);
+                result.Currentstste =(int) Helper.ECurrentState.Delete;
+                _context.categories.Update(result);
+                _context.SaveChanges();
+                return true;
+            }
+            catch (Exception)
+            {
+
+                return false; ;
+            }
         }
 
         public Category FindById(Guid Id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return _context.categories.FirstOrDefault(x => x.Id == Id);
+            }
+            catch (Exception)
+            {
+
+                return null;
+            }
         }
 
         public List<Category> GetAll()
@@ -41,7 +61,32 @@ namespace Infrastructure.IRepository.ServiceRepository
 
         public bool Save(Category model, Guid UserId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var result=FindById(model.Id);
+                if (result == null)
+                {
+                    model.Id=Guid.NewGuid();
+                    model.Currentstste = (int)Helper.ECurrentState.Active;
+                    _context.categories.Add(model);
+
+                }
+                else
+                {
+                    result.Name = model.Name;
+                    result.Description=model.Description;
+                    result.Currentstste = (int)Helper.ECurrentState.Active;
+                    _context.categories.Update(result);
+
+                }
+                _context.SaveChanges();
+                return true;
+            }
+            catch (Exception)
+            {
+
+                return false ;
+            }
         }
     }
 }

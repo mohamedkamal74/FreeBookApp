@@ -17,5 +17,14 @@ namespace Domin.Entity
 
         public const string Success = "success";
         public const string Error = "error";
+
+
+        public const string Admin = "Admin";
+
+        public enum ECurrentState
+        {
+            Active=1,
+            Delete=0
+        }
     }
 }
