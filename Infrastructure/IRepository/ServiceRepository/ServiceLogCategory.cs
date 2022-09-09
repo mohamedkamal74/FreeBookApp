@@ -45,9 +45,13 @@ namespace Infrastructure.IRepository.ServiceRepository
             try
             {
                 var result = FindById(Id);
-                _context.Logcategories.Remove(result);
-                _context.SaveChanges();
-                return true;
+                if(result != null)
+                {
+                    _context.Logcategories.Remove(result);
+                    _context.SaveChanges();
+                    return true;
+                }
+                return false;
             }
             catch (Exception)
             {

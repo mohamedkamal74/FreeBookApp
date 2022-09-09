@@ -29,6 +29,7 @@
         });
 
         builder.Services.AddScoped<IServiceRepository<Category>, ServicesCategory>();
+        builder.Services.AddScoped<IServiceRepositoryLog<LogCategory>, ServiceLogCategory>();
 
         builder.Services.ConfigureApplicationCookie(options =>
         {
