@@ -33,11 +33,24 @@ namespace Infrastructure.IRepository.ServiceRepository
             }
         }
 
+        public Category FindBy(string Name)
+        {
+            try
+            {
+                return _context.categories.FirstOrDefault(x => x.Name.Contains(Name.Trim())&&x.Currentstste>0);
+            }
+            catch (Exception)
+            {
+
+                return null;
+            }
+        }
+
         public Category FindById(Guid Id)
         {
             try
             {
-                return _context.categories.FirstOrDefault(x => x.Id == Id);
+                return _context.categories.FirstOrDefault(x => x.Id == Id&& x.Currentstste > 0);
             }
             catch (Exception)
             {
@@ -50,7 +63,7 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             try
             {
-                return _context.categories.OrderBy(x => x.Name).ToList(); 
+                return _context.categories.OrderBy(x => x.Name).Where(x=>x.Currentstste>0).ToList(); 
             }
             catch (Exception)
             {
@@ -59,13 +72,15 @@ namespace Infrastructure.IRepository.ServiceRepository
             }
         }
 
-        public bool Save(Category model, Guid UserId)
+        public bool Save(Category model)
         {
             try
             {
                 var result=FindById(model.Id);
                 if (result == null)
                 {
+                    if (FindBy(model.Name) != null)
+                        return false;
                     model.Id=Guid.NewGuid();
                     model.Currentstste = (int)Helper.ECurrentState.Active;
                     _context.categories.Add(model);

@@ -21,6 +21,10 @@ namespace Domin.Entity
 
         public const string Admin = "Admin";
 
+        public const string Delete = "Delete";
+        public const string Update = "Update";
+        public const string Save = "Save";
+
         public enum ECurrentState
         {
             Active=1,

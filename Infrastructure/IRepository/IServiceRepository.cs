@@ -10,7 +10,8 @@ namespace Infrastructure.IRepository
     {
         List<T> GetAll();
         T FindById(Guid Id);
-        bool Save(T model,Guid UserId);
+        T FindBy(string Name);
+        bool Save(T model);
         bool Delete(Guid Id);
     }
 }
