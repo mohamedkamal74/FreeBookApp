@@ -171,14 +171,29 @@
   <data name="lbMsgDenied" xml:space="preserve">
     <value>ليس لديك صلاحية لهذة الصفحة</value>
   </data>
+  <data name="lbMsgDupplicateNameCategory" xml:space="preserve">
+    <value>عذرا لا يستطيع الحفظ لان اسم الفئة موجود من قبل</value>
+  </data>
   <data name="lbMsgErrorLogin" xml:space="preserve">
     <value>البريد الالكتروني او كلمة المرور غير صحيح</value>
+  </data>
+  <data name="lbMsgNotSaveCategory" xml:space="preserve">
+    <value>لم يتم حفظ الفئة</value>
   </data>
   <data name="lbMsgNotSaveChangePassword" xml:space="preserve">
     <value>لم يتم تغيير كلمة المرور</value>
   </data>
+  <data name="lbMsgNotUpdatedCategory" xml:space="preserve">
+    <value>لم يتم تحديث اسم الفئة</value>
+  </data>
   <data name="lbMsgSaveChangePassword" xml:space="preserve">
     <value>تم تغيير كلمة المرور بنجاح</value>
+  </data>
+  <data name="lbMsgSaveNameCategory" xml:space="preserve">
+    <value>تم حفظ الفئة بنجاح</value>
+  </data>
+  <data name="lbMsgUpdateNameCategory" xml:space="preserve">
+    <value>تم تحديث اسم الفئة بنجاج</value>
   </data>
   <data name="lbNameRole" xml:space="preserve">
     <value>اسم المجموعة</value>

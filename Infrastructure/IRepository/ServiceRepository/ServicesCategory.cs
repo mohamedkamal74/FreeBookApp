@@ -79,8 +79,7 @@ namespace Infrastructure.IRepository.ServiceRepository
                 var result=FindById(model.Id);
                 if (result == null)
                 {
-                    if (FindBy(model.Name) != null)
-                        return false;
+                  
                     model.Id=Guid.NewGuid();
                     model.Currentstste = (int)Helper.ECurrentState.Active;
                     _context.categories.Add(model);
