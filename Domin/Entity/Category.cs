@@ -15,7 +15,7 @@ namespace Domin.Entity
         [MinLength(5, ErrorMessageResourceType = typeof(Resources.ResourceData), ErrorMessageResourceName = "MinLength")]
 
         public string Name { get; set; } 
-        public string Description { get; set; }
+        public string? Description { get; set; }
         public int Currentstste { get; set; }
 
     }

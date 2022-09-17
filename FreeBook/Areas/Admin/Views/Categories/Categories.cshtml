@@ -1,0 +1,152 @@
+﻿
+@model CategoryViewModel
+@{
+    ViewData["Title"] = "Roles";
+}
+
+<div class="content-wrapper">
+    <!--Content Header-->
+
+<div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+          <h1 class="m-0 text-dark">@ResourceWeb.lbCategories </h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class=" breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="/Admin/Home/Index"> @ResourceWeb.lbHomePage</a></li>
+              <li class="breadcrumb-item active">@ResourceWeb.lbManageBook</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+<!--End content Header-->
+<div class="card">
+            <div class="card-header d-flex align-items-center justify-content-start">
+              <h3 class="card-title">@ResourceWeb.lbCategories</h3>
+            </div>
+            <div class="card-tools">
+                <!-- Button trigger modal -->
+        
+<button type="button" class="btn btn-outline-primary rounded-pill mr-5 mt-2" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="Rest()">
+@ResourceWeb.lbBtnSaveNewCategory
+</button>
+ <!-- Button trigger modal -->
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+              <table id="tableRoles" class="table table-bordered table-hover table-striped">
+                  <thead>
+                      <tr>
+                        <td>@ResourceWeb.lbNameCategory</td>
+                        <td>@ResourceWeb.lbDescription</td>
+                        <td>@ResourceWeb.lbEvents</td>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model.Categories)
+                                {
+                                    <tr>
+                                        <td>
+                                           @item.Name
+                                        </td>
+                                        <td>@item.Description</td>
+                                        <td>
+                                            <input type="button" class="btn btn-info btn-sm" onclick="Edit('@item.Id','@item.Name')" value="@ResourceWeb.lbBtnEdit" data-bs-toggle="modal" data-bs-target="#exampleModal" />
+                                            <input type="button" class="btn btn-danger btn-sm" onclick="DeleteRoles('@item.Id')" value="@ResourceWeb.lbbtnDelete"/>
+                                        </td>
+                    </tr>
+                    
+                }
+               
+                </tbody>
+             
+            
+              </table>  
+            <!-- /.card-body -->
+          </div>
+</div>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="title">@ResourceWeb.lbBtnSaveNewRole</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+       <form asp-action="Roles" asp-controller="Accounts" method="post">
+           <div class="form-group">
+          <input type="text" asp-for="NewRole.RoleId" hidden class="form-control" id="roleId"/>
+
+           <label class="control-label" asp-for="NewRole.RoleName">@ResourceWeb.lbNameRole</label>
+           <input type="text" asp-for="NewRole.RoleName" class="form-control" id="roleName"/>
+           <span asp-validation-for="NewRole.RoleName" class="text-danger"></span>
+           </div>
+            <input  type="submit" class="btn btn-success" value="@ResourceWeb.lbBtnSave" id="btnSave"/>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+       </form>
+      </div>
+      <div class="modal-footer">
+       
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+@section Script{
+@if(!string.IsNullOrEmpty(Context.Session.GetString(Helper.MsgType)))
+{
+    if(Context.Session.GetString(Helper.MsgType)==Helper.Success)
+    {
+        <script>
+        Swal.fire({
+
+  icon: 'success',
+  title:'@Context.Session.GetString(Helper.Title)',
+  text:' @Html.Raw(Context.Session.GetString(Helper.Msg))',
+   confirmButtonText:@ResourceWeb.lbOk
+
+ 
+})
+        </script>
+    }
+    else{
+        <script>
+            Swal.fire({
+  icon: 'error',
+  title: '@Context.Session.GetString(Helper.Title)',
+  text: '@Html.Raw(Context.Session.GetString(Helper.Msg))',
+  confirmButtonText:'@ResourceWeb.lbOk'
+
+ 
+})
+        </script>
+    }
+Context.Session.SetString("msgType","");
+}
+
+<script src="~/Models/Roles.js"></script>
+
+<script>
+
+     let lbTitleEdit='@Html.Raw(ResourceWeb.lbTitleEdit)';
+     let lbEdit='@Html.Raw(ResourceWeb.lbEdit)';
+     let lbEditNewRole='@Html.Raw(ResourceWeb.lbEditNewRole)';
+     let lbSave='@Html.Raw(ResourceWeb.lbSave)';
+
+</script>
+
+
+}
+
+
+

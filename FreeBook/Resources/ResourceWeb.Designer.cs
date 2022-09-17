@@ -70,6 +70,15 @@ namespace FreeBook.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to مجموعة الفئات.
+        /// </summary>
+        public static string lbategories {
+            get {
+                return ResourceManager.GetString("lbategories", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to  تغيير كلمة المرور .
         /// </summary>
         public static string lbbtnChangePassword {
@@ -102,6 +111,15 @@ namespace FreeBook.Resources {
         public static string lbBtnSave {
             get {
                 return ResourceManager.GetString("lbBtnSave", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to حفظ مجموعة جديدة.
+        /// </summary>
+        public static string lbBtnSaveNewCategory {
+            get {
+                return ResourceManager.GetString("lbBtnSaveNewCategory", resourceCulture);
             }
         }
         
@@ -147,6 +165,15 @@ namespace FreeBook.Resources {
         public static string lbConfirmpassword {
             get {
                 return ResourceManager.GetString("lbConfirmpassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to تفاصيل الفئة.
+        /// </summary>
+        public static string lbDescription {
+            get {
+                return ResourceManager.GetString("lbDescription", resourceCulture);
             }
         }
         
@@ -291,6 +318,15 @@ namespace FreeBook.Resources {
         public static string lbMsgUpdateNameCategory {
             get {
                 return ResourceManager.GetString("lbMsgUpdateNameCategory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to اسم الفئة.
+        /// </summary>
+        public static string lbNameCategory {
+            get {
+                return ResourceManager.GetString("lbNameCategory", resourceCulture);
             }
         }
         

@@ -120,6 +120,9 @@
   <data name="lbActiveUser" xml:space="preserve">
     <value>تفعيل المستخدم</value>
   </data>
+  <data name="lbategories" xml:space="preserve">
+    <value>مجموعة الفئات</value>
+  </data>
   <data name="lbbtnChangePassword" xml:space="preserve">
     <value> تغيير كلمة المرور </value>
   </data>
@@ -131,6 +134,9 @@
   </data>
   <data name="lbBtnSave" xml:space="preserve">
     <value>حفظ </value>
+  </data>
+  <data name="lbBtnSaveNewCategory" xml:space="preserve">
+    <value>حفظ مجموعة جديدة</value>
   </data>
   <data name="lbBtnSaveNewRole" xml:space="preserve">
     <value>اضف مجموعة مستخدم جديد</value>
@@ -146,6 +152,9 @@
   </data>
   <data name="lbConfirmpassword" xml:space="preserve">
     <value>اعد كتابة كلمة المرور</value>
+  </data>
+  <data name="lbDescription" xml:space="preserve">
+    <value>تفاصيل الفئة</value>
   </data>
   <data name="lbEdit" xml:space="preserve">
     <value>تعديل</value>
@@ -194,6 +203,9 @@
   </data>
   <data name="lbMsgUpdateNameCategory" xml:space="preserve">
     <value>تم تحديث اسم الفئة بنجاج</value>
+  </data>
+  <data name="lbNameCategory" xml:space="preserve">
+    <value>اسم الفئة</value>
   </data>
   <data name="lbNameRole" xml:space="preserve">
     <value>اسم المجموعة</value>
