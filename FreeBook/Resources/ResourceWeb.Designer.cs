@@ -61,6 +61,15 @@ namespace FreeBook.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to اسم العملية.
+        /// </summary>
+        public static string lbActionName {
+            get {
+                return ResourceManager.GetString("lbActionName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to تفعيل المستخدم.
         /// </summary>
         public static string lbActiveUser {
@@ -70,11 +79,11 @@ namespace FreeBook.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to مجموعة الفئات.
+        ///   Looks up a localized string similar to اضف فئة جديدة.
         /// </summary>
-        public static string lbategories {
+        public static string lbAddNewCategory {
             get {
-                return ResourceManager.GetString("lbategories", resourceCulture);
+                return ResourceManager.GetString("lbAddNewCategory", resourceCulture);
             }
         }
         
@@ -151,6 +160,15 @@ namespace FreeBook.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to مجموعة الفئات.
+        /// </summary>
+        public static string lbCategories {
+            get {
+                return ResourceManager.GetString("lbCategories", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to نعم احذفها.
         /// </summary>
         public static string lbconfirmButtonText {
@@ -165,6 +183,15 @@ namespace FreeBook.Resources {
         public static string lbConfirmpassword {
             get {
                 return ResourceManager.GetString("lbConfirmpassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to التاريخ.
+        /// </summary>
+        public static string lbDate {
+            get {
+                return ResourceManager.GetString("lbDate", resourceCulture);
             }
         }
         
@@ -228,6 +255,15 @@ namespace FreeBook.Resources {
         public static string lbImageUser {
             get {
                 return ResourceManager.GetString("lbImageUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to عمليات الفئات.
+        /// </summary>
+        public static string lbLogCategories {
+            get {
+                return ResourceManager.GetString("lbLogCategories", resourceCulture);
             }
         }
         
@@ -484,6 +520,15 @@ namespace FreeBook.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to تعديل الفئة.
+        /// </summary>
+        public static string lbTitleEditCategory {
+            get {
+                return ResourceManager.GetString("lbTitleEditCategory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to تم التعديل.
         /// </summary>
         public static string lbUpdate {
@@ -507,6 +552,15 @@ namespace FreeBook.Resources {
         public static string lbUser {
             get {
                 return ResourceManager.GetString("lbUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to اسم المستخدم.
+        /// </summary>
+        public static string lbUserName {
+            get {
+                return ResourceManager.GetString("lbUserName", resourceCulture);
             }
         }
         

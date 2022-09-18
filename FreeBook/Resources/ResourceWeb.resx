@@ -117,11 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="lbActionName" xml:space="preserve">
+    <value>اسم العملية</value>
+  </data>
   <data name="lbActiveUser" xml:space="preserve">
     <value>تفعيل المستخدم</value>
   </data>
-  <data name="lbategories" xml:space="preserve">
-    <value>مجموعة الفئات</value>
+  <data name="lbAddNewCategory" xml:space="preserve">
+    <value>اضف فئة جديدة</value>
   </data>
   <data name="lbbtnChangePassword" xml:space="preserve">
     <value> تغيير كلمة المرور </value>
@@ -147,11 +150,17 @@
   <data name="lbCancelButtonText" xml:space="preserve">
     <value>الغاء</value>
   </data>
+  <data name="lbCategories" xml:space="preserve">
+    <value>مجموعة الفئات</value>
+  </data>
   <data name="lbconfirmButtonText" xml:space="preserve">
     <value>نعم احذفها</value>
   </data>
   <data name="lbConfirmpassword" xml:space="preserve">
     <value>اعد كتابة كلمة المرور</value>
+  </data>
+  <data name="lbDate" xml:space="preserve">
+    <value>التاريخ</value>
   </data>
   <data name="lbDescription" xml:space="preserve">
     <value>تفاصيل الفئة</value>
@@ -173,6 +182,9 @@
   </data>
   <data name="lbImageUser" xml:space="preserve">
     <value>صورة المستخدم</value>
+  </data>
+  <data name="lbLogCategories" xml:space="preserve">
+    <value>عمليات الفئات</value>
   </data>
   <data name="lbManageBook" xml:space="preserve">
     <value>ادارة الكتب</value>
@@ -258,6 +270,9 @@
   <data name="lbTitleEdit" xml:space="preserve">
     <value>تعديل مجموعة المستخدم</value>
   </data>
+  <data name="lbTitleEditCategory" xml:space="preserve">
+    <value>تعديل الفئة</value>
+  </data>
   <data name="lbUpdate" xml:space="preserve">
     <value>تم التعديل</value>
   </data>
@@ -266,6 +281,9 @@
   </data>
   <data name="lbUser" xml:space="preserve">
     <value>المستخدمين الحاليين</value>
+  </data>
+  <data name="lbUserName" xml:space="preserve">
+    <value>اسم المستخدم</value>
   </data>
   <data name="lmTextMsgDelete" xml:space="preserve">
     <value>لن تتمكن من التراجع !</value>

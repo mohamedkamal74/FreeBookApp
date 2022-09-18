@@ -48,7 +48,7 @@
                 @foreach (var item in Model.Roles)
                                 {
                                     <tr>
-                                        <td>
+                                          <td>
                                             @switch (@item.Name)
                                             {
                                                     case "SupperAdmin":
@@ -61,7 +61,7 @@
                                                     <span class="badge badge-warning" style="width:300px;height:25px">@item.Name</span>
                                                     break;
                                             }
-                                        </td>
+                                        </td>                                      
                                         <td>
                                             <input type="button" class="btn btn-info btn-sm" onclick="Edit('@item.Id','@item.Name')" value="@ResourceWeb.lbBtnEdit" data-bs-toggle="modal" data-bs-target="#exampleModal" />
                                             <input type="button" class="btn btn-danger btn-sm" onclick="DeleteRoles('@item.Id')" value="@ResourceWeb.lbbtnDelete"/>
