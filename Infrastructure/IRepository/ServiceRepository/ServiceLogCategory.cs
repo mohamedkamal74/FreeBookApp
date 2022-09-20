@@ -1,5 +1,6 @@
 ﻿using Domin.Entity;
 using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -64,7 +65,7 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             try
             {
-                return _context.Logcategories.FirstOrDefault(x => x.Id == Id);
+                return _context.Logcategories.Include(x=>x.category).FirstOrDefault(x => x.Id == Id);
             }
             catch (Exception)
             {
@@ -77,7 +78,7 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             try
             {
-                return _context.Logcategories.OrderByDescending(x => x.Date).ToList();
+                return _context.Logcategories.Include(x => x.category).OrderByDescending(x => x.Date).ToList();
             }
             catch (Exception)
             {

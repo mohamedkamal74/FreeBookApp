@@ -102,8 +102,8 @@
                                 </td>
                                 <td>@item.Description</td>
                                 <td>
-                                    <input type="button" class="btn btn-info btn-sm" onclick="Edit('@item.Id','@item.Name,'@item.Description')" value="@ResourceWeb.lbBtnEdit" data-bs-toggle="modal" data-bs-target="#exampleModal" />
-                                    <input type="button" class="btn btn-danger btn-sm" onclick="DeleteCategory('@item.Id')" value="@ResourceWeb.lbbtnDelete" />
+                                    <input type="button" class="btn btn-info btn-sm" onclick="Edit('@item.Id','@item.Name','@item.Description')" value="@ResourceWeb.lbBtnEdit" data-bs-toggle="modal" data-bs-target="#exampleModal" />
+                                    <input type="button" class="btn btn-danger btn-sm" onclick="Delete('@item.Id')" value="@ResourceWeb.lbbtnDelete" />
                                 </td>
                             </tr>
 
@@ -252,9 +252,11 @@ Context.Session.SetString("msgType","");
 
     let lbTitleEdit='@Html.Raw(ResourceWeb.lbTitleEditCategory)';
     let lbEdit='@Html.Raw(ResourceWeb.lbEdit)';
-    let lbEditNewRole='@Html.Raw(ResourceWeb.lbAddNewCategory)';
+    let lbAddNewCategory='@Html.Raw(ResourceWeb.lbAddNewCategory)';
     let lbSave='@Html.Raw(ResourceWeb.lbSave)';
 
+
+       let lbSuccess = '@Html.Raw(Helper.Success)';
 </script>
 
 

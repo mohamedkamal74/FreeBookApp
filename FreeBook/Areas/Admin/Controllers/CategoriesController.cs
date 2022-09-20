@@ -47,6 +47,7 @@ namespace FreeBook.Areas.Admin.Controllers
             if (ModelState.IsValid)
             {
                 var userId = _userManager.GetUserId(User);
+
                 if (model.NewCategory.Id == Guid.Parse(Guid.Empty.ToString()))
                 {
                     // create
@@ -54,11 +55,14 @@ namespace FreeBook.Areas.Admin.Controllers
                         SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDupplicateNameCategory);
                     else
                     {
-                        if(_serviceCategory.Save(model.NewCategory)&&
-                            _serviceCategoryLog.Save(model.NewCategory.Id, Guid.Parse(userId)))
-                        SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbMsgSaveNameCategory);
+                        if (_serviceCategory.Save(model.NewCategory)
+                           && _serviceCategoryLog.Save(model.NewCategory.Id, Guid.Parse(userId)))
+                        {
+                            SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbMsgSaveNameCategory);
+                           
+                        }
                         else
-                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSaveCategory);
+                            SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSaveCategory);
                     }
 
                 }
@@ -66,8 +70,8 @@ namespace FreeBook.Areas.Admin.Controllers
                 {
                     // update
 
-                    if (_serviceCategory.Save(model.NewCategory) &&
-                           _serviceCategoryLog.Update(model.NewCategory.Id, Guid.Parse(userId)))
+                    if (_serviceCategory.Save(model.NewCategory) 
+                          && _serviceCategoryLog.Update(model.NewCategory.Id, Guid.Parse(userId)))
                         SessionMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbMsgUpdateNameCategory);
                     else
                         SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotUpdatedCategory);

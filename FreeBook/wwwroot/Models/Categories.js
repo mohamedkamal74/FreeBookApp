@@ -2,11 +2,11 @@
 $(document).ready(function () {
     $('#tableCategories').DataTable({
         "autoWidth": false,
-        responsive: true
+       " responsive": true
     });
 });
 
-function DeleteCategory(id) {
+function Delete(id) {
     Swal.fire({
         title: lbTitleDeleteMsg,
         text: lmTextMsgDelete,
@@ -30,7 +30,7 @@ function DeleteCategory(id) {
 
 Edit = (id, name, description) => {
     document.getElementById('title').innerHTML = lbTitleEdit;
-    document.getElementById('btnSave').value = lbUpdate;
+    document.getElementById('btnSave').value = lbEdit;
     document.getElementById('categoryId').value = id;
     document.getElementById('categoryName').value = name;
     document.getElementById('description').value = description;   
