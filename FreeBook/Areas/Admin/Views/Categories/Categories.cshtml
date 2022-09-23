@@ -1,6 +1,6 @@
 ﻿@model CategoryViewModel
 @{
-    ViewData["Title"] = "Roles";
+    ViewData["Title"] = "Caregories";
 }
 
 <style>
@@ -69,7 +69,7 @@
             <!-- Button trigger modal -->
 
             <button type="button" class="btn btn-outline-primary rounded-pill mr-5 mt-2" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="Rest()">
-                @ResourceWeb.lbBtnSaveNewCategory
+                @ResourceWeb.lbAddNewCategory
             </button>
             <!-- Button trigger modal -->
         </div>
@@ -137,21 +137,21 @@
                                     @switch (@item.Action)
                                     {
                                         case "Save":
-                                            <span class="badge badge-success" style="width:300px;height:25px">@item.Action</span>
+                                            <span class="badge badge-success" style="width:150px;height:25px">@item.Action</span>
                                             break;
                                         case "Update":
-                                            <span class="badge badge-warning" style="width:300px;height:25px">@item.Action</span>
+                                            <span class="badge badge-warning" style="width:150px;height:25px">@item.Action</span>
                                             break;
                                         default:
-                                            <span class="badge badge-danger" style="width:300px;height:25px">@item.Action</span>
+                                            <span class="badge badge-danger" style="width:150px;height:25px">@item.Action</span>
                                             break;
                                     }
                                 </td>
                                 <td>@item.Date</td>
                                 <td>@item.UserId</td>
                                 <td>
-                                    @*                                <input type="button" class="btn btn-info btn-sm" onclick="Edit('@item.Id','@item.Name')" value="@ResourceWeb.lbBtnEdit" data-bs-toggle="modal" data-bs-target="#exampleModal" />
-                                    *@
+                                    <input type="button" class="btn btn-info btn-sm" onclick="Edit('@item.Id','@item.category.Name')" value="@ResourceWeb.lbBtnEdit" data-bs-toggle="modal" data-bs-target="#exampleModal" />
+
                                     <input type="button" class="btn btn-danger btn-sm" onclick="DeleteRoles('@item.Id')" value="@ResourceWeb.lbbtnDelete" />
                                 </td>
                             </tr>
@@ -177,41 +177,41 @@
 
 
     <!-- Modal -->
-     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-        <div class="modal-content">
-        <div class="modal-header">
-        <h5 class="modal-title" id="title">@ResourceWeb.lbBtnSaveNewRole</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="title">@ResourceWeb.lbBtnSaveNewRole</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
 
-        <form asp-action="Save" asp-controller="Categories" method="post">
-            <input type="text" asp-for="NewCategory.Id" hidden class="form-control" id="categoryId" />
+                    <form asp-action="Save" asp-controller="Categories" method="post">
+                        <input type="text" asp-for="NewCategory.Id" hidden class="form-control" id="categoryId" />
 
-        <div class="form-group">
-        <label class="control-label" asp-for="NewCategory.Name">@ResourceWeb.lbNameCategory</label>
-        <input type="text" asp-for="NewCategory.Name" class="form-control" id="categoryName" />
-        <span asp-validation-for="NewCategory.Name" class="text-danger"></span>
-        </div>
+                        <div class="form-group">
+                            <label class="control-label" asp-for="NewCategory.Name">@ResourceWeb.lbNameCategory</label>
+                            <input type="text" asp-for="NewCategory.Name" class="form-control" id="categoryName" />
+                            <span asp-validation-for="NewCategory.Name" class="text-danger"></span>
+                        </div>
 
-         <div class="form-group">
-        <label class="control-label" asp-for="NewCategory.Description">@ResourceWeb.lbDescription</label>
-        <input type="text" asp-for="NewCategory.Description" class="form-control" id="description" />
-        <span asp-validation-for="NewCategory.Description" class="text-danger"></span>
-        </div>
+                        <div class="form-group">
+                            <label class="control-label" asp-for="NewCategory.Description">@ResourceWeb.lbDescription</label>
+                            <input type="text" asp-for="NewCategory.Description" class="form-control" id="description" />
+                            <span asp-validation-for="NewCategory.Description" class="text-danger"></span>
+                        </div>
 
-        <div class="modal-footer-rtl" style="padding:0 15px 15px 0">
-        <input type="submit" class="btn btn-success" value="@ResourceWeb.lbBtnSave" id="btnSave" />
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
+                        <div class="modal-footer-rtl" style="padding:0 15px 15px 0">
+                            <input type="submit" class="btn btn-success" value="@ResourceWeb.lbBtnSave" id="btnSave" />
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
 
-        </form>
+                    </form>
+                </div>
+
+            </div>
         </div>
-       
-        </div>
-        </div>
-        </div>
+    </div>
 </div>
 
 @section Script{
@@ -252,10 +252,10 @@ Context.Session.SetString("msgType","");
 
     let lbTitleEdit='@Html.Raw(ResourceWeb.lbTitleEditCategory)';
     let lbEdit='@Html.Raw(ResourceWeb.lbEdit)';
-    let lbAddNewCategory='@Html.Raw(ResourceWeb.lbAddNewCategory)';
+    let lbAddNewCategory='@Html.Raw(ResourceWeb.lbBtnSaveNewCategory)';
     let lbSave='@Html.Raw(ResourceWeb.lbSave)';
 
-     let lbTitleMsgDelete = '@Html.Raw(ResourceWeb.lbBtnSave)';
+        let lbTitleMsgDelete = '@Html.Raw(ResourceWeb.lbBtnSave)';
         let lbTextMsgDelete = '@Html.Raw(ResourceWeb.lbTextMsgDelete)';
         let lbconfirmButtonText = '@Html.Raw(ResourceWeb.lbconfirmButtonText)';
         let lbcancelButtonText = '@Html.Raw(ResourceWeb.lbCancelButtonText)';

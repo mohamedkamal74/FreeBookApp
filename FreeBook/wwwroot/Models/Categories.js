@@ -6,39 +6,39 @@ $(document).ready(function () {
     });
 });
 
+
 function Delete(id) {
     Swal.fire({
-        title: lbTitleMsgDelete,
-        text: lbTextMsgDelete,
+        title: 'هل انت متاكد ؟',
+        text: "لن تتمكن من التراجع !",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: lbconfirmButtonText,
-        cancelButtonText: lbcancelButtonText
+        confirmButtonText: 'Yes, delete it!'
     }).then((result) => {
         if (result.isConfirmed) {
             window.location.href = `/Admin/Categories/Delete?Id=${id}`;
             Swal.fire(
-                lbTitleDeletedOk,
-                lbMsgDeletedOkCategory,
-                lbSuccess
+                'تم المسح',
+                'تم مسح مجموعة المستخدم بنجاح ',
+                'success'
             )
         }
     })
 }
 
 Edit = (id, name, description) => {
-    document.getElementById('title').innerHTML = lbTitleEdit;
-    document.getElementById('btnSave').value = lbEdit;
+    document.getElementById('title').innerHTML = "تم تعديل الفئة بنجاح";
+    document.getElementById('btnSave').value = "تعديل";
     document.getElementById('categoryId').value = id;
     document.getElementById('categoryName').value = name;
     document.getElementById('description').value = description;   
 }
 
 Rest = () => {
-    document.getElementById('title').innerHTML = lbAddNewCategory;
-    document.getElementById('btnSave').value = lbBtnSave;
+    document.getElementById('title').innerHTML = "حفظ مجموعة جديدة";
+    document.getElementById('btnSave').value = "حفظ";
     document.getElementById('categoryId').value = "";
     document.getElementById('categoryName').value ="" ;
     document.getElementById('description').value = "";

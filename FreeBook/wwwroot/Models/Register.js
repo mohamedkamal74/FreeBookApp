@@ -6,23 +6,44 @@ $(document).ready(function () {
     });
 });
 
+//function DeleteUser(id) {
+//    Swal.fire({
+//        title: lbTitleDeleteMsg,
+//        text: lmTextMsgDelete,
+//        icon: 'warning',
+//        showCancelButton: true,
+//        confirmButtonColor: '#3085d6',
+//        cancelButtonColor: '#d33',
+//        confirmButtonText: lbconfirmButtonText,
+//        cancelButtonText: lbCancelButtonText
+//    }).then((result) => {
+//        if (result.isConfirmed) {
+//            window.location.href = `/Admin/Accounts/DeleteUser?userId=${id}`;
+//            Swal.fire(
+//                lbTitleDeletedOk,
+//                lbTitleDeleteMsg,
+//                lbSuccess
+//            )
+//        }
+//    })
+//}
+
 function DeleteUser(id) {
     Swal.fire({
-        title: lbTitleDeleteMsg,
-        text: lmTextMsgDelete,
+        title: 'هل انت متاكد ؟',
+        text: "لن تتمكن من التراجع !",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: lbconfirmButtonText,
-        cancelButtonText: lbCancelButtonText
+        confirmButtonText: 'Yes, delete it!'
     }).then((result) => {
         if (result.isConfirmed) {
-            window.location.href = `/Admin/Accounts/DeleteUser?userId=${id}`;
+            window.location.href = `/Admin/Accounts/DeleteUser?Id=${id}`;
             Swal.fire(
-                lbTitleDeletedOk,
-                lbTitleDeleteMsg,
-                lbSuccess
+                'تم المسح',
+                'تم مسح مجموعة المستخدم بنجاح ',
+                'success'
             )
         }
     })

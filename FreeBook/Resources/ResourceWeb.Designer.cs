@@ -511,7 +511,7 @@ namespace FreeBook.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &apos;تم مسح مجموعة المستخدم بنجاح &apos;,.
+        ///   Looks up a localized string similar to تم الحذف بنجاح.
         /// </summary>
         public static string lbTitleDeletedOk {
             get {

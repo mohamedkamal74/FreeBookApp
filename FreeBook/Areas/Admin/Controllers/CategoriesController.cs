@@ -58,11 +58,12 @@ namespace FreeBook.Areas.Admin.Controllers
                         if (_serviceCategory.Save(model.NewCategory)
                            && _serviceCategoryLog.Save(model.NewCategory.Id, Guid.Parse(userId)))
                         {
-                            SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbMsgSaveNameCategory);
+                           
+                            SessionMsg(Helper.Success, "تم الحفظ بنجاح", "تم حفظ  الفئة بنجاح" );
                            
                         }
                         else
-                            SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSaveCategory);
+                            SessionMsg(Helper.Error, "حدث خطا في الحفظ", "لم يتم حفظ اسم الفئة");
                     }
 
                 }
@@ -72,9 +73,9 @@ namespace FreeBook.Areas.Admin.Controllers
 
                     if (_serviceCategory.Save(model.NewCategory) 
                           && _serviceCategoryLog.Update(model.NewCategory.Id, Guid.Parse(userId)))
-                        SessionMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbMsgUpdateNameCategory);
+                        SessionMsg(Helper.Success, "تم التعديل بنجاح", "تم تعديل  الفئة بنجاح");
                     else
-                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotUpdatedCategory);
+                        SessionMsg(Helper.Error, "حدث خطا في التعديل", "لم يتم تعديل اسم الفئة");
                 }
             }
             return RedirectToAction(nameof(Categories));
