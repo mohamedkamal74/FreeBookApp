@@ -8,20 +8,20 @@ $(document).ready(function () {
 
 function Delete(id) {
     Swal.fire({
-        title: lbTitleDeleteMsg,
-        text: lmTextMsgDelete,
+        title: lbTitleMsgDelete,
+        text: lbTextMsgDelete,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
         confirmButtonText: lbconfirmButtonText,
-        cancelButtonText: lbCancelButtonText
+        cancelButtonText: lbcancelButtonText
     }).then((result) => {
         if (result.isConfirmed) {
             window.location.href = `/Admin/Categories/Delete?Id=${id}`;
             Swal.fire(
                 lbTitleDeletedOk,
-                lbTitleDeleteMsg,
+                lbMsgDeletedOkCategory,
                 lbSuccess
             )
         }

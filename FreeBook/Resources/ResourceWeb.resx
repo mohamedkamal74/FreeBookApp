@@ -189,6 +189,9 @@
   <data name="lbManageBook" xml:space="preserve">
     <value>ادارة الكتب</value>
   </data>
+  <data name="lbMsgDeletedOkCategory" xml:space="preserve">
+    <value>تم حذف الفئة بنجاح</value>
+  </data>
   <data name="lbMsgDenied" xml:space="preserve">
     <value>ليس لديك صلاحية لهذة الصفحة</value>
   </data>
@@ -260,6 +263,9 @@
   </data>
   <data name="lbSelectUserRole" xml:space="preserve">
     <value>اختر مجموعة المستخدم -----</value>
+  </data>
+  <data name="lbTextMsgDelete" xml:space="preserve">
+    <value>تم الحذف بنجاح</value>
   </data>
   <data name="lbTitleDeletedOk" xml:space="preserve">
     <value>'تم مسح مجموعة المستخدم بنجاح ',</value>

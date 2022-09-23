@@ -277,6 +277,15 @@ namespace FreeBook.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to تم حذف الفئة بنجاح.
+        /// </summary>
+        public static string lbMsgDeletedOkCategory {
+            get {
+                return ResourceManager.GetString("lbMsgDeletedOkCategory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ليس لديك صلاحية لهذة الصفحة.
         /// </summary>
         public static string lbMsgDenied {
@@ -489,6 +498,15 @@ namespace FreeBook.Resources {
         public static string lbSelectUserRole {
             get {
                 return ResourceManager.GetString("lbSelectUserRole", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to تم الحذف بنجاح.
+        /// </summary>
+        public static string lbTextMsgDelete {
+            get {
+                return ResourceManager.GetString("lbTextMsgDelete", resourceCulture);
             }
         }
         
