@@ -79,15 +79,6 @@ namespace FreeBook.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to اضف فئة جديدة.
-        /// </summary>
-        public static string lbAddNewCategory {
-            get {
-                return ResourceManager.GetString("lbAddNewCategory", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to  تغيير كلمة المرور .
         /// </summary>
         public static string lbbtnChangePassword {
@@ -124,7 +115,7 @@ namespace FreeBook.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to حفظ مجموعة جديدة.
+        ///   Looks up a localized string similar to اضافة فئة جديدة.
         /// </summary>
         public static string lbBtnSaveNewCategory {
             get {
@@ -295,7 +286,7 @@ namespace FreeBook.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to عذرا لا يستطيع الحفظ لان اسم الفئة موجود من قبل.
+        ///   Looks up a localized string similar to اسم الفئة موجود بالفعل !!.
         /// </summary>
         public static string lbMsgDupplicateNameCategory {
             get {
@@ -331,38 +322,11 @@ namespace FreeBook.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to لم يتم تحديث اسم الفئة.
-        /// </summary>
-        public static string lbMsgNotUpdatedCategory {
-            get {
-                return ResourceManager.GetString("lbMsgNotUpdatedCategory", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to تم تغيير كلمة المرور بنجاح.
         /// </summary>
         public static string lbMsgSaveChangePassword {
             get {
                 return ResourceManager.GetString("lbMsgSaveChangePassword", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to تم حفظ الفئة بنجاح.
-        /// </summary>
-        public static string lbMsgSaveNameCategory {
-            get {
-                return ResourceManager.GetString("lbMsgSaveNameCategory", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to تم تحديث اسم الفئة بنجاج.
-        /// </summary>
-        public static string lbMsgUpdateNameCategory {
-            get {
-                return ResourceManager.GetString("lbMsgUpdateNameCategory", resourceCulture);
             }
         }
         

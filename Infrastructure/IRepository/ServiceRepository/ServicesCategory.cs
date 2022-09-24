@@ -37,7 +37,7 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             try
             {
-                return _context.categories.FirstOrDefault(x => x.Name.Contains(Name.Trim())&&x.Currentstste>0);
+                return _context.categories.FirstOrDefault(x => x.Name.Equals(Name.Trim())&&x.Currentstste>0);
             }
             catch (Exception)
             {

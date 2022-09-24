@@ -62,6 +62,7 @@
         </div>
     </div>
     <!--End content Header-->
+   
     <div class="card">
         <div class="card-header d-flex align-items-center justify-content-start">
             <h3 class="card-title">@ResourceWeb.lbCategories</h3>
@@ -84,7 +85,7 @@
 
             </div>
 
-            <!-- Tab content -->
+             <!-- Tab content -->
             <div id="Categories" class="tabcontent">
                 <table id="tableCategories" class="table table-bordered table-hover table-striped">
                     <thead>
@@ -116,7 +117,8 @@
                 </table>
             </div>
 
-            <div id="LogCategories" class="tabcontent">
+
+             <div id="LogCategories" class="tabcontent">
                 <table id="tableLogCategories" class="table table-bordered table-hover table-striped">
                     <thead>
                         <tr>
@@ -166,17 +168,12 @@
                 </table>
             </div>
 
-
-
-
-
-            <!-- /.card-body -->
+             <!-- /.card-body -->
         </div>
     </div>
 
 
-
-    <!-- Modal -->
+     <!-- Modal -->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -192,7 +189,6 @@
                         <div class="form-group">
                             <label class="control-label" asp-for="NewCategory.Name">@ResourceWeb.lbNameCategory</label>
                             <input type="text" asp-for="NewCategory.Name" class="form-control" id="categoryName" />
-                            <span asp-validation-for="NewCategory.Name" class="text-danger"></span>
                         </div>
 
                         <div class="form-group">
@@ -213,6 +209,8 @@
         </div>
     </div>
 </div>
+
+
 
 @section Script{
 @if(!string.IsNullOrEmpty(Context.Session.GetString(Helper.MsgType)))
@@ -248,7 +246,7 @@ Context.Session.SetString("msgType","");
 
 <script src="~/Models/Categories.js"></script>
 
-@*<script>
+<script>
 
     let lbTitleEditCategory='@Html.Raw(ResourceWeb.lbTitleEditCategory)';
     let lbEdit='@Html.Raw(ResourceWeb.lbEdit)';
@@ -264,9 +262,6 @@ Context.Session.SetString("msgType","");
 
        let lbSuccess = '@Html.Raw(Helper.Success)';
 </script>
-*@
+
 
 }
-
-
-

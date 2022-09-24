@@ -54,16 +54,15 @@ function DeleteLog(id) {
 }
 
 Edit = (id, name, description) => {
-    document.getElementById('title').innerHTML = "تم نعديل الفئة";
-    document.getElementById('btnSave').value = "تعديل";
+    document.getElementById('title').innerHTML = lbTitleEditCategory;
+    document.getElementById('btnSave').value = lbEdit;
     document.getElementById('categoryId').value = id;
     document.getElementById('categoryName').value = name;
     document.getElementById('description').value = description;   
 }
 
 Rest = () => {
-    document.getElementById('title').innerHTML = "حفظ مجموعة جديدة";
-    document.getElementById('btnSave').value = "حفظ";
+    document.getElementById('title').innerHTML = lbBtnSaveNewCategory;
     document.getElementById('categoryId').value = "";
     document.getElementById('categoryName').value ="" ;
     document.getElementById('description').value = "";
