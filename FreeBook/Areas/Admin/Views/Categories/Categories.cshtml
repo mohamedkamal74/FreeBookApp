@@ -1,4 +1,5 @@
 ﻿@model CategoryViewModel
+@inject UserManager<Infrastructure.ViewModel.ApplicationUser> usermanager
 @{
     ViewData["Title"] = "Caregories";
 }
@@ -69,7 +70,7 @@
             <!-- Button trigger modal -->
 
             <button type="button" class="btn btn-outline-primary rounded-pill mr-5 mt-2" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="Rest()">
-                @ResourceWeb.lbAddNewCategory
+                @ResourceWeb.lbBtnSaveNewCategory
             </button>
             <!-- Button trigger modal -->
         </div>
@@ -148,11 +149,10 @@
                                     }
                                 </td>
                                 <td>@item.Date</td>
-                                <td>@item.UserId</td>
+                                <td>@usermanager.FindByIdAsync(item.UserId.ToString()).Result?.Name</td>
                                 <td>
-                                    <input type="button" class="btn btn-info btn-sm" onclick="Edit('@item.Id','@item.category.Name')" value="@ResourceWeb.lbBtnEdit" data-bs-toggle="modal" data-bs-target="#exampleModal" />
 
-                                    <input type="button" class="btn btn-danger btn-sm" onclick="DeleteRoles('@item.Id')" value="@ResourceWeb.lbbtnDelete" />
+                                    <input type="button" class="btn btn-danger btn-sm" onclick="DeleteLog('@item.Id')" value="@ResourceWeb.lbbtnDelete" />
                                 </td>
                             </tr>
 
@@ -181,7 +181,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="title">@ResourceWeb.lbBtnSaveNewRole</h5>
+                    <h5 class="modal-title" id="title">@ResourceWeb.lbBtnSaveNewCategory</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -248,14 +248,14 @@ Context.Session.SetString("msgType","");
 
 <script src="~/Models/Categories.js"></script>
 
-<script>
+@*<script>
 
-    let lbTitleEdit='@Html.Raw(ResourceWeb.lbTitleEditCategory)';
+    let lbTitleEditCategory='@Html.Raw(ResourceWeb.lbTitleEditCategory)';
     let lbEdit='@Html.Raw(ResourceWeb.lbEdit)';
-    let lbAddNewCategory='@Html.Raw(ResourceWeb.lbBtnSaveNewCategory)';
+    let lbBtnSaveNewCategory='@Html.Raw(ResourceWeb.lbBtnSaveNewCategory)';
     let lbSave='@Html.Raw(ResourceWeb.lbSave)';
 
-        let lbTitleMsgDelete = '@Html.Raw(ResourceWeb.lbBtnSave)';
+        let lbBtnSave = '@Html.Raw(ResourceWeb.lbBtnSave)';
         let lbTextMsgDelete = '@Html.Raw(ResourceWeb.lbTextMsgDelete)';
         let lbconfirmButtonText = '@Html.Raw(ResourceWeb.lbconfirmButtonText)';
         let lbcancelButtonText = '@Html.Raw(ResourceWeb.lbCancelButtonText)';
@@ -264,7 +264,7 @@ Context.Session.SetString("msgType","");
 
        let lbSuccess = '@Html.Raw(Helper.Success)';
 </script>
-
+*@
 
 }
 

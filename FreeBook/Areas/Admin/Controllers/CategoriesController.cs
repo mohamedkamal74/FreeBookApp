@@ -40,12 +40,21 @@ namespace FreeBook.Areas.Admin.Controllers
 
         }
 
+        public IActionResult DeleteLog(Guid Id)
+        {
+          
+            if ( _serviceCategoryLog.DeleteLog(Id))
+                return RedirectToAction(nameof(Categories));
+            return RedirectToAction(nameof(Categories));
+
+        }
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Save(CategoryViewModel model)
         {
-            if (ModelState.IsValid)
-            {
+            
                 var userId = _userManager.GetUserId(User);
 
                 if (model.NewCategory.Id == Guid.Parse(Guid.Empty.ToString()))
@@ -56,12 +65,8 @@ namespace FreeBook.Areas.Admin.Controllers
                     else
                     {
                         if (_serviceCategory.Save(model.NewCategory)
-                           && _serviceCategoryLog.Save(model.NewCategory.Id, Guid.Parse(userId)))
-                        {
-                           
+                           && _serviceCategoryLog.Save(model.NewCategory.Id, Guid.Parse(userId)))  
                             SessionMsg(Helper.Success, "تم الحفظ بنجاح", "تم حفظ  الفئة بنجاح" );
-                           
-                        }
                         else
                             SessionMsg(Helper.Error, "حدث خطا في الحفظ", "لم يتم حفظ اسم الفئة");
                     }
@@ -70,16 +75,16 @@ namespace FreeBook.Areas.Admin.Controllers
                 else
                 {
                     // update
-
                     if (_serviceCategory.Save(model.NewCategory) 
                           && _serviceCategoryLog.Update(model.NewCategory.Id, Guid.Parse(userId)))
                         SessionMsg(Helper.Success, "تم التعديل بنجاح", "تم تعديل  الفئة بنجاح");
                     else
                         SessionMsg(Helper.Error, "حدث خطا في التعديل", "لم يتم تعديل اسم الفئة");
                 }
-            }
+           
             return RedirectToAction(nameof(Categories));
         }
+
 
         private void SessionMsg(string MsgType, string Title, string Msg)
         {

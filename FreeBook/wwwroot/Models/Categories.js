@@ -4,6 +4,10 @@ $(document).ready(function () {
         "autoWidth": false,
        " responsive": true
     });
+    $('#tableLogCategories').DataTable({
+        "autoWidth": false,
+        " responsive": true
+    });
 });
 
 
@@ -28,8 +32,29 @@ function Delete(id) {
     })
 }
 
+function DeleteLog(id) {
+    Swal.fire({
+        title: 'هل انت متاكد ؟',
+        text: "لن تتمكن من التراجع !",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = `/Admin/Categories/DeleteLog?Id=${id}`;
+            Swal.fire(
+                'تم المسح',
+                'تم مسح مجموعة المستخدم بنجاح ',
+                'success'
+            )
+        }
+    })
+}
+
 Edit = (id, name, description) => {
-    document.getElementById('title').innerHTML = "تم تعديل الفئة بنجاح";
+    document.getElementById('title').innerHTML = "تم نعديل الفئة";
     document.getElementById('btnSave').value = "تعديل";
     document.getElementById('categoryId').value = id;
     document.getElementById('categoryName').value = name;
