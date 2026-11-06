@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore FreeBook.sln
+
+      - name: Verify formatting
+        run: dotnet format FreeBook.sln --verify-no-changes --no-restore
+
+      - name: Build
+        run: dotnet build FreeBook.sln --no-restore --configuration Release
+
+      - name: Test
+        run: dotnet test FreeBook.sln --no-build --no-restore --configuration Release --collect:"XPlat Code Coverage"

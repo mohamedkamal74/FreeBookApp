@@ -1,10 +1,10 @@
-﻿using Domin.Entity;
+using System.IO;
+using Domin.Entity;
 using Infrastructure.Data;
 using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.IO;
 
 namespace FreeBook.Areas.Admin.Controllers
 {
@@ -73,9 +73,9 @@ namespace FreeBook.Areas.Admin.Controllers
                     RoleUpdate.Id = role.Id;
                     RoleUpdate.Name = role.Name;
                     var result = await _roleManager.UpdateAsync(RoleUpdate);
-                    if (result.Succeeded)                  
+                    if (result.Succeeded)
                         SessionMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbUpdateMsgRole);
-                        
+
                     else
                         SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbNotUpdateMsgRole);
                 }
@@ -161,8 +161,8 @@ namespace FreeBook.Areas.Admin.Controllers
                     {
                         //Succeded
                         var role = await _userManager.AddToRoleAsync(user, model.NewRegister.RoleName);
-                        if (role.Succeeded)  
-                            SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbSaveMsgRole);      
+                        if (role.Succeeded)
+                            SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbSaveMsgRole);
                         else
                             SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbNotSaveMsgRole);
                     }
@@ -190,10 +190,10 @@ namespace FreeBook.Areas.Admin.Controllers
                         await _userManager.RemoveFromRolesAsync(userUpdate, oldRole);
                         var addRole = await _userManager.AddToRoleAsync(userUpdate, model.NewRegister.RoleName);
                         if (addRole.Succeeded)
-                        
-                            SessionMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbUpdateMsgRole);  
+
+                            SessionMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbUpdateMsgRole);
                         else
-                        
+
                             SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbNotSaveMsgRole);
                     }
                     else
@@ -246,8 +246,8 @@ namespace FreeBook.Areas.Admin.Controllers
                 await _userManager.RemovePasswordAsync(user);
                 var AddNewPassword = await _userManager.AddPasswordAsync(user, model.changePassword.NewPassword);
                 if (AddNewPassword.Succeeded)
-                    SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbMsgSaveChangePassword);            
-               else
+                    SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbMsgSaveChangePassword);
+                else
                     SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSaveChangePassword);
                 return RedirectToAction("Register");
             }

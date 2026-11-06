@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,8 +27,8 @@ namespace Domin.Entity
 
         public enum ECurrentState
         {
-            Active=1,
-            Delete=0
+            Active = 1,
+            Delete = 0
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Domin.Entity;
+using Domin.Entity;
 using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Identity;
@@ -42,8 +42,8 @@ namespace FreeBook.Areas.Admin.Controllers
 
         public IActionResult DeleteLog(Guid Id)
         {
-          
-            if ( _serviceCategoryLog.DeleteLog(Id))
+
+            if (_serviceCategoryLog.DeleteLog(Id))
                 return RedirectToAction(nameof(Categories));
             return RedirectToAction(nameof(Categories));
 
@@ -54,34 +54,34 @@ namespace FreeBook.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Save(CategoryViewModel model)
         {
-            
-                var userId = _userManager.GetUserId(User);
 
-                if (model.NewCategory.Id == Guid.Parse(Guid.Empty.ToString()))
-                {
-                    // create
-                    if (_serviceCategory.FindBy(model.NewCategory.Name) != null) 
-                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDupplicateNameCategory);
-                    else
-                    {
-                        if (_serviceCategory.Save(model.NewCategory)
-                           && _serviceCategoryLog.Save(model.NewCategory.Id, Guid.Parse(userId)))  
-                            SessionMsg(Helper.Success, "تم الحفظ بنجاح", "تم حفظ  الفئة بنجاح" );
-                        else
-                            SessionMsg(Helper.Error, "حدث خطا في الحفظ", "لم يتم حفظ اسم الفئة");
-                    }
+            var userId = _userManager.GetUserId(User);
 
-                }
+            if (model.NewCategory.Id == Guid.Parse(Guid.Empty.ToString()))
+            {
+                // create
+                if (_serviceCategory.FindBy(model.NewCategory.Name) != null)
+                    SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDupplicateNameCategory);
                 else
                 {
-                    // update
-                    if (_serviceCategory.Save(model.NewCategory) 
-                          && _serviceCategoryLog.Update(model.NewCategory.Id, Guid.Parse(userId)))
-                        SessionMsg(Helper.Success, "تم التعديل بنجاح", "تم تعديل  الفئة بنجاح");
+                    if (_serviceCategory.Save(model.NewCategory)
+                       && _serviceCategoryLog.Save(model.NewCategory.Id, Guid.Parse(userId)))
+                        SessionMsg(Helper.Success, "تم الحفظ بنجاح", "تم حفظ  الفئة بنجاح");
                     else
-                        SessionMsg(Helper.Error, "حدث خطا في التعديل", "لم يتم تعديل اسم الفئة");
+                        SessionMsg(Helper.Error, "حدث خطا في الحفظ", "لم يتم حفظ اسم الفئة");
                 }
-           
+
+            }
+            else
+            {
+                // update
+                if (_serviceCategory.Save(model.NewCategory)
+                      && _serviceCategoryLog.Update(model.NewCategory.Id, Guid.Parse(userId)))
+                    SessionMsg(Helper.Success, "تم التعديل بنجاح", "تم تعديل  الفئة بنجاح");
+                else
+                    SessionMsg(Helper.Error, "حدث خطا في التعديل", "لم يتم تعديل اسم الفئة");
+            }
+
             return RedirectToAction(nameof(Categories));
         }
 

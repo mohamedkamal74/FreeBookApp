@@ -1,20 +1,20 @@
-﻿using Domin.Entity;
-using Infrastructure.ViewModel;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domin.Entity;
+using Infrastructure.ViewModel;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data
 {
-    public class FreeBookDbContext:IdentityDbContext<ApplicationUser>
-      
+    public class FreeBookDbContext : IdentityDbContext<ApplicationUser>
+
     {
-        public FreeBookDbContext(DbContextOptions<FreeBookDbContext>options):base(options)
+        public FreeBookDbContext(DbContextOptions<FreeBookDbContext> options) : base(options)
         {
 
         }

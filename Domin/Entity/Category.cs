@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -14,7 +14,7 @@ namespace Domin.Entity
         [MaxLength(25, ErrorMessageResourceType = typeof(Resources.ResourceData), ErrorMessageResourceName = "MaxLength")]
         [MinLength(5, ErrorMessageResourceType = typeof(Resources.ResourceData), ErrorMessageResourceName = "MinLength")]
 
-        public string Name { get; set; } 
+        public string Name { get; set; }
         public string? Description { get; set; }
         public int Currentstste { get; set; }
 

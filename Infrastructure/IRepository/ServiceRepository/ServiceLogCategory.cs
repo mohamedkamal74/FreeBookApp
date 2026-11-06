@@ -1,11 +1,11 @@
-﻿using Domin.Entity;
-using Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domin.Entity;
+using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.IRepository.ServiceRepository
 {
@@ -23,11 +23,11 @@ namespace Infrastructure.IRepository.ServiceRepository
             {
                 var logCategory = new LogCategory
                 {
-                    Id=Guid.NewGuid(),
-                    Action=Helper.Delete,
-                    UserId=UserId,
-                    Date=DateTime.Now,
-                    CategoryId=Id
+                    Id = Guid.NewGuid(),
+                    Action = Helper.Delete,
+                    UserId = UserId,
+                    Date = DateTime.Now,
+                    CategoryId = Id
                 };
                 _context.Logcategories.Add(logCategory);
                 _context.SaveChanges();
@@ -46,7 +46,7 @@ namespace Infrastructure.IRepository.ServiceRepository
             try
             {
                 var result = FindById(Id);
-                if(result != null)
+                if (result != null)
                 {
                     _context.Logcategories.Remove(result);
                     _context.SaveChanges();
@@ -65,7 +65,7 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             try
             {
-                return _context.Logcategories.Include(x=>x.category).FirstOrDefault(x => x.Id == Id);
+                return _context.Logcategories.Include(x => x.category).FirstOrDefault(x => x.Id == Id);
             }
             catch (Exception)
             {

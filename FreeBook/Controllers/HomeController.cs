@@ -1,6 +1,6 @@
-﻿using FreeBook.Models;
-using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using FreeBook.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace FreeBook.Controllers
 {

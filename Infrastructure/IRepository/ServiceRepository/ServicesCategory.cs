@@ -1,10 +1,10 @@
-﻿using Domin.Entity;
-using Infrastructure.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domin.Entity;
+using Infrastructure.Data;
 
 namespace Infrastructure.IRepository.ServiceRepository
 {
@@ -21,7 +21,7 @@ namespace Infrastructure.IRepository.ServiceRepository
             try
             {
                 var result = FindById(Id);
-                result.Currentstste =(int) Helper.ECurrentState.Delete;
+                result.Currentstste = (int)Helper.ECurrentState.Delete;
                 _context.categories.Update(result);
                 _context.SaveChanges();
                 return true;
@@ -37,7 +37,7 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             try
             {
-                return _context.categories.FirstOrDefault(x => x.Name.Equals(Name.Trim())&&x.Currentstste>0);
+                return _context.categories.FirstOrDefault(x => x.Name.Equals(Name.Trim()) && x.Currentstste > 0);
             }
             catch (Exception)
             {
@@ -50,7 +50,7 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             try
             {
-                return _context.categories.FirstOrDefault(x => x.Id == Id&& x.Currentstste > 0);
+                return _context.categories.FirstOrDefault(x => x.Id == Id && x.Currentstste > 0);
             }
             catch (Exception)
             {
@@ -63,7 +63,7 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             try
             {
-                return _context.categories.OrderBy(x => x.Name).Where(x=>x.Currentstste>0).ToList(); 
+                return _context.categories.OrderBy(x => x.Name).Where(x => x.Currentstste > 0).ToList();
             }
             catch (Exception)
             {
@@ -76,11 +76,11 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             try
             {
-                var result=FindById(model.Id);
+                var result = FindById(model.Id);
                 if (result == null)
                 {
-                  
-                    model.Id=Guid.NewGuid();
+
+                    model.Id = Guid.NewGuid();
                     model.Currentstste = (int)Helper.ECurrentState.Active;
                     _context.categories.Add(model);
 
@@ -88,7 +88,7 @@ namespace Infrastructure.IRepository.ServiceRepository
                 else
                 {
                     result.Name = model.Name;
-                    result.Description=model.Description;
+                    result.Description = model.Description;
                     result.Currentstste = (int)Helper.ECurrentState.Active;
                     _context.categories.Update(result);
 
@@ -99,7 +99,7 @@ namespace Infrastructure.IRepository.ServiceRepository
             catch (Exception)
             {
 
-                return false ;
+                return false;
             }
         }
     }
