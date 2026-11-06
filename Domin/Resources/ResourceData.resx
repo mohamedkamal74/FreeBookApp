@@ -153,4 +153,52 @@
   <data name="RoleName" xml:space="preserve">
     <value>يجب ادحال اسم المجموعة</value>
   </data>
+  <data name="AuthorName" xml:space="preserve">
+    <value>يجب ادخال اسم المؤلف</value>
+  </data>
+  <data name="FirstName" xml:space="preserve">
+    <value>يجب ادخال الاسم الاول</value>
+  </data>
+  <data name="LastName" xml:space="preserve">
+    <value>يجب ادخال اسم العائلة</value>
+  </data>
+  <data name="NationalId" xml:space="preserve">
+    <value>يجب ادخال الرقم القومي</value>
+  </data>
+  <data name="MobileNumber" xml:space="preserve">
+    <value>يجب ادخال رقم الموبايل</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>يجب ادخال البريد الالكتروني</value>
+  </data>
+  <data name="AreaName" xml:space="preserve">
+    <value>يجب ادخال اسم المنطقة</value>
+  </data>
+  <data name="GovernorateName" xml:space="preserve">
+    <value>يجب ادخال اسم المحافظة</value>
+  </data>
+  <data name="Address" xml:space="preserve">
+    <value>يجب ادخال العنوان</value>
+  </data>
+  <data name="IsBlackListed" xml:space="preserve">
+    <value>القائمة السوداء</value>
+  </data>
+  <data name="EditionNumber" xml:space="preserve">
+    <value>يجب ادخال رقم الطبعة</value>
+  </data>
+  <data name="SerialNumber" xml:space="preserve">
+    <value>يجب ادخال الرقم التسلسلي</value>
+  </data>
+  <data name="RentalDate" xml:space="preserve">
+    <value>تاريخ الاستعارة</value>
+  </data>
+  <data name="EndDate" xml:space="preserve">
+    <value>تاريخ الانتهاء</value>
+  </data>
+  <data name="ReturnDate" xml:space="preserve">
+    <value>تاريخ الإرجاع</value>
+  </data>
+  <data name="PenaltyPaid" xml:space="preserve">
+    <value>الغرامة مدفوعة</value>
+  </data>
 </root>

@@ -11,26 +11,45 @@ namespace Domin.Entity
     public class Book
     {
         public Guid Id { get; set; }
+
         [Required(ErrorMessageResourceType = typeof(Resources.ResourceData), ErrorMessageResourceName = "BookName")]
-        [MaxLength(25, ErrorMessageResourceType = typeof(Resources.ResourceData), ErrorMessageResourceName = "MaxLength")]
-        [MinLength(5, ErrorMessageResourceType = typeof(Resources.ResourceData), ErrorMessageResourceName = "MinLength")]
+        [MaxLength(100, ErrorMessageResourceType = typeof(Resources.ResourceData), ErrorMessageResourceName = "MaxLength")]
+        [MinLength(2, ErrorMessageResourceType = typeof(Resources.ResourceData), ErrorMessageResourceName = "MinLength")]
+        public string Name { get; set; } = null!;
 
-        public string Name { get; set; }
-        [Required(ErrorMessageResourceType = typeof(Resources.ResourceData), ErrorMessageResourceName = "AuthorName")]
-        [MaxLength(25, ErrorMessageResourceType = typeof(Resources.ResourceData), ErrorMessageResourceName = "MaxLength")]
-        [MinLength(5, ErrorMessageResourceType = typeof(Resources.ResourceData), ErrorMessageResourceName = "MinLength")]
+        public Guid AuthorId { get; set; }
+        public Author? Author { get; set; }
 
-        public string Author { get; set; }
-        public string? ImageName { get; set; }
-        public string FileName { get; set; }
-        public string Description { get; set; }
-        public bool Puplish { get; set; }
-        public Guid CategoryId { get; set; }
+        [MaxLength(100)]
+        public string? Publisher { get; set; }
+
+        public DateTime? PublishingDate { get; set; }
+
+        public string? ImageUrl { get; set; }
+
+        public string? ImageThumbnailUrl { get; set; }
+
+        public string? ImagePublicId { get; set; }
+
+        [MaxLength(50)]
+        public string? Hall { get; set; }
+
+        public bool IsAvailableForRental { get; set; } = true;
+
+        public string? Description { get; set; }
+
+        public Guid? CategoryId { get; set; }
         [ForeignKey("CategoryId")]
         public Category? Category { get; set; }
-        public Guid SubCategoryId { get; set; }
+
+        public Guid? SubCategoryId { get; set; }
         [ForeignKey("SubCategoryId")]
-        public SubCategory? subCategory { get; set; }
-        public int Currentstate { get; set; }
+        public SubCategory? SubCategory { get; set; }
+
+        public ICollection<BookCategory> BookCategories { get; set; } = new List<BookCategory>();
+
+        public ICollection<BookCopy> Copies { get; set; } = new List<BookCopy>();
+
+        public int CurrentState { get; set; } = (int)Helper.ECurrentState.Active;
     }
 }

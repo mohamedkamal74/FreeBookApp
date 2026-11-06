@@ -51,4 +51,52 @@
   <data name="SubCtegoryName" xml:space="preserve">
     <value>Subcategory name is required</value>
   </data>
+  <data name="AuthorName" xml:space="preserve">
+    <value>Author name is required</value>
+  </data>
+  <data name="FirstName" xml:space="preserve">
+    <value>First name is required</value>
+  </data>
+  <data name="LastName" xml:space="preserve">
+    <value>Last name is required</value>
+  </data>
+  <data name="NationalId" xml:space="preserve">
+    <value>National ID is required</value>
+  </data>
+  <data name="MobileNumber" xml:space="preserve">
+    <value>Mobile number is required</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>Email is required</value>
+  </data>
+  <data name="AreaName" xml:space="preserve">
+    <value>Area name is required</value>
+  </data>
+  <data name="GovernorateName" xml:space="preserve">
+    <value>Governorate name is required</value>
+  </data>
+  <data name="Address" xml:space="preserve">
+    <value>Address is required</value>
+  </data>
+  <data name="IsBlackListed" xml:space="preserve">
+    <value>Blacklisted</value>
+  </data>
+  <data name="EditionNumber" xml:space="preserve">
+    <value>Edition number is required</value>
+  </data>
+  <data name="SerialNumber" xml:space="preserve">
+    <value>Serial number is required</value>
+  </data>
+  <data name="RentalDate" xml:space="preserve">
+    <value>Rental date</value>
+  </data>
+  <data name="EndDate" xml:space="preserve">
+    <value>End date</value>
+  </data>
+  <data name="ReturnDate" xml:space="preserve">
+    <value>Return date</value>
+  </data>
+  <data name="PenaltyPaid" xml:space="preserve">
+    <value>Penalty paid</value>
+  </data>
 </root>

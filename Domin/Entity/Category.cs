@@ -10,13 +10,18 @@ namespace Domin.Entity
     public class Category
     {
         public Guid Id { get; set; }
+
         [Required(ErrorMessageResourceType = typeof(Resources.ResourceData), ErrorMessageResourceName = "CtegoryName")]
-        [MaxLength(25, ErrorMessageResourceType = typeof(Resources.ResourceData), ErrorMessageResourceName = "MaxLength")]
-        [MinLength(5, ErrorMessageResourceType = typeof(Resources.ResourceData), ErrorMessageResourceName = "MinLength")]
+        [MaxLength(100, ErrorMessageResourceType = typeof(Resources.ResourceData), ErrorMessageResourceName = "MaxLength")]
+        [MinLength(2, ErrorMessageResourceType = typeof(Resources.ResourceData), ErrorMessageResourceName = "MinLength")]
+        public string Name { get; set; } = null!;
 
-        public string Name { get; set; }
         public string? Description { get; set; }
-        public int Currentstste { get; set; }
 
+        public int Currentstste { get; set; } = (int)Helper.ECurrentState.Active;
+
+        public ICollection<BookCategory> Books { get; set; } = new List<BookCategory>();
+
+        public ICollection<SubCategory> SubCategories { get; set; } = new List<SubCategory>();
     }
 }
