@@ -1,10 +1,13 @@
+using System.Threading.RateLimiting;
 using Domin.Entity;
+using FreeBook.Data;
 using FreeBook.Middleware;
 using Infrastructure.Data;
 using Infrastructure.IRepository;
 using Infrastructure.IRepository.ServiceRepository;
 using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +18,17 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddFixedWindowLimiter("login", limiter =>
+    {
+        limiter.PermitLimit = 5;
+        limiter.Window = TimeSpan.FromMinutes(1);
+        limiter.QueueLimit = 0;
+        limiter.AutoReplenishment = true;
+    });
+});
 builder.Services.AddHealthChecks().AddDbContextCheck<FreeBookDbContext>("database");
 
 builder.Services.AddSession();
@@ -24,13 +38,12 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFramework
 builder.Services.AddRazorPages();
 builder.Services.Configure<IdentityOptions>(options =>
 {
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireDigit = false;
-    options.Password.RequiredUniqueChars = 0;
-    options.Password.RequireLowercase = false;
-    options.Password.RequireUppercase = false;
-    options.Password.RequiredLength = 5;
-
+    options.Password.RequiredLength = 8;
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequiredUniqueChars = 1;
 });
 
 builder.Services.AddScoped<IServiceRepository<Category>, ServicesCategory>();
@@ -40,10 +53,17 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Admin";
     options.AccessDeniedPath = "/Admin/Home/Denied";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.ExpireTimeSpan = TimeSpan.FromHours(8);
+    options.SlidingExpiration = true;
 });
 
 
 var app = builder.Build();
+
+app.UseMiddleware<SecurityHeadersMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -61,6 +81,7 @@ else
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+app.UseRateLimiter();
 app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
@@ -79,6 +100,12 @@ app.UseEndpoints(endpoints =>
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+if (app.Configuration.GetValue<bool>("Startup:MigrateOnStartup")
+    || app.Configuration.GetValue<bool>("Startup:SeedAdmin"))
+{
+    await DatabaseInitializer.InitializeAsync(app.Services, app.Configuration, app.Logger);
+}
 
 app.Run();
 

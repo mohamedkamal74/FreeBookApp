@@ -5,6 +5,7 @@ using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 namespace FreeBook.Areas.Admin.Controllers
@@ -97,6 +98,8 @@ namespace FreeBook.Areas.Admin.Controllers
         }
 
         [Authorize(Roles = "Admin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
 
         public async Task<IActionResult> DeleteRole(string Id)
         {
@@ -230,6 +233,8 @@ namespace FreeBook.Areas.Admin.Controllers
             return RedirectToAction("Register", "Accounts");
         }
         [Authorize(Roles = "Admin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
 
         public async Task<IActionResult> DeleteUser(string userId)
         {
@@ -291,6 +296,7 @@ namespace FreeBook.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         [AllowAnonymous]
         [Authorize(Roles = "Admin,User")]
+        [EnableRateLimiting("login")]
 
         public async Task<IActionResult> Login(LoginViewModel model)
         {

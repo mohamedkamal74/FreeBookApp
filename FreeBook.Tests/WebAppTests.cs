@@ -42,6 +42,32 @@ public class WebAppTests : IClassFixture<CustomWebApplicationFactory>
     }
 
     [Fact]
+    public async Task HomePage_IncludesSecurityHeaders()
+    {
+        var client = _factory.CreateClient();
+
+        var response = await client.GetAsync("/");
+
+        Assert.Equal("nosniff", response.Headers.GetValues("X-Content-Type-Options").Single());
+        Assert.Equal("DENY", response.Headers.GetValues("X-Frame-Options").Single());
+        Assert.Equal("no-referrer", response.Headers.GetValues("Referrer-Policy").Single());
+    }
+
+    [Fact]
+    public async Task AnonymousCategoriesRequest_RedirectsToLogin()
+    {
+        var client = _factory.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false
+        });
+
+        var response = await client.GetAsync("/Admin/Categories/Categories");
+
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.Contains("/Admin", response.Headers.Location!.OriginalString);
+    }
+
+    [Fact]
     public async Task Health_ReturnsHealthy()
     {
         var client = _factory.CreateClient();

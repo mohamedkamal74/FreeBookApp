@@ -11,6 +11,13 @@ $(document).ready(function () {
 });
 
 
+function postDelete(url, id) {
+    const form = document.getElementById('deleteForm');
+    form.action = url;
+    document.getElementById('deleteFormId').value = id;
+    form.submit();
+}
+
 function Delete(id) {
     Swal.fire({
         title: 'هل انت متاكد ؟',
@@ -22,12 +29,7 @@ function Delete(id) {
         confirmButtonText: 'Yes, delete it!'
     }).then((result) => {
         if (result.isConfirmed) {
-            window.location.href = `/Admin/Categories/Delete?Id=${id}`;
-            Swal.fire(
-                'تم المسح',
-                'تم مسح مجموعة المستخدم بنجاح ',
-                'success'
-            )
+            postDelete('/Admin/Categories/Delete', id);
         }
     })
 }
@@ -43,12 +45,7 @@ function DeleteLog(id) {
         confirmButtonText: 'Yes, delete it!'
     }).then((result) => {
         if (result.isConfirmed) {
-            window.location.href = `/Admin/Categories/DeleteLog?Id=${id}`;
-            Swal.fire(
-                'تم المسح',
-                'تم مسح مجموعة المستخدم بنجاح ',
-                'success'
-            )
+            postDelete('/Admin/Categories/DeleteLog', id);
         }
     })
 }

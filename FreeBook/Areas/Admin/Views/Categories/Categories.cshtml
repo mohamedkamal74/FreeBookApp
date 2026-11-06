@@ -134,7 +134,7 @@
                         {
                             <tr>
                                 <td>
-                                    @item.category.Name
+                                    @item.category?.Name
                                 </td>
                                 <td>
                                     @switch (@item.Action)
@@ -210,7 +210,10 @@
     </div>
 </div>
 
-
+<form id="deleteForm" method="post" class="d-none">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="Id" id="deleteFormId" />
+</form>
 
 @section Script{
 @if(!string.IsNullOrEmpty(Context.Session.GetString(Helper.MsgType)))

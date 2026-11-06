@@ -11,14 +11,14 @@ namespace Infrastructure.ViewModel
 {
     public class RolesViewModel
     {
-        public List<IdentityRole>? Roles { get; set; }
-        public NewRole? NewRole { get; set; }
+        public List<IdentityRole> Roles { get; set; } = new();
+        public NewRole NewRole { get; set; } = new();
     }
     public class NewRole
     {
         public string? RoleId { get; set; }
         [Required(ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "RoleName")]
-        public string RoleName { get; set; }
+        public string RoleName { get; set; } = string.Empty;
 
     }
 }

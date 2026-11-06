@@ -39,12 +39,10 @@ function DeleteUser(id) {
         confirmButtonText: 'Yes, delete it!'
     }).then((result) => {
         if (result.isConfirmed) {
-            window.location.href = `/Admin/Accounts/DeleteUser?Id=${id}`;
-            Swal.fire(
-                'تم المسح',
-                'تم مسح مجموعة المستخدم بنجاح ',
-                'success'
-            )
+            const form = document.getElementById('deleteForm');
+            form.action = '/Admin/Accounts/DeleteUser';
+            document.getElementById('deleteFormUserId').value = id;
+            form.submit();
         }
     })
 }

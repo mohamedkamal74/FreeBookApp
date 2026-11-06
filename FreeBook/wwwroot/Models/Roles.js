@@ -14,12 +14,10 @@ function DeleteRoles(id) {
         confirmButtonText: 'Yes, delete it!'
     }).then((result) => {
         if (result.isConfirmed) {
-            window.location.href = `/Admin/Accounts/DeleteRole?Id=${id}`;
-            Swal.fire(
-                'تم المسح',
-                'تم مسح مجموعة المستخدم بنجاح ',
-                'success'
-            )
+            const form = document.getElementById('deleteForm');
+            form.action = '/Admin/Accounts/DeleteRole';
+            document.getElementById('deleteFormId').value = id;
+            form.submit();
         }
     })
 }

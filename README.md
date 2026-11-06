@@ -72,6 +72,22 @@ dotnet run --project FreeBook --no-launch-profile --urls http://localhost:5128
 - Swagger UI (Development only): <http://localhost:5128/swagger>
 - Health check: <http://localhost:5128/health>
 
+### Docker
+
+Run SQL Server and the app together; migrations run and an admin is seeded on startup:
+
+```powershell
+docker compose up --build
+```
+
+- App: <http://localhost:8080>
+- Admin login: `admin@bookify.local` / `Admin@12345` (override with `SEED_ADMIN_EMAIL` and `SEED_ADMIN_PASSWORD`)
+- SQL Server password: override `MSSQL_SA_PASSWORD` (defaults are for local use only)
+- See `.env.example` for the available settings.
+
+The startup hooks are opt-in via configuration: `Startup:MigrateOnStartup` and
+`Startup:SeedAdmin` (plus `Seed:AdminEmail` / `Seed:AdminPassword`).
+
 ## Development commands
 
 ```powershell
@@ -94,6 +110,11 @@ Convenience scripts live in `scripts/` (`build.ps1`, `run.ps1`, `migrate.ps1`).
   unreachable.
 - Outside Development, unhandled exceptions are logged and returned as a `ProblemDetails`
   JSON response with status `500`.
+- Security headers (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, and
+  `Permissions-Policy`) are added to every response. Login is rate-limited to 5 attempts
+  per minute per client, and passwords require 8+ characters with upper, lower, digit, and
+  symbol.
+- Destructive admin actions are POST-only and protected by antiforgery tokens.
 
 ## Tests
 
@@ -106,13 +127,13 @@ dotnet test FreeBook.sln
 
 ## Known issues
 
-- `.editorconfig` demotes common nullable diagnostics to `suggestion`; the build still shows a few Razor view nullability warnings.
-- NuGet reports non-blocking advisories for `Microsoft.OpenApi` (via Swashbuckle) and
-  `System.Security.Cryptography.Pkcs` (transitive dependency).
+- `.editorconfig` demotes some nullable diagnostics to `suggestion`; the build is currently
+  warning-free.
 - `Domin.Entity.VwUser` maps to the DB view `VwUsers`, which is created by migration
   `AddVwUsersView`. `AccountsController.Register` fails if this view is missing.
 
 ## CI
 
-`.github/workflows/ci.yml` runs restore, `dotnet format --verify-no-changes`, a Release
-build, and `dotnet test` on pushes and pull requests.
+`.github/workflows/ci.yml` runs restore, a package vulnerability audit,
+`dotnet format --verify-no-changes`, a Release build, `dotnet test` with coverage, and
+uploads the test results as an artifact on pushes and pull requests.

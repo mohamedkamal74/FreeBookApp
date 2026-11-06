@@ -12,7 +12,7 @@ namespace Infrastructure.ViewModel
     {
         public string? Id { get; set; }
         [Required(ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "Password")]
-        [MinLength(5)]
+        [MinLength(8)]
         public string? NewPassword { get; set; }
         [Required(ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "ConfirmPassword")]
         [Compare("NewPassword")]

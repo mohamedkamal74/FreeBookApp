@@ -12,10 +12,10 @@ namespace Infrastructure.ViewModel
 {
     public class RegisterViewModel
     {
-        public List<VwUser>? Users { get; set; }
-        public NewRegister? NewRegister { get; set; }
-        public List<IdentityRole>? Roles { get; set; }
-        public ChangePasswordViewModel? changePassword { get; set; }
+        public List<VwUser> Users { get; set; } = new();
+        public NewRegister NewRegister { get; set; } = new();
+        public List<IdentityRole> Roles { get; set; } = new();
+        public ChangePasswordViewModel changePassword { get; set; } = new();
     }
 
     public class NewRegister
@@ -37,7 +37,7 @@ namespace Infrastructure.ViewModel
         public bool ActiveUser { get; set; }
         [Required(ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "Password")]
         [MaxLength(20, ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "MaxLength")]
-        [MinLength(5, ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "MinLength")]
+        [MinLength(8, ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "MinLength")]
         public string? Password { get; set; }
         [Required(ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "ConfirmPassword")]
         [Compare("Password", ErrorMessageResourceType = typeof(ResourceData), ErrorMessageResourceName = "ConfirmPasswordError")]

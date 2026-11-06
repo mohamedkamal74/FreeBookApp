@@ -1,12 +1,14 @@
 using Domin.Entity;
 using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FreeBook.Areas.Admin.Controllers
 {
     [Area(Helper.Admin)]
+    [Authorize(Roles = "Admin,User")]
     public class CategoriesController : Controller
     {
         private readonly IServiceRepository<Category> _serviceCategory;
@@ -31,6 +33,8 @@ namespace FreeBook.Areas.Admin.Controllers
             });
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid Id)
         {
             var userId = _userManager.GetUserId(User);
@@ -42,6 +46,8 @@ namespace FreeBook.Areas.Admin.Controllers
 
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteLog(Guid Id)
         {
 

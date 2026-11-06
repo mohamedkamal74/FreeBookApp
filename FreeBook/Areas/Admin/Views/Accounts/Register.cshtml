@@ -203,6 +203,11 @@
 </div>
 </div>
 
+<form id="deleteForm" method="post" class="d-none">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="userId" id="deleteFormUserId" />
+</form>
+
 @section Script{
 @if(!string.IsNullOrEmpty(Context.Session.GetString(Helper.MsgType)))
 {
