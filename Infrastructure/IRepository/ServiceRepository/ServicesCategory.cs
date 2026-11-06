@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Domin.Entity;
 using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.IRepository.ServiceRepository
 {
@@ -16,74 +16,78 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             _context = context;
         }
-        public bool Delete(Guid Id)
+
+        public async Task<bool> DeleteAsync(Guid id)
         {
             try
             {
-                var result = FindById(Id);
+                var result = await FindByIdAsync(id);
+                if (result is null)
+                    return false;
+
                 result.Currentstste = (int)Helper.ECurrentState.Delete;
                 _context.categories.Update(result);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return true;
             }
             catch (Exception)
             {
-
-                return false; ;
+                return false;
             }
         }
 
-        public Category FindBy(string Name)
+        public async Task<Category?> FindByAsync(string name)
         {
             try
             {
-                return _context.categories.FirstOrDefault(x => x.Name.Equals(Name.Trim()) && x.Currentstste > 0);
+                var trimmed = name.Trim();
+                return await _context.categories
+                    .FirstOrDefaultAsync(x => x.Name.Equals(trimmed) && x.Currentstste > 0);
             }
             catch (Exception)
             {
-
                 return null;
             }
         }
 
-        public Category FindById(Guid Id)
+        public async Task<Category?> FindByIdAsync(Guid id)
         {
             try
             {
-                return _context.categories.FirstOrDefault(x => x.Id == Id && x.Currentstste > 0);
+                return await _context.categories
+                    .FirstOrDefaultAsync(x => x.Id == id && x.Currentstste > 0);
             }
             catch (Exception)
             {
-
                 return null;
             }
         }
 
-        public List<Category> GetAll()
+        public async Task<List<Category>> GetAllAsync()
         {
             try
             {
-                return _context.categories.OrderBy(x => x.Name).Where(x => x.Currentstste > 0).ToList();
+                return await _context.categories
+                    .OrderBy(x => x.Name)
+                    .Where(x => x.Currentstste > 0)
+                    .ToListAsync();
             }
             catch (Exception)
             {
-
-                return null;
+                return new List<Category>();
             }
         }
 
-        public bool Save(Category model)
+        public async Task<bool> SaveAsync(Category model)
         {
             try
             {
-                var result = FindById(model.Id);
-                if (result == null)
+                var result = await FindByIdAsync(model.Id);
+                if (result is null)
                 {
-
                     model.Id = Guid.NewGuid();
                     model.Currentstste = (int)Helper.ECurrentState.Active;
                     _context.categories.Add(model);
-
                 }
                 else
                 {
@@ -91,14 +95,13 @@ namespace Infrastructure.IRepository.ServiceRepository
                     result.Description = model.Description;
                     result.Currentstste = (int)Helper.ECurrentState.Active;
                     _context.categories.Update(result);
-
                 }
-                _context.SaveChanges();
+
+                await _context.SaveChangesAsync();
                 return true;
             }
             catch (Exception)
             {
-
                 return false;
             }
         }

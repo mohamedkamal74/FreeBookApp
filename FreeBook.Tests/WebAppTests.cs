@@ -42,6 +42,16 @@ public class WebAppTests : IClassFixture<CustomWebApplicationFactory>
     }
 
     [Fact]
+    public async Task Health_ReturnsHealthy()
+    {
+        var client = _factory.CreateClient();
+
+        var response = await client.GetAsync("/health");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
     public async Task Swagger_IsServedInDevelopment()
     {
         var client = _factory.CreateClient();

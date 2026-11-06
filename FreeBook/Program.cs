@@ -1,11 +1,11 @@
 using Domin.Entity;
+using FreeBook.Middleware;
 using Infrastructure.Data;
 using Infrastructure.IRepository;
 using Infrastructure.IRepository.ServiceRepository;
 using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +13,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+builder.Services.AddHealthChecks().AddDbContextCheck<FreeBookDbContext>("database");
 
 builder.Services.AddSession();
 builder.Services.AddDbContext<FreeBookDbContext>(options =>
@@ -45,7 +48,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
+    app.UseExceptionHandler();
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
@@ -62,6 +65,7 @@ app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapRazorPages();
+app.MapHealthChecks("/health");
 
 
 app.UseEndpoints(endpoints =>

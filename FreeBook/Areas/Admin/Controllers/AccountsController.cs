@@ -5,6 +5,7 @@ using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace FreeBook.Areas.Admin.Controllers
 {
@@ -33,13 +34,12 @@ namespace FreeBook.Areas.Admin.Controllers
 
         #region Methods
         [Authorize(Roles = "Admin,User")]
-        public IActionResult Roles()
+        public async Task<IActionResult> Roles()
         {
             var model = new RolesViewModel()
             {
                 NewRole = new NewRole(),
-                Roles = _roleManager.Roles.OrderBy(x => x.Name).ToList()
-
+                Roles = await _roleManager.Roles.OrderBy(x => x.Name).ToListAsync()
             };
             return View(model);
         }
@@ -70,6 +70,12 @@ namespace FreeBook.Areas.Admin.Controllers
                 else
                 {   //update
                     var RoleUpdate = await _roleManager.FindByIdAsync(role.Id);
+                    if (RoleUpdate is null)
+                    {
+                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbNotUpdateMsgRole);
+                        return RedirectToAction(nameof(Roles));
+                    }
+
                     RoleUpdate.Id = role.Id;
                     RoleUpdate.Name = role.Name;
                     var result = await _roleManager.UpdateAsync(RoleUpdate);
@@ -94,8 +100,8 @@ namespace FreeBook.Areas.Admin.Controllers
 
         public async Task<IActionResult> DeleteRole(string Id)
         {
-            var role = _roleManager.Roles.FirstOrDefault(x => x.Id == Id);
-            if ((await _roleManager.DeleteAsync(role)).Succeeded)
+            var role = await _roleManager.Roles.FirstOrDefaultAsync(x => x.Id == Id);
+            if (role is not null && (await _roleManager.DeleteAsync(role)).Succeeded)
             {
                 return RedirectToAction(nameof(Roles));
             }
@@ -106,13 +112,13 @@ namespace FreeBook.Areas.Admin.Controllers
         }
         [Authorize(Roles = "Admin,User")]
 
-        public IActionResult Register()
+        public async Task<IActionResult> Register()
         {
             var model = new RegisterViewModel
             {
                 NewRegister = new NewRegister(),
-                Roles = _roleManager.Roles.OrderBy(x => x.Name).ToList(),
-                Users = _context.VwUsers.OrderBy(x => x.Role).ToList()   // _userManager.Users.OrderBy(x=>x.Name).ToList()
+                Roles = await _roleManager.Roles.OrderBy(x => x.Name).ToListAsync(),
+                Users = await _context.VwUsers.OrderBy(x => x.Role).ToListAsync()
 
 
             };
@@ -125,20 +131,31 @@ namespace FreeBook.Areas.Admin.Controllers
 
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
+            if (model.NewRegister is null)
+                return RedirectToAction("Register", "Accounts");
+
             if (ModelState.IsValid)
             {
-                var file = HttpContext.Request.Form.Files;
-                if (file.Count() > 0)
+                var files = HttpContext.Request.Form.Files;
+                if (files.Count > 0)
                 {
-                    string ImageName = Guid.NewGuid().ToString() + Path.GetExtension(file[0].FileName);
-                    var fileStream = new FileStream(Path.Combine(@"wwwroot/", Helper.PathSaveImageUser, ImageName), FileMode.Create);
-                    file[0].CopyTo(fileStream);
-                    model.NewRegister.ImageUser = ImageName;
+                    var uploaded = files[0];
+                    var extension = Path.GetExtension(uploaded.FileName);
 
-                }
-                else
-                {
-                    model.NewRegister.ImageUser = model.NewRegister.ImageUser;
+                    if (!Helper.AllowedImageExtensions.Contains(extension) || uploaded.Length > Helper.MaxImageSizeBytes)
+                    {
+                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave,
+                            "Only JPG, JPEG, PNG, GIF, or WEBP images up to 5 MB are allowed.");
+                        return RedirectToAction("Register", "Accounts");
+                    }
+
+                    var imageName = Guid.NewGuid().ToString("N") + extension.ToLowerInvariant();
+                    var uploadDirectory = Path.Combine("wwwroot", Helper.PathSaveImageUser);
+                    Directory.CreateDirectory(uploadDirectory);
+
+                    await using var fileStream = new FileStream(Path.Combine(uploadDirectory, imageName), FileMode.Create);
+                    await uploaded.CopyToAsync(fileStream);
+                    model.NewRegister.ImageUser = imageName;
                 }
 
 
@@ -176,6 +193,12 @@ namespace FreeBook.Areas.Admin.Controllers
                 {
                     //Update
                     var userUpdate = await _userManager.FindByIdAsync(user.Id);
+                    if (userUpdate is null)
+                    {
+                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbNotSaveMsgRole);
+                        return RedirectToAction("Register", "Accounts");
+                    }
+
                     userUpdate.Id = model.NewRegister.Id;
                     userUpdate.Name = model.NewRegister.Name;
                     userUpdate.UserName = model.NewRegister.Email;
@@ -210,17 +233,18 @@ namespace FreeBook.Areas.Admin.Controllers
 
         public async Task<IActionResult> DeleteUser(string userId)
         {
-            var user = _userManager.Users.FirstOrDefault(x => x.Id == userId);
-            //Add this Row Number One
+            var user = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == userId);
+            if (user is null)
+                return RedirectToAction("Register", "Accounts");
+
             var oldRole = await _userManager.GetRolesAsync(user);
 
             if (user.ImageUser != null && user.ImageUser != Guid.Empty.ToString())
             {
-                var ImagePath = Path.Combine(@"wwwroot/", Helper.PathImageUser, user.ImageUser);
-                if (System.IO.File.Exists(ImagePath))
-                    System.IO.File.Delete(ImagePath);
+                var imagePath = Path.Combine("wwwroot", Helper.PathSaveImageUser, user.ImageUser);
+                if (System.IO.File.Exists(imagePath))
+                    System.IO.File.Delete(imagePath);
             }
-            //Add this Row Number Two
             if ((await _userManager.RemoveFromRolesAsync(user, oldRole)).Succeeded)
             {
                 if ((await _userManager.DeleteAsync(user)).Succeeded)

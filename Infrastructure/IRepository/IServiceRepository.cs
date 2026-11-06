@@ -1,17 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Infrastructure.IRepository
 {
     public interface IServiceRepository<T> where T : class
     {
-        List<T> GetAll();
-        T FindById(Guid Id);
-        T FindBy(string Name);
-        bool Save(T model);
-        bool Delete(Guid Id);
+        Task<List<T>> GetAllAsync();
+        Task<T?> FindByIdAsync(Guid id);
+        Task<T?> FindByAsync(string name);
+        Task<bool> SaveAsync(T model);
+        Task<bool> DeleteAsync(Guid id);
     }
 }

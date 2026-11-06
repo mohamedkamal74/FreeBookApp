@@ -29,6 +29,12 @@ dotnet ef migrations add <Name> --project Infrastructure --startup-project FreeB
 
 Helper scripts: `scripts/build.ps1`, `scripts/run.ps1`, `scripts/migrate.ps1`.
 
+Override the connection string locally without editing tracked files (user-secrets are enabled in `FreeBook.csproj`):
+
+```powershell
+dotnet user-secrets set "ConnectionStrings:BookConnection" "Server=...;Database=...;" --project FreeBook
+```
+
 ## Database
 
 - Connection string `BookConnection` in `FreeBook/appsettings.json` points to `(localdb)\MSSQLLocalDB`, DB `BookDb`.
@@ -41,14 +47,18 @@ Helper scripts: `scripts/build.ps1`, `scripts/run.ps1`, `scripts/migrate.ps1`.
 
 - Project references: `FreeBook` → `Infrastructure` → `Domin`.
 - `FreeBook.Tests` references `FreeBook` and `Infrastructure`; tests use EF Core InMemory + `WebApplicationFactory` (no LocalDB needed).
+- Repository/service contracts (`IServiceRepository<T>`, `IServiceRepositoryLog<T>`) are async (`*Async`) and use EF Core async APIs.
 - `Program.cs` ends with `public partial class Program { }` so `WebApplicationFactory<Program>` can boot the app.
 - Areas: `Admin` (`Accounts`, `Categories`, `Home`); public `Home`.
 - Auth: cookie auth via ASP.NET Identity; login path is `/Admin` (`Accounts/Login`).
-- Uploaded user images go to `wwwroot/Images/Users` (`Domin.Entity.Helper.PathSaveImageUser`).
+- Uploaded user images go to `wwwroot/Images/Users` (`Domin.Entity.Helper.PathSaveImageUser`). `AccountsController.Register` only accepts `.jpg`, `.jpeg`, `.png`, `.gif`, `.webp` up to 5 MB (`Helper.MaxImageSizeBytes`).
+- Health endpoint: `/health` (`AddDbContextCheck<FreeBookDbContext>`).
+- Unhandled exceptions are logged and returned as `ProblemDetails` 500 via `GlobalExceptionHandler` outside Development.
 
 ## Gotchas
 
 - Nullable is enabled. `.editorconfig` demotes common nullable diagnostics to `suggestion`; remaining build warnings are Razor view nullability and NuGet advisories.
 - Build shows non-blocking NU190x advisories for `Microsoft.OpenApi` (via Swashbuckle) and `System.Security.Cryptography.Pkcs` (transitive).
 - Swagger UI is available only in Development at `/swagger`.
+- `/health` is anonymous and runs a DB connectivity check; it returns `503` when the database is unreachable.
 - `VwUsers` is a SQL Server view, so InMemory tests do not exercise its data; verify it against LocalDB (`sqllocaldb start MSSQLLocalDB`).

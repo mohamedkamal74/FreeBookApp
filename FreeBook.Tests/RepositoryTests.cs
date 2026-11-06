@@ -13,75 +13,91 @@ public class RepositoryTests
             .Options);
 
     [Fact]
-    public void Save_NewCategory_PersistsAndCanBeFound()
+    public async Task Save_NewCategory_PersistsAndCanBeFound()
     {
         using var context = CreateContext();
         var service = new ServicesCategory(context);
         var category = new Category { Name = "Fiction", Description = "Novels" };
 
-        Assert.True(service.Save(category));
+        Assert.True(await service.SaveAsync(category));
 
-        var saved = service.FindById(category.Id);
+        var saved = await service.FindByIdAsync(category.Id);
         Assert.NotNull(saved);
         Assert.Equal("Fiction", saved!.Name);
         Assert.Equal((int)Helper.ECurrentState.Active, saved.Currentstste);
     }
 
     [Fact]
-    public void Save_ExistingCategory_UpdatesFields()
+    public async Task Save_ExistingCategory_UpdatesFields()
     {
         using var context = CreateContext();
         var service = new ServicesCategory(context);
         var category = new Category { Name = "Fiction" };
-        Assert.True(service.Save(category));
+        Assert.True(await service.SaveAsync(category));
 
         category.Name = "Science";
-        Assert.True(service.Save(category));
+        Assert.True(await service.SaveAsync(category));
 
-        var updated = service.FindById(category.Id);
+        var updated = await service.FindByIdAsync(category.Id);
         Assert.Equal("Science", updated!.Name);
     }
 
     [Fact]
-    public void Delete_MarksCategoryAsDeleted()
+    public async Task Delete_MarksCategoryAsDeleted()
     {
         using var context = CreateContext();
         var service = new ServicesCategory(context);
         var category = new Category { Name = "Fiction" };
-        Assert.True(service.Save(category));
+        Assert.True(await service.SaveAsync(category));
 
-        Assert.True(service.Delete(category.Id));
+        Assert.True(await service.DeleteAsync(category.Id));
 
-        Assert.Null(service.FindById(category.Id));
-        Assert.Empty(service.GetAll());
+        Assert.Null(await service.FindByIdAsync(category.Id));
+        Assert.Empty(await service.GetAllAsync());
     }
 
     [Fact]
-    public void FindBy_TrimsAndMatchesName()
+    public async Task FindBy_TrimsAndMatchesName()
     {
         using var context = CreateContext();
         var service = new ServicesCategory(context);
-        Assert.True(service.Save(new Category { Name = "Fiction" }));
+        Assert.True(await service.SaveAsync(new Category { Name = "Fiction" }));
 
-        Assert.NotNull(service.FindBy("  Fiction  "));
+        Assert.NotNull(await service.FindByAsync("  Fiction  "));
     }
 
     [Fact]
-    public void LogService_Save_CreatesLogEntry()
+    public async Task LogService_Save_CreatesLogEntry()
     {
         using var context = CreateContext();
         var categoryService = new ServicesCategory(context);
         var logService = new ServiceLogCategory(context);
         var category = new Category { Name = "Fiction" };
-        Assert.True(categoryService.Save(category));
+        Assert.True(await categoryService.SaveAsync(category));
 
         var userId = Guid.NewGuid();
-        Assert.True(logService.Save(category.Id, userId));
+        Assert.True(await logService.SaveAsync(category.Id, userId));
 
-        var logs = logService.GetAll();
+        var logs = await logService.GetAllAsync();
         Assert.Single(logs);
         Assert.Equal(Helper.Save, logs[0].Action);
         Assert.Equal(userId, logs[0].UserId);
         Assert.Equal(category.Id, logs[0].CategoryId);
+    }
+
+    [Fact]
+    public async Task LogService_Delete_CreatesLogEntryWithDeleteAction()
+    {
+        using var context = CreateContext();
+        var categoryService = new ServicesCategory(context);
+        var logService = new ServiceLogCategory(context);
+        var category = new Category { Name = "Fiction" };
+        Assert.True(await categoryService.SaveAsync(category));
+
+        Assert.True(await logService.DeleteAsync(category.Id, Guid.NewGuid()));
+
+        var logs = await logService.GetAllAsync();
+        Assert.Single(logs);
+        Assert.Equal(Helper.Delete, logs[0].Action);
     }
 }

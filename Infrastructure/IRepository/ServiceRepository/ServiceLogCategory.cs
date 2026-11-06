@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Domin.Entity;
 using Infrastructure.Data;
@@ -17,121 +16,88 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             _context = context;
         }
-        public bool Delete(Guid Id, Guid UserId)
+
+        public async Task<bool> DeleteAsync(Guid id, Guid userId)
+        {
+            return await AddLogAsync(Helper.Delete, id, userId);
+        }
+
+        public async Task<bool> DeleteLogAsync(Guid id)
         {
             try
             {
-                var logCategory = new LogCategory
-                {
-                    Id = Guid.NewGuid(),
-                    Action = Helper.Delete,
-                    UserId = UserId,
-                    Date = DateTime.Now,
-                    CategoryId = Id
-                };
-                _context.Logcategories.Add(logCategory);
-                _context.SaveChanges();
+                var result = await FindByIdAsync(id);
+                if (result is null)
+                    return false;
 
+                _context.Logcategories.Remove(result);
+                await _context.SaveChangesAsync();
                 return true;
             }
             catch (Exception)
             {
-
-                return false; ;
-            }
-        }
-
-        public bool DeleteLog(Guid Id)
-        {
-            try
-            {
-                var result = FindById(Id);
-                if (result != null)
-                {
-                    _context.Logcategories.Remove(result);
-                    _context.SaveChanges();
-                    return true;
-                }
-                return false;
-            }
-            catch (Exception)
-            {
-
                 return false;
             }
         }
 
-        public LogCategory FindById(Guid Id)
+        public async Task<LogCategory?> FindByIdAsync(Guid id)
         {
             try
             {
-                return _context.Logcategories.Include(x => x.category).FirstOrDefault(x => x.Id == Id);
+                return await _context.Logcategories
+                    .Include(x => x.category)
+                    .FirstOrDefaultAsync(x => x.Id == id);
             }
             catch (Exception)
             {
-
                 return null;
             }
         }
 
-        public List<LogCategory> GetAll()
+        public async Task<List<LogCategory>> GetAllAsync()
         {
             try
             {
-                return _context.Logcategories.Include(x => x.category).OrderByDescending(x => x.Date).ToList();
+                return await _context.Logcategories
+                    .Include(x => x.category)
+                    .OrderByDescending(x => x.Date)
+                    .ToListAsync();
             }
             catch (Exception)
             {
-
-                return null;
+                return new List<LogCategory>();
             }
         }
 
-        public bool Save(Guid Id, Guid UserId)
+        public async Task<bool> SaveAsync(Guid id, Guid userId)
+        {
+            return await AddLogAsync(Helper.Save, id, userId);
+        }
+
+        public async Task<bool> UpdateAsync(Guid id, Guid userId)
+        {
+            return await AddLogAsync(Helper.Update, id, userId);
+        }
+
+        private async Task<bool> AddLogAsync(string action, Guid categoryId, Guid userId)
         {
             try
             {
                 var logCategory = new LogCategory
                 {
                     Id = Guid.NewGuid(),
-                    Action = Helper.Save,
-                    UserId = UserId,
+                    Action = action,
+                    UserId = userId,
                     Date = DateTime.Now,
-                    CategoryId = Id
+                    CategoryId = categoryId
                 };
                 _context.Logcategories.Add(logCategory);
-                _context.SaveChanges();
-
+                await _context.SaveChangesAsync();
                 return true;
             }
             catch (Exception)
             {
-
-                return false; ;
-            }
-        }
-
-        public bool Update(Guid Id, Guid UserId)
-        {
-            try
-            {
-                var logCategory = new LogCategory
-                {
-                    Id = Guid.NewGuid(),
-                    Action = Helper.Update,
-                    UserId = UserId,
-                    Date = DateTime.Now,
-                    CategoryId = Id
-                };
-                _context.Logcategories.Add(logCategory);
-                _context.SaveChanges();
-
-                return true;
-            }
-            catch (Exception)
-            {
-
-                return false; ;
+                return false;
             }
         }
     }

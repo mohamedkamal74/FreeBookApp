@@ -21,29 +21,31 @@ namespace FreeBook.Areas.Admin.Controllers
             _serviceCategoryLog = serviceCategoryLog;
             _userManager = userManager;
         }
-        public IActionResult Categories(CategoryViewModel model)
+        public async Task<IActionResult> Categories(CategoryViewModel model)
         {
             return View(new CategoryViewModel
             {
-                Categories = _serviceCategory.GetAll(),
-                LogCategories = _serviceCategoryLog.GetAll(),
+                Categories = await _serviceCategory.GetAllAsync(),
+                LogCategories = await _serviceCategoryLog.GetAllAsync(),
                 NewCategory = new Category()
             });
         }
 
-        public IActionResult Delete(Guid Id)
+        public async Task<IActionResult> Delete(Guid Id)
         {
             var userId = _userManager.GetUserId(User);
-            if (_serviceCategory.Delete(Id) && _serviceCategoryLog.Delete(Id, Guid.Parse(userId)))
+            if (userId is not null
+                && await _serviceCategory.DeleteAsync(Id)
+                && await _serviceCategoryLog.DeleteAsync(Id, Guid.Parse(userId)))
                 return RedirectToAction(nameof(Categories));
             return RedirectToAction(nameof(Categories));
 
         }
 
-        public IActionResult DeleteLog(Guid Id)
+        public async Task<IActionResult> DeleteLog(Guid Id)
         {
 
-            if (_serviceCategoryLog.DeleteLog(Id))
+            if (await _serviceCategoryLog.DeleteLogAsync(Id))
                 return RedirectToAction(nameof(Categories));
             return RedirectToAction(nameof(Categories));
 
@@ -52,20 +54,22 @@ namespace FreeBook.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Save(CategoryViewModel model)
+        public async Task<IActionResult> Save(CategoryViewModel model)
         {
 
             var userId = _userManager.GetUserId(User);
+            if (userId is null)
+                return RedirectToAction(nameof(Categories));
 
-            if (model.NewCategory.Id == Guid.Parse(Guid.Empty.ToString()))
+            if (model.NewCategory.Id == Guid.Empty)
             {
                 // create
-                if (_serviceCategory.FindBy(model.NewCategory.Name) != null)
+                if (await _serviceCategory.FindByAsync(model.NewCategory.Name) != null)
                     SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDupplicateNameCategory);
                 else
                 {
-                    if (_serviceCategory.Save(model.NewCategory)
-                       && _serviceCategoryLog.Save(model.NewCategory.Id, Guid.Parse(userId)))
+                    if (await _serviceCategory.SaveAsync(model.NewCategory)
+                       && await _serviceCategoryLog.SaveAsync(model.NewCategory.Id, Guid.Parse(userId)))
                         SessionMsg(Helper.Success, "تم الحفظ بنجاح", "تم حفظ  الفئة بنجاح");
                     else
                         SessionMsg(Helper.Error, "حدث خطا في الحفظ", "لم يتم حفظ اسم الفئة");
@@ -75,8 +79,8 @@ namespace FreeBook.Areas.Admin.Controllers
             else
             {
                 // update
-                if (_serviceCategory.Save(model.NewCategory)
-                      && _serviceCategoryLog.Update(model.NewCategory.Id, Guid.Parse(userId)))
+                if (await _serviceCategory.SaveAsync(model.NewCategory)
+                      && await _serviceCategoryLog.UpdateAsync(model.NewCategory.Id, Guid.Parse(userId)))
                     SessionMsg(Helper.Success, "تم التعديل بنجاح", "تم تعديل  الفئة بنجاح");
                 else
                     SessionMsg(Helper.Error, "حدث خطا في التعديل", "لم يتم تعديل اسم الفئة");

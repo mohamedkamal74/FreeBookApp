@@ -52,6 +52,13 @@ There is **no seed data**. Before you can log in, create an `Admin` role and an 
 user manually (for example with a short EF Core/Identity seeder). Roles used by the app:
 `Admin` and `User`.
 
+To override the connection string locally without editing tracked files (user-secrets are
+already enabled in `FreeBook.csproj`):
+
+```powershell
+dotnet user-secrets set "ConnectionStrings:BookConnection" "Server=...;Database=...;" --project FreeBook
+```
+
 ### First run
 
 The checked-in `launchSettings.json` profile uses IIS Express. For a plain CLI run:
@@ -63,6 +70,7 @@ dotnet run --project FreeBook --no-launch-profile --urls http://localhost:5128
 - Public site: <http://localhost:5128>
 - Admin login: <http://localhost:5128/Admin>
 - Swagger UI (Development only): <http://localhost:5128/swagger>
+- Health check: <http://localhost:5128/health>
 
 ## Development commands
 
@@ -76,6 +84,25 @@ dotnet ef database update --project Infrastructure --startup-project FreeBook
 ```
 
 Convenience scripts live in `scripts/` (`build.ps1`, `run.ps1`, `migrate.ps1`).
+
+## Behavior notes
+
+- Repository/service methods are async (`*Async`) and use EF Core async APIs.
+- `AccountsController.Register` accepts only `.jpg`, `.jpeg`, `.png`, `.gif`, and `.webp`
+  images up to 5 MB; the upload directory is created automatically.
+- `/health` runs a database connectivity check and returns `503` when the database is
+  unreachable.
+- Outside Development, unhandled exceptions are logged and returned as a `ProblemDetails`
+  JSON response with status `500`.
+
+## Tests
+
+`FreeBook.Tests` uses EF Core InMemory and `WebApplicationFactory`, so no LocalDB is
+required:
+
+```powershell
+dotnet test FreeBook.sln
+```
 
 ## Known issues
 
