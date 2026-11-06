@@ -1,7 +1,8 @@
 ﻿@inject UserManager<ApplicationUser> usermanager
 @inject SignInManager<ApplicationUser> signinmanager
+@inject IStringLocalizer<ResourceWeb> Localizer
 <!DOCTYPE html>
-<html>
+<html lang="@CultureInfo.CurrentUICulture.Name" dir="@(CultureInfo.CurrentUICulture.Name == "ar" ? "rtl" : "ltr")">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -26,24 +27,16 @@
 
     <!-- summernote -->
     <link rel="stylesheet" href="~/Admin/plugins/summernote/summernote-bs4.css">
-    <!-- Bootstrap 4 RTL -->
-    <link rel="stylesheet" href="~/Admin/dist/css/bootstrap-rtl.min.css">
+    @if (CultureInfo.CurrentUICulture.Name == "ar")
+    {
+        <!-- Bootstrap 4 RTL -->
+        <link rel="stylesheet" href="~/Admin/dist/css/bootstrap-rtl.min.css">
+        <!-- Custom style for RTL -->
+        <link rel="stylesheet" href="~/Admin/dist/css/custom.css">
+        <!-- Responsive RTL -->
+        <link rel="stylesheet" href="~/Admin/dist/css/responsive-rtl.css">
+    }
     <!-- DataTables -->
-    <link rel="stylesheet" href="~/Admin/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="~/Admin/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-    <link rel="stylesheet" href="~/Admin/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" />
-    <!-- RoundSlider -->
-    <link rel="stylesheet" href="~/Admin/plugins/roundSlider-master/roundslider.min.css">
-    <!-- Select2 -->
-    <link rel="stylesheet" href="~/Admin/plugins/select2/css/select2.min.css">
-    <link rel="stylesheet" href="~/Admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
-    <!-- Sweet Aler -->
-    <link rel="stylesheet" href="~/Admin/plugins/sweetalert2/sweetalert2.min.css">
-    <!-- Custom style for RTL -->
-    <link rel="stylesheet" href="~/Admin/dist/css/custom.css">
-    <!-- Responsive RTL -->
-    <link rel="stylesheet" href="~/Admin/dist/css/responsive-rtl.css">
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper mr-auto">
@@ -167,6 +160,9 @@
                         <i class="fas fa-th-large"></i>
                     </a>
                 </li>
+                <li class="nav-item">
+                    @await Html.PartialAsync("_LanguageSwitcher")
+                </li>
             </ul>
         </nav>
         <!-- /.navbar -->
@@ -194,7 +190,7 @@
                         <a href="#" class="d-block">@(currentUser?.Name)</a>
 
                         <form asp-action="LogOut" asp-controller="Accounts" method="post">
-                        <input type="submit" style="border:none;background-color:#343a40;color:orange" value="تسجيل الخروج"/>
+                        <input type="submit" style="border:none;background-color:#343a40;color:orange" value="@Localizer["lbLogout"]"/>
                         </form>
                     </div>
 

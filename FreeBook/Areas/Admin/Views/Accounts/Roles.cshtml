@@ -1,5 +1,6 @@
 ﻿
 @model RolesViewModel
+@inject IStringLocalizer<ResourceWeb> Localizer
 @{
     ViewData["Title"] = "Roles";
 }
@@ -11,12 +12,12 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-          <h1 class="m-0 text-dark">@ResourceWeb.lbRoleUser </h1>
+          <h1 class="m-0 text-dark">@Localizer["lbRoleUser"] </h1>
           </div>
           <div class="col-sm-6">
             <ol class=" breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="/Admin/Home/Index"> @ResourceWeb.lbHomePage</a></li>
-              <li class="breadcrumb-item active">@ResourceWeb.lbManageBook</li>
+<li class="breadcrumb-item"><a href="/Admin/Home/Index"> @Localizer["lbHomePage"]</a></li>
+<li class="breadcrumb-item active">@Localizer["lbManageBook"]</li>
             </ol>
           </div>
         </div>
@@ -25,25 +26,25 @@
 <!--End content Header-->
 <div class="card">
             <div class="card-header d-flex align-items-center justify-content-start">
-              <h3 class="card-title">@ResourceWeb.lbRoleUser</h3>
+              <h3 class="card-title">@Localizer["lbRoleUser"]</h3>
             </div>
             <div class="card-tools">
                 <!-- Button trigger modal -->
         
 <button type="button" class="btn btn-outline-primary rounded-pill mr-5 mt-2" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="Rest()">
-@ResourceWeb.lbBtnSaveNewRole
+@Localizer["lbBtnSaveNewRole"]
 </button>
  <!-- Button trigger modal -->
             </div>
             <!-- /.card-header -->
             <div class="card-body">
               <table id="tableRoles" class="table table-bordered table-hover table-striped">
-                  <thead>
-                      <tr>
-                        <td>@ResourceWeb.lbNameRole</td>
-                        <td>@ResourceWeb.lbEvents</td>
-                    </tr>
-                </thead>
+<thead>
+    <tr>
+        <td>@Localizer["lbNameRole"]</td>
+        <td>@Localizer["lbEvents"]</td>
+    </tr>
+</thead>
                 <tbody>
                 @foreach (var item in Model.Roles)
                                 {
@@ -62,10 +63,10 @@
                                                     break;
                                             }
                                         </td>                                      
-                                        <td>
-                                            <input type="button" class="btn btn-info btn-sm" onclick="Edit('@item.Id','@item.Name')" value="@ResourceWeb.lbBtnEdit" data-bs-toggle="modal" data-bs-target="#exampleModal" />
-                                            <input type="button" class="btn btn-danger btn-sm" onclick="DeleteRoles('@item.Id')" value="@ResourceWeb.lbbtnDelete"/>
-                                        </td>
+<td>
+    <input type="button" class="btn btn-info btn-sm" onclick="Edit('@item.Id','@item.Name')" value="@Localizer["lbBtnEdit"]" data-bs-toggle="modal" data-bs-target="#exampleModal" />
+    <input type="button" class="btn btn-danger btn-sm" onclick="DeleteRoles('@item.Id')" value="@Localizer["lbbtnDelete"]"/>
+</td>
                     </tr>
                     
                 }
@@ -85,7 +86,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="title">@ResourceWeb.lbBtnSaveNewRole</h5>
+        <h5 class="modal-title" id="title">@Localizer["lbBtnSaveNewRole"]</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -94,11 +95,11 @@
            <div class="form-group">
           <input type="text" asp-for="NewRole.RoleId" hidden class="form-control" id="roleId"/>
 
-           <label class="control-label" asp-for="NewRole.RoleName">@ResourceWeb.lbNameRole</label>
-           <input type="text" asp-for="NewRole.RoleName" class="form-control" id="roleName"/>
-           <span asp-validation-for="NewRole.RoleName" class="text-danger"></span>
-           </div>
-            <input  type="submit" class="btn btn-success" value="@ResourceWeb.lbBtnSave" id="btnSave"/>
+<label class="control-label" asp-for="NewRole.RoleName">@Localizer["lbNameRole"]</label>
+<input type="text" asp-for="NewRole.RoleName" class="form-control" id="roleName"/>
+<span asp-validation-for="NewRole.RoleName" class="text-danger"></span>
+</div>
+<input  type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="btnSave"/>
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 
        </form>
@@ -126,7 +127,7 @@
   icon: 'success',
   title:'@Context.Session.GetString(Helper.Title)',
   text:' @Html.Raw(Context.Session.GetString(Helper.Msg))',
-   confirmButtonText:@ResourceWeb.lbOk
+   confirmButtonText:'@Localizer["lbOk"]'
 
  
 })
@@ -138,7 +139,7 @@
   icon: 'error',
   title: '@Context.Session.GetString(Helper.Title)',
   text: '@Html.Raw(Context.Session.GetString(Helper.Msg))',
-  confirmButtonText:'@ResourceWeb.lbOk'
+  confirmButtonText:'@Localizer["lbOk"]'
 
  
 })
@@ -151,10 +152,10 @@ Context.Session.SetString("msgType","");
 
 <script>
 
-     let lbTitleEdit='@Html.Raw(ResourceWeb.lbTitleEdit)';
-     let lbEdit='@Html.Raw(ResourceWeb.lbEdit)';
-     let lbEditNewRole='@Html.Raw(ResourceWeb.lbEditNewRole)';
-     let lbSave='@Html.Raw(ResourceWeb.lbSave)';
+     let lbTitleEdit='@Html.Raw(Localizer["lbTitleEdit"])';
+     let lbEdit='@Html.Raw(Localizer["lbEdit"])';
+     let lbEditNewRole='@Html.Raw(Localizer["lbEditNewRole"])';
+     let lbSave='@Html.Raw(Localizer["lbSave"])';
 
 </script>
 

@@ -1,5 +1,6 @@
 ﻿@model CategoryViewModel
 @inject UserManager<Infrastructure.ViewModel.ApplicationUser> usermanager
+@inject IStringLocalizer<ResourceWeb> Localizer
 @{
     ViewData["Title"] = "Caregories";
 }
@@ -50,12 +51,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0 text-dark">@ResourceWeb.lbCategories </h1>
+                    <h1 class="m-0 text-dark">@Localizer["lbCategories"] </h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class=" breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="/Admin/Home/Index"> @ResourceWeb.lbHomePage</a></li>
-                        <li class="breadcrumb-item active">@ResourceWeb.lbManageBook</li>
+<li class="breadcrumb-item"><a href="/Admin/Home/Index"> @Localizer["lbHomePage"]</a></li>
+<li class="breadcrumb-item active">@Localizer["lbManageBook"]</li>
                     </ol>
                 </div>
             </div>
@@ -65,13 +66,13 @@
    
     <div class="card">
         <div class="card-header d-flex align-items-center justify-content-start">
-            <h3 class="card-title">@ResourceWeb.lbCategories</h3>
+            <h3 class="card-title">@Localizer["lbCategories"]</h3>
         </div>
         <div class="card-tools">
             <!-- Button trigger modal -->
 
             <button type="button" class="btn btn-outline-primary rounded-pill mr-5 mt-2" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="Rest()">
-                @ResourceWeb.lbBtnSaveNewCategory
+                @Localizer["lbBtnSaveNewCategory"]
             </button>
             <!-- Button trigger modal -->
         </div>
@@ -80,21 +81,21 @@
 
             <!-- Tab links -->
             <div class="tab">
-                <button class="tablinks" onclick="openCity(event, 'Categories')" id="defaultOpen">@ResourceWeb.lbCategories</button>
-                <button class="tablinks" onclick="openCity(event, 'LogCategories')">@ResourceWeb.lbLogCategories</button>
+                <button class="tablinks" onclick="openCity(event, 'Categories')" id="defaultOpen">@Localizer["lbCategories"]</button>
+                <button class="tablinks" onclick="openCity(event, 'LogCategories')">@Localizer["lbLogCategories"]</button>
 
             </div>
 
              <!-- Tab content -->
             <div id="Categories" class="tabcontent">
                 <table id="tableCategories" class="table table-bordered table-hover table-striped">
-                    <thead>
-                        <tr>
-                            <td>@ResourceWeb.lbNameCategory</td>
-                            <td>@ResourceWeb.lbDescription</td>
-                            <td>@ResourceWeb.lbEvents</td>
-                        </tr>
-                    </thead>
+<thead>
+    <tr>
+        <td>@Localizer["lbNameCategory"]</td>
+        <td>@Localizer["lbDescription"]</td>
+        <td>@Localizer["lbEvents"]</td>
+    </tr>
+</thead>
                     <tbody>
                         @foreach (var item in Model.Categories)
                         {
@@ -103,10 +104,10 @@
                                     @item.Name
                                 </td>
                                 <td>@item.Description</td>
-                                <td>
-                                    <input type="button" class="btn btn-info btn-sm" onclick="Edit('@item.Id','@item.Name','@item.Description')" value="@ResourceWeb.lbBtnEdit" data-bs-toggle="modal" data-bs-target="#exampleModal" />
-                                    <input type="button" class="btn btn-danger btn-sm" onclick="Delete('@item.Id')" value="@ResourceWeb.lbbtnDelete" />
-                                </td>
+<td>
+    <input type="button" class="btn btn-info btn-sm" onclick="Edit('@item.Id','@item.Name','@item.Description')" value="@Localizer["lbBtnEdit"]" data-bs-toggle="modal" data-bs-target="#exampleModal" />
+    <input type="button" class="btn btn-danger btn-sm" onclick="Delete('@item.Id')" value="@Localizer["lbbtnDelete"]" />
+</td>
                             </tr>
 
                         }
@@ -120,15 +121,15 @@
 
              <div id="LogCategories" class="tabcontent">
                 <table id="tableLogCategories" class="table table-bordered table-hover table-striped">
-                    <thead>
-                        <tr>
-                            <td>@ResourceWeb.lbNameCategory</td>
-                            <td>@ResourceWeb.lbActionName</td>
-                            <td>@ResourceWeb.lbDate</td>
-                            <td>@ResourceWeb.lbUserName</td>
-                            <td>@ResourceWeb.lbEvents</td>
-                        </tr>
-                    </thead>
+<thead>
+    <tr>
+        <td>@Localizer["lbNameCategory"]</td>
+        <td>@Localizer["lbActionName"]</td>
+        <td>@Localizer["lbDate"]</td>
+        <td>@Localizer["lbUserName"]</td>
+        <td>@Localizer["lbEvents"]</td>
+    </tr>
+</thead>
                     <tbody>
                         @foreach (var item in Model.LogCategories)
                         {
@@ -154,7 +155,7 @@
                                 <td>@usermanager.FindByIdAsync(item.UserId.ToString()).Result?.Name</td>
                                 <td>
 
-                                    <input type="button" class="btn btn-danger btn-sm" onclick="DeleteLog('@item.Id')" value="@ResourceWeb.lbbtnDelete" />
+                                    <input type="button" class="btn btn-danger btn-sm" onclick="DeleteLog('@item.Id')" value="@Localizer["lbbtnDelete"]" />
                                 </td>
                             </tr>
 
@@ -178,7 +179,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="title">@ResourceWeb.lbBtnSaveNewCategory</h5>
+                    <h5 class="modal-title" id="title">@Localizer["lbBtnSaveNewCategory"]</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -186,21 +187,21 @@
                     <form asp-action="Save" asp-controller="Categories" method="post">
                         <input type="text" asp-for="NewCategory.Id" hidden class="form-control" id="categoryId" />
 
-                        <div class="form-group">
-                            <label class="control-label" asp-for="NewCategory.Name">@ResourceWeb.lbNameCategory</label>
-                            <input type="text" asp-for="NewCategory.Name" class="form-control" id="categoryName" />
-                        </div>
+<div class="form-group">
+    <label class="control-label" asp-for="NewCategory.Name">@Localizer["lbNameCategory"]</label>
+    <input type="text" asp-for="NewCategory.Name" class="form-control" id="categoryName" />
+</div>
 
-                        <div class="form-group">
-                            <label class="control-label" asp-for="NewCategory.Description">@ResourceWeb.lbDescription</label>
-                            <input type="text" asp-for="NewCategory.Description" class="form-control" id="description" />
-                            <span asp-validation-for="NewCategory.Description" class="text-danger"></span>
-                        </div>
+<div class="form-group">
+    <label class="control-label" asp-for="NewCategory.Description">@Localizer["lbDescription"]</label>
+    <input type="text" asp-for="NewCategory.Description" class="form-control" id="description" />
+    <span asp-validation-for="NewCategory.Description" class="text-danger"></span>
+</div>
 
-                        <div class="modal-footer-rtl" style="padding:0 15px 15px 0">
-                            <input type="submit" class="btn btn-success" value="@ResourceWeb.lbBtnSave" id="btnSave" />
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        </div>
+<div class="modal-footer-rtl" style="padding:0 15px 15px 0">
+    <input type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="btnSave" />
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+</div>
 
                     </form>
                 </div>
@@ -226,7 +227,7 @@
       icon: 'success',
       title:'@Context.Session.GetString(Helper.Title)',
       text:' @Html.Raw(Context.Session.GetString(Helper.Msg))',
-       confirmButtonText:@ResourceWeb.lbOk
+       confirmButtonText:'@Localizer["lbOk"]'
 
 
     })
@@ -238,7 +239,7 @@
       icon: 'error',
       title: '@Context.Session.GetString(Helper.Title)',
       text: '@Html.Raw(Context.Session.GetString(Helper.Msg))',
-      confirmButtonText:'@ResourceWeb.lbOk'
+      confirmButtonText:'@Localizer["lbOk"]'
 
 
     })
@@ -251,19 +252,19 @@ Context.Session.SetString("msgType","");
 
 <script>
 
-    let lbTitleEditCategory='@Html.Raw(ResourceWeb.lbTitleEditCategory)';
-    let lbEdit='@Html.Raw(ResourceWeb.lbEdit)';
-    let lbBtnSaveNewCategory='@Html.Raw(ResourceWeb.lbBtnSaveNewCategory)';
-    let lbSave='@Html.Raw(ResourceWeb.lbSave)';
+    let lbTitleEditCategory='@Html.Raw(Localizer["lbTitleEditCategory"])';
+    let lbEdit='@Html.Raw(Localizer["lbEdit"])';
+    let lbBtnSaveNewCategory='@Html.Raw(Localizer["lbBtnSaveNewCategory"])';
+    let lbSave='@Html.Raw(Localizer["lbSave"])';
 
-        let lbBtnSave = '@Html.Raw(ResourceWeb.lbBtnSave)';
-        let lbTextMsgDelete = '@Html.Raw(ResourceWeb.lbTextMsgDelete)';
-        let lbconfirmButtonText = '@Html.Raw(ResourceWeb.lbconfirmButtonText)';
-        let lbcancelButtonText = '@Html.Raw(ResourceWeb.lbCancelButtonText)';
-        let lbTitleDeletedOk = '@Html.Raw(ResourceWeb.lbTitleDeletedOk)';
-        let lbMsgDeletedOkCategory = '@Html.Raw(ResourceWeb.lbMsgDeletedOkCategory)';
+    let lbBtnSave = '@Html.Raw(Localizer["lbBtnSave"])';
+    let lbTextMsgDelete = '@Html.Raw(Localizer["lbTextMsgDelete"])';
+    let lbconfirmButtonText = '@Html.Raw(Localizer["lbconfirmButtonText"])';
+    let lbcancelButtonText = '@Html.Raw(Localizer["lbCancelButtonText"])';
+    let lbTitleDeletedOk = '@Html.Raw(Localizer["lbTitleDeletedOk"])';
+    let lbMsgDeletedOkCategory = '@Html.Raw(Localizer["lbMsgDeletedOkCategory"])';
 
-       let lbSuccess = '@Html.Raw(Helper.Success)';
+   let lbSuccess = '@Html.Raw(Helper.Success)';
 </script>
 
 

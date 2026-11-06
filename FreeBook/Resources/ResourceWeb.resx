@@ -282,4 +282,13 @@
   <data name="lmTextMsgDelete" xml:space="preserve">
     <value>لن تتمكن من التراجع !</value>
   </data>
+  <data name="lbLangArabic" xml:space="preserve">
+    <value>العربية</value>
+  </data>
+  <data name="lbLangEnglish" xml:space="preserve">
+    <value>الإنجليزية</value>
+  </data>
+  <data name="lbLogout" xml:space="preserve">
+    <value>تسجيل الخروج</value>
+  </data>
 </root>

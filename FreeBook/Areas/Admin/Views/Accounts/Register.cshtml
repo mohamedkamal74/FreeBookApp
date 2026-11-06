@@ -1,4 +1,5 @@
 ﻿@model RegisterViewModel
+@inject IStringLocalizer<ResourceWeb> Localizer
 @{
     ViewData["Title"] = "Register";
 }
@@ -12,12 +13,12 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-          <h1 class="m-0 text-dark">@ResourceWeb.lbUser </h1>
+          <h1 class="m-0 text-dark">@Localizer["lbUser"] </h1>
           </div>
           <div class="col-sm-6">
             <ol class=" breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="/Admin/Home/Index"> @ResourceWeb.lbHomePage</a></li>
-              <li class="breadcrumb-item active">@ResourceWeb.lbManageBook</li>
+<li class="breadcrumb-item"><a href="/Admin/Home/Index"> @Localizer["lbHomePage"]</a></li>
+<li class="breadcrumb-item active">@Localizer["lbManageBook"]</li>
             </ol>
           </div>
         </div>
@@ -26,29 +27,29 @@
 <!--End content Header-->
 <div class="card">
             <div class="card-header d-flex align-items-center justify-content-start">
-              <h3 class="card-title">@ResourceWeb.lbUser</h3>
+              <h3 class="card-title">@Localizer["lbUser"]</h3>
             </div>
             <div class="card-tools">
                 <!-- Button trigger modal -->
         
 <button type="button" class="btn btn-outline-primary rounded-pill mr-5 mt-2" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="Rest()">
-@ResourceWeb.lbBtnSaveNewUser
+@Localizer["lbBtnSaveNewUser"]
 </button>
  <!-- Button trigger modal -->
             </div>
             <!-- /.card-header -->
             <div class="card-body">
               <table id="tableRoles" class="table table-bordered table-hover table-striped">
-                  <thead>
-                      <tr>
-                        <td style="width:15%">@ResourceWeb.lbNameUser</td>
-                        <td style="width:15%">@ResourceWeb.lbNameRole</td>
-                        <td style="width:15%">@ResourceWeb.lbImageUser</td>
-                        <td style="width:15%">@ResourceWeb.lbEmailUser</td>
-                        <td style="width:10%">@ResourceWeb.lbActiveUser</td>
-                        <td style="width:30%">@ResourceWeb.lbEvents</td>
-                    </tr>
-                </thead>
+<thead>
+    <tr>
+        <td style="width:15%">@Localizer["lbNameUser"]</td>
+        <td style="width:15%">@Localizer["lbNameRole"]</td>
+        <td style="width:15%">@Localizer["lbImageUser"]</td>
+        <td style="width:15%">@Localizer["lbEmailUser"]</td>
+        <td style="width:10%">@Localizer["lbActiveUser"]</td>
+        <td style="width:30%">@Localizer["lbEvents"]</td>
+    </tr>
+</thead>
                 <tbody>
                     @foreach (var user in Model.Users)
                     {
@@ -71,13 +72,13 @@
                             <td><img src="@Helper.PathImageUser/@user.ImageUser" class="img-bordered img-circle"  style="width:50px;height:50px"/></td>
                             <td>@user.Email</td>
                         <td><input type="checkbox" disabled checked="@user.ActiveUser" style="width:30px;height:30px"/></td>
-                            <td>
-                                 <input type="button" class="btn btn-info btn-sm" onclick="Edit('@user.Id','@user.Name','@user.Email','@user.ImageUser','@user.Role','@user.ActiveUser')"
-                                 value="@ResourceWeb.lbBtnEdit" data-bs-toggle="modal" data-bs-target="#exampleModal" />
-                                <input type="button" class="btn btn-danger btn-sm" onclick="DeleteUser('@user.Id')" value="@ResourceWeb.lbbtnDelete"/>
-                                <input type="button" class="btn btn-dark btn-sm" onclick="ChangePassword('@user.Id')" value="@ResourceWeb.lbbtnChangePassword"
-                                 data-bs-toggle="modal" data-bs-target="#ChangePasswordModal"/>
-                            </td>
+<td>
+    <input type="button" class="btn btn-info btn-sm" onclick="Edit('@user.Id','@user.Name','@user.Email','@user.ImageUser','@user.Role','@user.ActiveUser')"
+    value="@Localizer["lbBtnEdit"]" data-bs-toggle="modal" data-bs-target="#exampleModal" />
+    <input type="button" class="btn btn-danger btn-sm" onclick="DeleteUser('@user.Id')" value="@Localizer["lbbtnDelete"]"/>
+    <input type="button" class="btn btn-dark btn-sm" onclick="ChangePassword('@user.Id')" value="@Localizer["lbbtnChangePassword"]"
+    data-bs-toggle="modal" data-bs-target="#ChangePasswordModal"/>
+</td>
                          
 
                         </tr>
@@ -100,7 +101,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="title">@ResourceWeb.lbBtnSaveNewUser</h5>
+        <h5 class="modal-title" id="title">@Localizer["lbBtnSaveNewUser"]</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -110,12 +111,12 @@
           <input type="text" asp-for="NewRegister.Id" hidden class="form-control" id="userId"/>
           <input type="text" asp-for="NewRegister.ImageUser" hidden class="form-control" id="imagehidden"/>
 
-           <label class="control-label" asp-for="NewRegister.Name">@ResourceWeb.lbNameUser</label>
+           <label class="control-label" asp-for="NewRegister.Name">@Localizer["lbNameUser"]</label>
            <input type="text" asp-for="NewRegister.Name" class="form-control" id="userName"/>
            <span asp-validation-for="NewRegister.Name" class="text-danger"></span>
            </div>
             <div class="form-group">
-           <label class="control-label" asp-for="NewRegister.Email">@ResourceWeb.lbEmailUser</label>
+           <label class="control-label" asp-for="NewRegister.Email">@Localizer["lbEmailUser"]</label>
            <input type="text" asp-for="NewRegister.Email" class="form-control" id="userEmail"/>
            <span asp-validation-for="NewRegister.Email" class="text-danger"></span>
            </div>
@@ -124,38 +125,38 @@
                class="img-circle" style="width:35px;height:35px" hidden id="image" />
            </div>
             <div class="form-group">
-           <label class="control-label" asp-for="NewRegister.ImageUser">@ResourceWeb.lbImageUser</label>
+           <label class="control-label" asp-for="NewRegister.ImageUser">@Localizer["lbImageUser"]</label>
            <input type="file" asp-for="NewRegister.ImageUser" class="form-control" id="userImage"/>
            <span asp-validation-for="NewRegister.ImageUser" class="text-danger"></span>
            </div>
             <div class="form-group">
-           <label class="control-label" asp-for="NewRegister.RoleName">@ResourceWeb.lbNameRole</label>
-           <select asp-for="NewRegister.RoleName" class="form-control" id="ddluserRole"
-           asp-items="@(new SelectList(Model.Roles,"Name","Name"))">
-               <option value="">@ResourceWeb.lbSelectUserRole</option>
-           </select>
+<label class="control-label" asp-for="NewRegister.RoleName">@Localizer["lbNameRole"]</label>
+<select asp-for="NewRegister.RoleName" class="form-control" id="ddluserRole"
+asp-items="@(new SelectList(Model.Roles,"Name","Name"))">
+    <option value="">@Localizer["lbSelectUserRole"]</option>
+</select>
            <span asp-validation-for="NewRegister.RoleName" class="text-danger"></span>
            </div>
             <div class="form-group">
-           <label class="control-label" asp-for="NewRegister.ActiveUser">@ResourceWeb.lbActiveUser</label>
+           <label class="control-label" asp-for="NewRegister.ActiveUser">@Localizer["lbActiveUser"]</label>
            <input type="checkbox"  asp-for="NewRegister.ActiveUser" style="height:30px;width:30px" id="userActive"/>
 
 
            </div>
              <div class="form-group" id="grPassword">
-           <label class="control-label" asp-for="NewRegister.Password">@ResourceWeb.lbPassword</label>
+           <label class="control-label" asp-for="NewRegister.Password">@Localizer["lbPassword"]</label>
            <input type="password" asp-for="NewRegister.Password" class="form-control" id="userPassword"/>
            <span asp-validation-for="NewRegister.Password" class="text-danger"></span>
            </div>
-             <div class="form-group" id="confPassword">
-           <label class="control-label" asp-for="NewRegister.ConfirmPassword">@ResourceWeb.lbConfirmpassword</label>
-           <input type="password" asp-for="NewRegister.ConfirmPassword" class="form-control" id="userConfirm"/>
-           <span asp-validation-for="NewRegister.ConfirmPassword" class="text-danger"></span>
-           </div>
-            <input  type="submit" class="btn btn-success" value="@ResourceWeb.lbBtnSave" id="btnSave"/>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+<div class="form-group" id="confPassword">
+            <label class="control-label" asp-for="NewRegister.ConfirmPassword">@Localizer["lbConfirmpassword"]</label>
+            <input type="password" asp-for="NewRegister.ConfirmPassword" class="form-control" id="userConfirm"/>
+            <span asp-validation-for="NewRegister.ConfirmPassword" class="text-danger"></span>
+            </div>
+             <input  type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="btnSave"/>
+             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 
-       </form>
+        </form>
       </div>
       <div class="modal-footer">
        
@@ -170,7 +171,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="title">@ResourceWeb.lbbtnChangePassword</h5>
+        <h5 class="modal-title" id="title">@Localizer["lbbtnChangePassword"]</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -179,21 +180,21 @@
            <div class="form-group">
           <input type="text" asp-for="changePassword.Id" hidden class="form-control" id="userPassId"/>
 
-           <label class="control-label" asp-for="changePassword.NewPassword">@ResourceWeb.lbPassword</label>
+           <label class="control-label" asp-for="changePassword.NewPassword">@Localizer["lbPassword"]</label>
            <input type="password" asp-for="changePassword.NewPassword" class="form-control" />
            <span asp-validation-for="changePassword.NewPassword" class="text-danger"></span>
            </div>
-            <div class="form-group">
-           <label class="control-label" asp-for="changePassword.ConfirmPassword">@ResourceWeb.lbConfirmpassword</label>
-           <input type="password" asp-for="changePassword.ConfirmPassword" class="form-control" />
-           <span asp-validation-for="changePassword.ConfirmPassword" class="text-danger"></span>
-           </div>
-          
+<div class="form-group">
+            <label class="control-label" asp-for="changePassword.ConfirmPassword">@Localizer["lbConfirmpassword"]</label>
+            <input type="password" asp-for="changePassword.ConfirmPassword" class="form-control" />
+            <span asp-validation-for="changePassword.ConfirmPassword" class="text-danger"></span>
+            </div>
+           
              
-            <input  type="submit" class="btn btn-success" value="@ResourceWeb.lbBtnSave" id="btnSave"/>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+             <input  type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="btnSave"/>
+             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 
-       </form>
+        </form>
       </div>
       <div class="modal-footer">
        
@@ -219,7 +220,7 @@
   icon: 'success',
   title:'@Context.Session.GetString(Helper.Title)',
   text:' @Html.Raw(Context.Session.GetString(Helper.Msg))',
-   confirmButtonText:'@ResourceWeb.lbOk'
+confirmButtonText:'@Localizer["lbOk"]'
    
  
 })
@@ -243,20 +244,18 @@ Context.Session.SetString(Helper.MsgType,"");
 
 <script>
 
-     let lbTitleEdit='@Html.Raw(ResourceWeb.lbTitleEdit)';
-     let lbUpdate='@Html.Raw(ResourceWeb.lbUpdate)';
-     let lbBtnSaveNewRole='@Html.Raw(ResourceWeb.lbBtnSaveNewRole)';
-     let lbBtnSave='@Html.Raw(ResourceWeb.lbBtnSave)';
+    let lbTitleEdit='@Html.Raw(Localizer["lbTitleEdit"])';
+    let lbUpdate='@Html.Raw(Localizer["lbUpdate"])';
+    let lbBtnSaveNewRole='@Html.Raw(Localizer["lbBtnSaveNewRole"])';
+    let lbBtnSave='@Html.Raw(Localizer["lbBtnSave"])';
 
-     let lmTextMsgDelete='@Html.Raw(ResourceWeb.lmTextMsgDelete)';
-     let lbconfirmButtonText='@Html.Raw(ResourceWeb.lbconfirmButtonText)';
-     let lbCancelButtonText='@Html.Raw(ResourceWeb.lbCancelButtonText)';
+    let lmTextMsgDelete='@Html.Raw(Localizer["lmTextMsgDelete"])';
+    let lbconfirmButtonText='@Html.Raw(Localizer["lbconfirmButtonText"])';
+    let lbCancelButtonText='@Html.Raw(Localizer["lbCancelButtonText"])';
 
-     let lbTitleDeletedOk='@Html.Raw(ResourceWeb.lbTitleDeletedOk)';
-     let lbSuccess='@Html.Raw(Helper.Success)';
-     let lbPathImageUser='@Html.Raw(Helper.PathImageUser)';
-
-
+    let lbTitleDeletedOk='@Html.Raw(Localizer["lbTitleDeletedOk"])';
+    let lbSuccess='@Html.Raw(Helper.Success)';
+    let lbPathImageUser='@Html.Raw(Helper.PathImageUser)';
 
 
 </script>

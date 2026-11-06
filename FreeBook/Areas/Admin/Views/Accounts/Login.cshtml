@@ -1,10 +1,11 @@
 ﻿@model LoginViewModel
+@inject IStringLocalizer<ResourceWeb> Localizer
 @{
     Layout = null;
 }
 
 <!DOCTYPE html>
-<html>
+<html lang="@CultureInfo.CurrentUICulture.Name" dir="@(CultureInfo.CurrentUICulture.Name == "ar" ? "rtl" : "ltr")">
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -20,6 +21,10 @@
   <link rel="stylesheet" href="~/Admin/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="~/Admin/dist/css/adminlte.min.css">
+  @if (CultureInfo.CurrentUICulture.Name == "ar")
+  {
+      <link rel="stylesheet" href="~/Admin/dist/css/bootstrap-rtl.min.css">
+  }
   <!-- Google Font: Source Sans Pro -->
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 </head>
@@ -33,9 +38,10 @@
     <div class="card-body login-card-body">
       <p class="login-box-msg">Sign in to start your session</p>
 
-      <form asp-action="Login" asp-controller="Accounts" method="post">
-          @if(ViewBag.ErrorLogin==false)
-          {<span class="alert alert-danger w-100">@ResourceWeb.lbMsgErrorLogin</span><br /><br />}
+<form asp-action="Login" asp-controller="Accounts" method="post">
+        @if(ViewBag.ErrorLogin==false)
+        {<span class="alert alert-danger w-100">@Localizer["lbMsgErrorLogin"]</span><br /><br />}
+        @await Html.PartialAsync("_LanguageSwitcher")
         <div class="input-group mb-3">
           <input type="email" class="form-control" asp-for="Email" placeholder="Email">
           <div class="input-group-append">

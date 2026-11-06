@@ -1,5 +1,6 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@inject IStringLocalizer<ResourceWeb> Localizer
+<!DOCTYPE html>
+<html lang="@CultureInfo.CurrentUICulture.Name" dir="@(CultureInfo.CurrentUICulture.Name == "ar" ? "rtl" : "ltr")">
 <head>
 <title>Course</title>
 <meta charset="utf-8">
@@ -7,6 +8,10 @@
 <meta name="description" content="Course Project">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" type="text/css" href="~/web/styles/bootstrap4/bootstrap.min.css">
+@if (CultureInfo.CurrentUICulture.Name == "ar")
+{
+    <link rel="stylesheet" type="text/css" href="~/web/styles/bootstrap4/bootstrap-rtl.min.css">
+}
 <link href="~/web/plugins/fontawesome-free-5.0.1/css/fontawesome-all.css" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="~/web/plugins/OwlCarousel2-2.2.1/owl.carousel.css">
 <link rel="stylesheet" type="text/css" href="~/web/plugins/OwlCarousel2-2.2.1/owl.theme.default.css">
@@ -45,6 +50,7 @@
 			</nav>
 		</div>
 		<div class="header_side d-flex flex-row justify-content-center align-items-center">
+			@await Html.PartialAsync("_LanguageSwitcher")
 			<img src="~/web/images/phone-call.svg" alt="">
 			<span>+43 4566 7788 2457</span>
 		</div>

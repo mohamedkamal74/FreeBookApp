@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AuthorName" xml:space="preserve">
+    <value>Author name is required</value>
+  </data>
+  <data name="BookName" xml:space="preserve">
+    <value>Book name is required</value>
+  </data>
+  <data name="ConfirmPassword" xml:space="preserve">
+    <value>Confirm password</value>
+  </data>
+  <data name="ConfirmPasswordError" xml:space="preserve">
+    <value>Passwords do not match</value>
+  </data>
+  <data name="CtegoryName" xml:space="preserve">
+    <value>This field is required</value>
+  </data>
+  <data name="MaxLength" xml:space="preserve">
+    <value>This field must not exceed 25 characters</value>
+  </data>
+  <data name="MinLength" xml:space="preserve">
+    <value>This field must be at least 5 characters</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Password is required</value>
+  </data>
+  <data name="RegisterEmail" xml:space="preserve">
+    <value>Email is required</value>
+  </data>
+  <data name="RegisterEmailError" xml:space="preserve">
+    <value>Enter a valid email address</value>
+  </data>
+  <data name="RegisterName" xml:space="preserve">
+    <value>User name is required</value>
+  </data>
+  <data name="RoleName" xml:space="preserve">
+    <value>Role name is required</value>
+  </data>
+  <data name="SubCtegoryName" xml:space="preserve">
+    <value>Subcategory name is required</value>
+  </data>
+</root>

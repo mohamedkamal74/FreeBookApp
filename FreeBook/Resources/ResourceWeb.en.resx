@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="lbActionName" xml:space="preserve">
+    <value>Action Name</value>
+  </data>
+  <data name="lbActiveUser" xml:space="preserve">
+    <value>Activate User</value>
+  </data>
+  <data name="lbbtnChangePassword" xml:space="preserve">
+    <value>Change Password</value>
+  </data>
+  <data name="lbbtnDelete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="lbBtnEdit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="lbBtnSave" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="lbBtnSaveNewCategory" xml:space="preserve">
+    <value>Add New Category</value>
+  </data>
+  <data name="lbBtnSaveNewRole" xml:space="preserve">
+    <value>Add New User Group</value>
+  </data>
+  <data name="lbBtnSaveNewUser" xml:space="preserve">
+    <value>Add New User</value>
+  </data>
+  <data name="lbCancelButtonText" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="lbCategories" xml:space="preserve">
+    <value>Categories</value>
+  </data>
+  <data name="lbconfirmButtonText" xml:space="preserve">
+    <value>Yes, delete it</value>
+  </data>
+  <data name="lbConfirmpassword" xml:space="preserve">
+    <value>Confirm Password</value>
+  </data>
+  <data name="lbDate" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="lbDescription" xml:space="preserve">
+    <value>Category Details</value>
+  </data>
+  <data name="lbEdit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="lbEditNewRole" xml:space="preserve">
+    <value>Add New User Group</value>
+  </data>
+  <data name="lbEmailUser" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="lbEvents" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="lbHomePage" xml:space="preserve">
+    <value>Home Page</value>
+  </data>
+  <data name="lbImageUser" xml:space="preserve">
+    <value>User Image</value>
+  </data>
+  <data name="lbLogCategories" xml:space="preserve">
+    <value>Category Operations</value>
+  </data>
+  <data name="lbManageBook" xml:space="preserve">
+    <value>Book Management</value>
+  </data>
+  <data name="lbMsgDeletedOkCategory" xml:space="preserve">
+    <value>Category deleted successfully</value>
+  </data>
+  <data name="lbMsgDenied" xml:space="preserve">
+    <value>You do not have permission for this page</value>
+  </data>
+  <data name="lbMsgDupplicateNameCategory" xml:space="preserve">
+    <value>Category name already exists!</value>
+  </data>
+  <data name="lbMsgErrorLogin" xml:space="preserve">
+    <value>Email or password is incorrect</value>
+  </data>
+  <data name="lbMsgNotSaveCategory" xml:space="preserve">
+    <value>Category not saved</value>
+  </data>
+  <data name="lbMsgNotSaveChangePassword" xml:space="preserve">
+    <value>Password not changed</value>
+  </data>
+  <data name="lbMsgSaveChangePassword" xml:space="preserve">
+    <value>Password changed successfully</value>
+  </data>
+  <data name="lbNameCategory" xml:space="preserve">
+    <value>Category Name</value>
+  </data>
+  <data name="lbNameRole" xml:space="preserve">
+    <value>Group Name</value>
+  </data>
+  <data name="lbNameUser" xml:space="preserve">
+    <value>User Name</value>
+  </data>
+  <data name="lbNotSave" xml:space="preserve">
+    <value>Not saved</value>
+  </data>
+  <data name="lbNotSaveMsgRole" xml:space="preserve">
+    <value>User group not saved</value>
+  </data>
+  <data name="lbNotUpdate" xml:space="preserve">
+    <value>Not updated</value>
+  </data>
+  <data name="lbNotUpdateMsgRole" xml:space="preserve">
+    <value>User group not updated</value>
+  </data>
+  <data name="lbOk" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="lbPassword" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="lbRegisters" xml:space="preserve">
+    <value>Users</value>
+  </data>
+  <data name="lbRoles" xml:space="preserve">
+    <value>User Groups</value>
+  </data>
+  <data name="lbRoleUser" xml:space="preserve">
+    <value>User Groups</value>
+  </data>
+  <data name="lbSave" xml:space="preserve">
+    <value>Saved</value>
+  </data>
+  <data name="lbSaveMsgRole" xml:space="preserve">
+    <value>User group saved successfully</value>
+  </data>
+  <data name="lbSelectUserRole" xml:space="preserve">
+    <value>Select User Group -----</value>
+  </data>
+  <data name="lbTextMsgDelete" xml:space="preserve">
+    <value>Deleted successfully</value>
+  </data>
+  <data name="lbTitleDeletedOk" xml:space="preserve">
+    <value>Deleted Successfully</value>
+  </data>
+  <data name="lbTitleDeleteMsg" xml:space="preserve">
+    <value>Are you sure?</value>
+  </data>
+  <data name="lbTitleEdit" xml:space="preserve">
+    <value>Edit User Group</value>
+  </data>
+  <data name="lbTitleEditCategory" xml:space="preserve">
+    <value>Edit Category</value>
+  </data>
+  <data name="lbUpdate" xml:space="preserve">
+    <value>Updated</value>
+  </data>
+  <data name="lbUpdateMsgRole" xml:space="preserve">
+    <value>User group updated successfully</value>
+  </data>
+  <data name="lbUser" xml:space="preserve">
+    <value>Current Users</value>
+  </data>
+  <data name="lbUserName" xml:space="preserve">
+    <value>User Name</value>
+  </data>
+  <data name="lmTextMsgDelete" xml:space="preserve">
+    <value>You will not be able to undo this!</value>
+  </data>
+  <data name="lbLangArabic" xml:space="preserve">
+    <value>Arabic</value>
+  </data>
+  <data name="lbLangEnglish" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="lbLogout" xml:space="preserve">
+    <value>Logout</value>
+  </data>
+</root>
