@@ -57,6 +57,15 @@ builder.Services.Configure<IdentityOptions>(options =>
 builder.Services.AddScoped<IServiceRepository<Category>, ServicesCategory>();
 builder.Services.AddScoped<IServiceRepositoryLog<LogCategory>, ServiceLogCategory>();
 
+builder.Services.AddScoped<Infrastructure.IRepository.IAuthorRepository, Infrastructure.IRepository.ServiceRepository.ServicesAuthor>();
+builder.Services.AddScoped<IServiceRepository<Book>, Infrastructure.IRepository.ServiceRepository.ServicesBook>();
+builder.Services.AddScoped<IServiceRepository<BookCopy>, Infrastructure.IRepository.ServiceRepository.ServicesBookCopy>();
+builder.Services.AddScoped<IServiceRepository<Rental>, Infrastructure.IRepository.ServiceRepository.ServicesRental>();
+builder.Services.AddScoped<IServiceRepository<Subscriber>, Infrastructure.IRepository.ServiceRepository.ServicesSubscriber>();
+builder.Services.AddScoped<IServiceRepository<Subscription>, Infrastructure.IRepository.ServiceRepository.ServicesSubscription>();
+builder.Services.AddScoped<IServiceRepository<Governorate>, Infrastructure.IRepository.ServiceRepository.ServicesGovernorate>();
+builder.Services.AddScoped<IServiceRepository<Area>, Infrastructure.IRepository.ServiceRepository.ServicesArea>();
+
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Admin";

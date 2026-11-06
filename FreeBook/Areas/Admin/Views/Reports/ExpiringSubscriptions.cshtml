@@ -1,0 +1,69 @@
+@model List<Subscription>
+@inject IStringLocalizer<ResourceWeb> Localizer
+@{
+    ViewData["Title"] = "ExpiringSubscriptions";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">@Localizer["lbExpiringSubscriptions"] (@ViewBag.Days @Localizer["lbDays"])</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/Admin/Reports">@Localizer["lbReports"]</a></li>
+                        <li class="breadcrumb-item active">@Localizer["lbExpiringSubscriptions"]</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <table id="tableExpiring" class="table table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>@Localizer["lbSubscriber"]</th>
+                        <th>@Localizer["lbNationalId"]</th>
+                        <th>@Localizer["lbMobileNumber"]</th>
+                        <th>@Localizer["lbEmail"]</th>
+                        <th>@Localizer["lbStartDate"]</th>
+                        <th>@Localizer["lbEndDate"]</th>
+                        <th>@Localizer["lbDaysLeft"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var sub in Model)
+                    {
+                        var daysLeft = (sub.EndDate - DateTime.UtcNow).Days;
+                        <tr class="@(daysLeft <= 7 ? "table-danger" : (daysLeft <= 14 ? "table-warning" : ""))">
+                            <td>@sub.Subscriber?.FullName</td>
+                            <td>@sub.Subscriber?.NationalId</td>
+                            <td>@sub.Subscriber?.MobileNumber</td>
+                            <td>@sub.Subscriber?.Email</td>
+                            <td>@sub.StartDate.ToString("yyyy-MM-dd")</td>
+                            <td>@sub.EndDate.ToString("yyyy-MM-dd")</td>
+                            <td>@daysLeft @Localizer["lbDays"]</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @section Script{
+        <script>
+            $(function () {
+                $("#tableExpiring").DataTable({
+                    "responsive": true,
+                    "lengthChange": false,
+                    "autoWidth": false,
+                    "buttons": ["copy", "csv", "excel", "pdf", "print"]
+                }).buttons().container().appendTo('#tableExpiring_wrapper .col-md-6:eq(0)');
+            });
+        </script>
+    }

@@ -1,0 +1,140 @@
+@model SubscriptionViewModel
+@inject IStringLocalizer<ResourceWeb> Localizer
+@{
+    ViewData["Title"] = "Subscriptions";
+}
+
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">@Localizer["lbSubscriptions"]</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/Admin/Home/Index"> @Localizer["lbHomePage"]</a></li>
+                        <li class="breadcrumb-item active">@Localizer["lbManageBook"]</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header d-flex align-items-center justify-content-start">
+            <h3 class="card-title">@Localizer["lbSubscriptions"]</h3>
+        </div>
+        <div class="card-tools">
+            <button type="button" class="btn btn-outline-primary rounded-pill mr-5 mt-2" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="Rest()">
+                @Localizer["lbBtnSaveNewCategory"]
+            </button>
+        </div>
+        <div class="card-body">
+            <table id="tableSubscriptions" class="table table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <td>@Localizer["lbSubscriber"]</td>
+                        <td>@Localizer["lbStartDate"]</td>
+                        <td>@Localizer["lbEndDate"]</td>
+                        <td>@Localizer["lbEvents"]</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Subscriptions)
+                    {
+                        var isActive = item.StartDate <= DateTime.UtcNow && item.EndDate >= DateTime.UtcNow;
+                        <tr class="@(isActive ? "table-success" : (item.EndDate < DateTime.UtcNow ? "table-danger" : "table-warning"))">
+                            <td>@item.Subscriber?.FullName</td>
+                            <td>@item.StartDate.ToString("yyyy-MM-dd")</td>
+                            <td>@item.EndDate.ToString("yyyy-MM-dd")</td>
+                            <td>
+                                <input type="button" class="btn btn-danger btn-sm" onclick="DeleteSubscription('@item.Id')" value="@Localizer["lbbtnDelete"]" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="title">@Localizer["lbBtnSaveNewCategory"]</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form asp-action="Save" asp-controller="Subscriptions" method="post">
+                        <div class="form-group">
+                            <input type="text" asp-for="NewSubscription.SubscriptionId" hidden class="form-control" id="subscriptionId"/>
+                            <div class="form-group">
+                                <label class="control-label" asp-for="NewSubscription.SubscriberId">@Localizer["lbSubscriber"]</label>
+                                <select asp-for="NewSubscription.SubscriberId" class="form-control" id="subscriberId"
+                                        asp-items="@(new SelectList(Model.Subscribers,"Id","FullName"))">
+                                    <option value="">@Localizer["lbSelectUserRole"]</option>
+                                </select>
+                                <span asp-validation-for="NewSubscription.SubscriberId" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label" asp-for="NewSubscription.StartDate">@Localizer["lbStartDate"]</label>
+                                <input type="date" asp-for="NewSubscription.StartDate" class="form-control" id="startDate"/>
+                                <span asp-validation-for="NewSubscription.StartDate" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label" asp-for="NewSubscription.EndDate">@Localizer["lbEndDate"]</label>
+                                <input type="date" asp-for="NewSubscription.EndDate" class="form-control" id="endDate"/>
+                                <span asp-validation-for="NewSubscription.EndDate" class="text-danger"></span>
+                            </div>
+                            <input type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="btnSave"/>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form id="deleteForm" method="post" class="d-none">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Id" id="deleteFormId" />
+    </form>
+
+    @section Script{
+        @if(!string.IsNullOrEmpty(Context.Session.GetString(Helper.MsgType)))
+        {
+            if(Context.Session.GetString(Helper.MsgType)==Helper.Success)
+            {
+                <script>
+                Swal.fire({
+                    icon: 'success',
+                    title:'@Context.Session.GetString(Helper.Title)',
+                    text:' @Html.Raw(Context.Session.GetString(Helper.Msg))',
+                    confirmButtonText:'@Localizer["lbOk"]'
+                })
+                </script>
+            }
+            else{
+                <script>
+                    Swal.fire({
+                        icon: 'error',
+                        title: '@Context.Session.GetString(Helper.Title)',
+                        text: '@Html.Raw(Context.Session.GetString(Helper.Msg))',
+                        confirmButtonText:'@Localizer["lbOk"]'
+                    })
+                </script>
+            }
+            Context.Session.SetString("msgType","");
+        }
+
+        <script src="~/Models/Subscriptions.js"></script>
+
+        <script>
+            let lbTitleEdit='@Html.Raw(Localizer["lbTitleEdit"])';
+            let lbEdit='@Html.Raw(Localizer["lbEdit"])';
+            let lbBtnSaveNewCategory='@Html.Raw(Localizer["lbBtnSaveNewCategory"])';
+            let lbSave='@Html.Raw(Localizer["lbSave"])';
+        </script>
+    }

@@ -1,0 +1,58 @@
+@model List<dynamic>
+@inject IStringLocalizer<ResourceWeb> Localizer
+@{
+    ViewData["Title"] = "BooksByCategory";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">@Localizer["lbBooksByCategory"]</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/Admin/Reports">@Localizer["lbReports"]</a></li>
+                        <li class="breadcrumb-item active">@Localizer["lbBooksByCategory"]</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <table id="tableByCategory" class="table table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>@Localizer["lbCategory"]</th>
+                        <th>@Localizer["lbBookCount"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Category?.Name</td>
+                            <td>@item.Count</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @section Script{
+        <script>
+            $(function () {
+                $("#tableByCategory").DataTable({
+                    "responsive": true,
+                    "lengthChange": false,
+                    "autoWidth": false,
+                    "buttons": ["copy", "csv", "excel", "pdf", "print"]
+                }).buttons().container().appendTo('#tableByCategory_wrapper .col-md-6:eq(0)');
+            });
+        </script>
+    }

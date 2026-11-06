@@ -204,10 +204,10 @@
                         <!-- Add icons to the links using the .nav-icon class
                              with font-awesome or any other icon font library -->
                         <li class="nav-item has-treeview menu-open">
-                            <a href="/" class="nav-link active">
+                            <a href="/Admin/Dashboard" class="nav-link active">
                                 <i class="nav-icon fas fa-tachometer-alt"></i>
                                 <p>
-                                    Dashboard
+                                    @Localizer["lbDashboard"]
                                     <i class="right fas fa-angle-left"></i>
                                 </p>
                             </a>
@@ -215,19 +215,67 @@
                                 <li class="nav-item">
                                     <a href="/Admin/Accounts/Roles" class="nav-link active">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>@ResourceWeb.lbRoles</p>
+                                        <p>@Localizer["lbRoles"]</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="/Admin/Accounts/Register" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>@ResourceWeb.lbRegisters</p>
+                                        <p>@Localizer["lbRegisters"]</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="~/Admin/Categories/Categories" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>@ResourceWeb.lbCategories</p>
+                                        <p>@Localizer["lbCategories"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/Admin/Authors/Authors" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>@Localizer["lbAuthors"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/Admin/BookCopies/BookCopies" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>@Localizer["lbBookCopies"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/Admin/Rentals/Rentals" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>@Localizer["lbRentals"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/Admin/Subscribers/Subscribers" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>@Localizer["lbSubscribers"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/Admin/Subscriptions/Subscriptions" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>@Localizer["lbSubscriptions"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/Admin/Governorates/Governorates" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>@Localizer["lbGovernorates"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/Admin/Areas/Areas" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>@Localizer["lbAreas"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/Admin/Reports" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>@Localizer["lbReports"]</p>
                                     </a>
                                 </li>
                             </ul>

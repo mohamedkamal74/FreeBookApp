@@ -1,0 +1,219 @@
+@model SubscriberViewModel
+@inject IStringLocalizer<ResourceWeb> Localizer
+@{
+    ViewData["Title"] = "Subscribers";
+}
+
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">@Localizer["lbSubscribers"]</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/Admin/Home/Index"> @Localizer["lbHomePage"]</a></li>
+                        <li class="breadcrumb-item active">@Localizer["lbManageBook"]</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header d-flex align-items-center justify-content-start">
+            <h3 class="card-title">@Localizer["lbSubscribers"]</h3>
+        </div>
+        <div class="card-tools">
+            <button type="button" class="btn btn-outline-primary rounded-pill mr-5 mt-2" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="Rest()">
+                @Localizer["lbBtnSaveNewUser"]
+            </button>
+        </div>
+        <div class="card-body">
+            <table id="tableSubscribers" class="table table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <td style="width:15%">@Localizer["lbFirstName"]</td>
+                        <td style="width:15%">@Localizer["lbLastName"]</td>
+                        <td style="width:15%">@Localizer["lbNationalId"]</td>
+                        <td style="width:15%">@Localizer["lbMobileNumber"]</td>
+                        <td style="width:10%">@Localizer["lbEmail"]</td>
+                        <td style="width:10%">@Localizer["lbArea"]</td>
+                        <td style="width:10%">@Localizer["lbGovernorate"]</td>
+                        <td style="width:10%">@Localizer["lbIsBlackListed"]</td>
+                        <td style="width:30%">@Localizer["lbEvents"]</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var subscriber in Model.Subscribers)
+                    {
+                        <tr>
+                            <td>@subscriber.FirstName</td>
+                            <td>@subscriber.LastName</td>
+                            <td>@subscriber.NationalId</td>
+                            <td>@subscriber.MobileNumber</td>
+                            <td>@subscriber.Email</td>
+                            <td>@subscriber.Area?.Name</td>
+                            <td>@subscriber.Governorate?.Name</td>
+                            <td>
+                                <input type="checkbox" disabled checked="@subscriber.IsBlackListed" style="width:30px;height:30px"/>
+                            </td>
+                            <td>
+                                <input type="button" class="btn btn-info btn-sm" onclick="Edit('@subscriber.Id','@subscriber.FirstName','@subscriber.LastName','@subscriber.NationalId','@subscriber.MobileNumber','@subscriber.HasWhatsApp','@subscriber.Email','@subscriber.AreaId','@subscriber.GovernorateId','@subscriber.Address','@subscriber.IsBlackListed','@subscriber.DateOfBirth')" value="@Localizer["lbBtnEdit"]" data-bs-toggle="modal" data-bs-target="#exampleModal" />
+                                <input type="button" class="btn btn-danger btn-sm" onclick="DeleteSubscriber('@subscriber.Id')" value="@Localizer["lbbtnDelete"]"/>
+                                <input type="button" class="btn btn-warning btn-sm" onclick="ToggleBlacklist('@subscriber.Id')" value="@(subscriber.IsBlackListed ? Localizer["lbActiveUser"] : Localizer["lbIsBlackListed"])" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="title">@Localizer["lbBtnSaveNewUser"]</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form asp-action="Save" asp-controller="Subscribers" method="post">
+                        <div class="form-group">
+                            <input type="text" asp-for="NewSubscriber.SubscriberId" hidden class="form-control" id="subscriberId"/>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="control-label" asp-for="NewSubscriber.FirstName">@Localizer["lbFirstName"]</label>
+                                    <input type="text" asp-for="NewSubscriber.FirstName" class="form-control" id="firstName"/>
+                                    <span asp-validation-for="NewSubscriber.FirstName" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="control-label" asp-for="NewSubscriber.LastName">@Localizer["lbLastName"]</label>
+                                    <input type="text" asp-for="NewSubscriber.LastName" class="form-control" id="lastName"/>
+                                    <span asp-validation-for="NewSubscriber.LastName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="control-label" asp-for="NewSubscriber.DateOfBirth">@Localizer["lbDateOfBirth"]</label>
+                                    <input type="date" asp-for="NewSubscriber.DateOfBirth" class="form-control" id="dateOfBirth"/>
+                                    <span asp-validation-for="NewSubscriber.DateOfBirth" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="control-label" asp-for="NewSubscriber.NationalId">@Localizer["lbNationalId"]</label>
+                                    <input type="text" asp-for="NewSubscriber.NationalId" class="form-control" id="nationalId"/>
+                                    <span asp-validation-for="NewSubscriber.NationalId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="control-label" asp-for="NewSubscriber.MobileNumber">@Localizer["lbMobileNumber"]</label>
+                                    <input type="text" asp-for="NewSubscriber.MobileNumber" class="form-control" id="mobileNumber"/>
+                                    <span asp-validation-for="NewSubscriber.MobileNumber" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check mt-4">
+                                        <input type="checkbox" asp-for="NewSubscriber.HasWhatsApp" class="form-check-input" id="hasWhatsApp"/>
+                                        <label class="form-check-label" for="hasWhatsApp">@Localizer["lbHasWhatsApp"]</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="control-label" asp-for="NewSubscriber.Email">@Localizer["lbEmail"]</label>
+                                    <input type="email" asp-for="NewSubscriber.Email" class="form-control" id="email"/>
+                                    <span asp-validation-for="NewSubscriber.Email" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="control-label" asp-for="NewSubscriber.AreaId">@Localizer["lbArea"]</label>
+                                    <select asp-for="NewSubscriber.AreaId" class="form-control" id="areaId"
+                                            asp-items="@(new SelectList(Model.Areas,"Id","Name"))">
+                                        <option value="">@Localizer["lbSelectUserRole"]</option>
+                                    </select>
+                                    <span asp-validation-for="NewSubscriber.AreaId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="control-label" asp-for="NewSubscriber.GovernorateId">@Localizer["lbGovernorate"]</label>
+                                    <select asp-for="NewSubscriber.GovernorateId" class="form-control" id="governorateId"
+                                            asp-items="@(new SelectList(Model.Governorates,"Id","Name"))">
+                                        <option value="">@Localizer["lbSelectUserRole"]</option>
+                                    </select>
+                                    <span asp-validation-for="NewSubscriber.GovernorateId" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="control-label" asp-for="NewSubscriber.IsBlackListed">@Localizer["lbIsBlackListed"]</label>
+                                    <div class="form-check mt-4">
+                                        <input type="checkbox" asp-for="NewSubscriber.IsBlackListed" class="form-check-input" id="isBlackListed"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label" asp-for="NewSubscriber.Address">@Localizer["lbAddress"]</label>
+                                <textarea asp-for="NewSubscriber.Address" class="form-control" id="address" rows="3"></textarea>
+                                <span asp-validation-for="NewSubscriber.Address" class="text-danger"></span>
+                            </div>
+                            <input type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="btnSave"/>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form id="deleteForm" method="post" class="d-none">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Id" id="deleteFormSubscriberId" />
+    </form>
+
+    <form id="blacklistForm" method="post" class="d-none">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Id" id="blacklistFormId" />
+    </form>
+
+    @section Script{
+        @if(!string.IsNullOrEmpty(Context.Session.GetString(Helper.MsgType)))
+        {
+            if(Context.Session.GetString(Helper.MsgType)==Helper.Success)
+            {
+                <script>
+                Swal.fire({
+                    icon: 'success',
+                    title:'@Context.Session.GetString(Helper.Title)',
+                    text:' @Html.Raw(Context.Session.GetString(Helper.Msg))',
+                    confirmButtonText:'@Localizer["lbOk"]'
+                })
+                </script>
+            }
+            else{
+                <script>
+                    Swal.fire({
+                        icon: 'error',
+                        title: '@Context.Session.GetString(Helper.Title)',
+                        text: '@Html.Raw(Context.Session.GetString(Helper.Msg))',
+                        confirmButtonText:'@Localizer["lbOk"]'
+                    })
+                </script>
+            }
+            Context.Session.SetString("msgType","");
+        }
+
+        <script src="~/Models/Subscribers.js"></script>
+
+        <script>
+            let lbTitleEdit='@Html.Raw(Localizer["lbTitleEdit"])';
+            let lbUpdate='@Html.Raw(Localizer["lbUpdate"])';
+            let lbBtnSaveNewRole='@Html.Raw(Localizer["lbBtnSaveNewRole"])';
+            let lbBtnSave='@Html.Raw(Localizer["lbBtnSave"])';
+            let lmTextMsgDelete='@Html.Raw(Localizer["lmTextMsgDelete"])';
+            let lbconfirmButtonText='@Html.Raw(Localizer["lbconfirmButtonText"])';
+            let lbCancelButtonText='@Html.Raw(Localizer["lbCancelButtonText"])';
+            let lbTitleDeletedOk='@Html.Raw(Localizer["lbTitleDeletedOk"])';
+            let lbSuccess='@Html.Raw(Helper.Success)';
+            let lbPathImageUser='@Html.Raw(Helper.PathImageUser)';
+        </script>
+    }

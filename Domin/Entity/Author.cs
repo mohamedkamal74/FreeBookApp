@@ -16,6 +16,16 @@ namespace Domin.Entity
         [MinLength(2, ErrorMessageResourceType = typeof(Resources.ResourceData), ErrorMessageResourceName = "MinLength")]
         public string Name { get; set; } = null!;
 
+        public bool IsDeleted { get; set; }
+
+        public string? CreatedById { get; set; }
+
+        public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
+
+        public string? LastUpdatedById { get; set; }
+
+        public DateTime? LastUpdatedOn { get; set; }
+
         public ICollection<Book> Books { get; set; } = new List<Book>();
     }
 }

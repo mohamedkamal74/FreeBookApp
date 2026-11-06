@@ -1,0 +1,81 @@
+@inject IStringLocalizer<ResourceWeb> Localizer
+@{
+    ViewData["Title"] = "Reports";
+}
+
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">@Localizer["lbReports"]</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card card-primary card-outline">
+                <div class="card-body text-center">
+                    <h4>@Localizer["lbOverdueBooks"]</h4>
+                    <p class="text-muted">@Localizer["lbViewOverdueBooks"]</p>
+                    <a href="/Admin/Reports/OverdueBooks" class="btn btn-primary">@Localizer["lbViewReport"]</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-success card-outline">
+                <div class="card-body text-center">
+                    <h4>@Localizer["lbPopularBooks"]</h4>
+                    <p class="text-muted">@Localizer["lbViewPopularBooks"]</p>
+                    <a href="/Admin/Reports/PopularBooks" class="btn btn-success">@Localizer["lbViewReport"]</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-info card-outline">
+                <div class="card-body text-center">
+                    <h4>@Localizer["lbActiveSubscribers"]</h4>
+                    <p class="text-muted">@Localizer["lbViewActiveSubscribers"]</p>
+                    <a href="/Admin/Reports/ActiveSubscribers" class="btn btn-info">@Localizer["lbViewReport"]</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-warning card-outline">
+                <div class="card-body text-center">
+                    <h4>@Localizer["lbExpiringSubscriptions"]</h4>
+                    <p class="text-muted">@Localizer["lbViewExpiringSubscriptions"]</p>
+                    <a href="/Admin/Reports/ExpiringSubscriptions" class="btn btn-warning">@Localizer["lbViewReport"]</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-danger card-outline">
+                <div class="card-body text-center">
+                    <h4>@Localizer["lbRentalHistory"]</h4>
+                    <p class="text-muted">@Localizer["lbViewRentalHistory"]</p>
+                    <a href="/Admin/Reports/RentalHistory" class="btn btn-danger">@Localizer["lbViewReport"]</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-secondary card-outline">
+                <div class="card-body text-center">
+                    <h4>@Localizer["lbBooksByCategory"]</h4>
+                    <p class="text-muted">@Localizer["lbViewBooksByCategory"]</p>
+                    <a href="/Admin/Reports/BooksByCategory" class="btn btn-secondary">@Localizer["lbViewReport"]</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-dark card-outline">
+                <div class="card-body text-center">
+                    <h4>@Localizer["lbBooksByAuthor"]</h4>
+                    <p class="text-muted">@Localizer["lbViewBooksByAuthor"]</p>
+                    <a href="/Admin/Reports/BooksByAuthor" class="btn btn-dark">@Localizer["lbViewReport"]</a>
+                </div>
+            </div>
+        </div>
+    </div>

@@ -1,0 +1,201 @@
+@model RentalViewModel
+@inject IStringLocalizer<ResourceWeb> Localizer
+@{
+    ViewData["Title"] = "Rentals";
+}
+
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">@Localizer["lbRentals"]</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/Admin/Home/Index"> @Localizer["lbHomePage"]</a></li>
+                        <li class="breadcrumb-item active">@Localizer["lbManageBook"]</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header d-flex align-items-center justify-content-start">
+            <h3 class="card-title">@Localizer["lbRentals"]</h3>
+        </div>
+        <div class="card-tools">
+            <button type="button" class="btn btn-outline-primary rounded-pill mr-5 mt-2" data-bs-toggle="modal" data-bs-target="#createRentalModal" onclick="Rest()">
+                @Localizer["lbBtnSaveNewCategory"]
+            </button>
+        </div>
+        <div class="card-body">
+            <table id="tableRentals" class="table table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <td>@Localizer["lbSubscriber"]</td>
+                        <td>@Localizer["lbRentalDate"]</td>
+                        <td>@Localizer["lbEndDate"]</td>
+                        <td>@Localizer["lbReturnDate"]</td>
+                        <td>@Localizer["lbPenaltyPaid"]</td>
+                        <td>@Localizer["lbEvents"]</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var rental in Model.Rentals)
+                    {
+                        var hasOverdue = rental.RentalCopies.Any(rc => rc.ReturnDate == null && rc.EndDate < DateTime.UtcNow);
+                        var hasActive = rental.RentalCopies.Any(rc => rc.ReturnDate == null);
+                        <tr class="@(hasOverdue ? "table-danger" : (hasActive ? "table-warning" : ""))">
+                            <td>@rental.Subscriber?.FullName</td>
+                            <td>@rental.StartDate.ToString("yyyy-MM-dd")</td>
+                            <td>
+                                @if (rental.RentalCopies.Any())
+                                {
+                                    var minEndDate = rental.RentalCopies.Min(rc => rc.EndDate);
+                                    var maxEndDate = rental.RentalCopies.Max(rc => rc.EndDate);
+                                    @minEndDate.ToString("yyyy-MM-dd")
+                                    @if (minEndDate != maxEndDate) { <text> - @maxEndDate.ToString("yyyy-MM-dd")</text> }
+                                }
+                            </td>
+                            <td>
+                                @if (rental.RentalCopies.Any())
+                                {
+                                    var returned = rental.RentalCopies.Where(rc => rc.ReturnDate != null).ToList();
+                                    if (returned.Any())
+                                    {
+                                        var minReturn = returned.Min(rc => rc.ReturnDate);
+                                        var maxReturn = returned.Max(rc => rc.ReturnDate);
+                                        @minReturn.Value.ToString("yyyy-MM-dd")
+                                        @if (minReturn != maxReturn) { <text> - @maxReturn.Value.ToString("yyyy-MM-dd")</text> }
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">@Localizer["lbPending"]</span>
+                                    }
+                                }
+                            </td>
+                            <td>
+                                <input type="checkbox" disabled checked="@rental.PenaltyPaid" style="width:30px;height:30px"/>
+                            </td>
+                            <td>
+                                @foreach (var rc in rental.RentalCopies)
+                                {
+                                    if (rc.ReturnDate == null)
+                                    {
+                                        <div class="btn-group btn-group-sm mb-1" role="group">
+                                            <form asp-action="ReturnBook" asp-controller="Rentals" method="post" style="display:inline;">
+                                                <input type="hidden" name="RentalId" value="@rental.Id" />
+                                                <input type="hidden" name="RentalCopyId" value="@rc.BookCopyId" />
+                                                <input type="hidden" name="ReturnDate" value="@DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss")" />
+                                                <button type="submit" class="btn btn-success" title="@Localizer["lbReturn"]">
+                                                    <i class="fas fa-undo"></i>
+                                                </button>
+                                            </form>
+                                            <form asp-action="ExtendRental" asp-controller="Rentals" method="post" style="display:inline;">
+                                                <input type="hidden" name="RentalId" value="@rental.Id" />
+                                                <input type="hidden" name="RentalCopyId" value="@rc.BookCopyId" />
+                                                <input type="date" name="NewEndDate" value="@rc.EndDate.AddDays(7).ToString("yyyy-MM-dd")" class="form-control form-control-sm" style="width:130px;display:inline-block;" />
+                                                <button type="submit" class="btn btn-info" title="@Localizer["lbExtend"]">
+                                                    <i class="fas fa-calendar-plus"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-success">@Localizer["lbReturned"]</span>
+                                    }
+                                }
+                                @if (rental.RentalCopies.Any(rc => rc.ReturnDate == null && rc.EndDate < DateTime.UtcNow) && !rental.PenaltyPaid)
+                                {
+                                    <form asp-action="PayPenalty" asp-controller="Rentals" method="post" style="display:inline;">
+                                        <input type="hidden" name="rentalId" value="@rental.Id" />
+                                        <button type="submit" class="btn btn-danger btn-sm" title="@Localizer["lbPayPenalty"]">
+                                            <i class="fas fa-money-bill-wave"></i> @Localizer["lbPenaltyPaid"]
+                                        </button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Create Rental Modal -->
+    <div class="modal fade" id="createRentalModal" tabindex="-1" aria-labelledby="createRentalModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createRentalModalLabel">@Localizer["lbCreateRental"]</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form asp-action="CreateRental" asp-controller="Rentals" method="post">
+                        <div class="form-group">
+                            <label class="control-label" asp-for="NewRental.SubscriberId">@Localizer["lbSubscriber"]</label>
+                            <select asp-for="NewRental.SubscriberId" class="form-control" id="subscriberId"
+                                    asp-items="@(new SelectList(Model.Subscribers,"Id","FullName"))">
+                                <option value="">@Localizer["lbSelectUserRole"]</option>
+                            </select>
+                            <span asp-validation-for="NewRental.SubscriberId" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">@Localizer["lbAvailableCopies"]</label>
+                            <div style="max-height: 300px; overflow-y: auto;">
+                                @foreach (var copy in Model.AvailableCopies.Where(c => c.IsAvailableForRental))
+                                {
+                                    <div class="form-check">
+                                        <input class="form-check-input copy-checkbox" type="checkbox" name="SelectedCopyIds" value="@copy.Id" id="copy_@copy.Id" data-title="@copy.Book?.Name" data-edition="@copy.EditionNumber" data-serial="@copy.SerialNumber">
+                                        <label class="form-check-label" for="copy_@copy.Id">
+                                            @copy.Book?.Name - Edition: @copy.EditionNumber, Serial: @copy.SerialNumber
+                                        </label>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <input type="submit" class="btn btn-success" value="@Localizer["lbCreateRental"]" id="btnCreateRental"/>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section Script{
+        @if(!string.IsNullOrEmpty(Context.Session.GetString(Helper.MsgType)))
+        {
+            if(Context.Session.GetString(Helper.MsgType)==Helper.Success)
+            {
+                <script>
+                Swal.fire({
+                    icon: 'success',
+                    title:'@Context.Session.GetString(Helper.Title)',
+                    text:' @Html.Raw(Context.Session.GetString(Helper.Msg))',
+                    confirmButtonText:'@Localizer["lbOk"]'
+                })
+                </script>
+            }
+            else{
+                <script>
+                    Swal.fire({
+                        icon: 'error',
+                        title: '@Context.Session.GetString(Helper.Title)',
+                        text: '@Html.Raw(Context.Session.GetString(Helper.Msg))',
+                        confirmButtonText:'@Localizer["lbOk"]'
+                    })
+                </script>
+            }
+            Context.Session.SetString("msgType","");
+        }
+
+        <script>
+            let lbTitleDeleteMsg='@Html.Raw(Localizer["lbTitleDeleteMsg"])';
+            let lmTextMsgDelete='@Html.Raw(Localizer["lmTextMsgDelete"])';
+            let lbconfirmButtonText='@Html.Raw(Localizer["lbconfirmButtonText"])';
+            let lbCancelButtonText='@Html.Raw(Localizer["lbCancelButtonText"])';
+            let lbTitleDeletedOk='@Html.Raw(Localizer["lbTitleDeletedOk"])';
+        </script>
+    }

@@ -1,0 +1,232 @@
+@inject IStringLocalizer<ResourceWeb> Localizer
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">@Localizer["lbDashboard"]</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-info">
+                <div class="inner">
+                    <h3>@ViewBag.TotalBooks</h3>
+                    <p>@Localizer["lbTotalBooks"]</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-book"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-success">
+                <div class="inner">
+                    <h3>@ViewBag.AvailableCopies</h3>
+                    <p>@Localizer["lbAvailableCopies"]</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-book-reader"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-warning">
+                <div class="inner">
+                    <h3>@ViewBag.TotalSubscribers</h3>
+                    <p>@Localizer["lbTotalSubscribers"]</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-users"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-primary">
+                <div class="inner">
+                    <h3>@ViewBag.ActiveSubscriptions</h3>
+                    <p>@Localizer["lbActiveSubscriptions"]</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-id-card"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-danger">
+                <div class="inner">
+                    <h3>@ViewBag.ActiveRentals</h3>
+                    <p>@Localizer["lbActiveRentals"]</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-hand-holding"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-danger">
+                <div class="inner">
+                    <h3>@ViewBag.OverdueRentals</h3>
+                    <p>@Localizer["lbOverdueBooks"]</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-info">
+                <div class="inner">
+                    <h3>@ViewBag.ExpiringSubscriptions</h3>
+                    <p>@Localizer["lbExpiringSubscriptions"]</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-secondary">
+                <div class="inner">
+                    <h3>@ViewBag.BlacklistedSubscribers</h3>
+                    <p>@Localizer["lbBlacklistedSubscribers"]</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-user-slash"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">@Localizer["lbRecentRentals"]</h3>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>@Localizer["lbSubscriber"]</th>
+                                <th>@Localizer["lbRentalDate"]</th>
+                                <th>@Localizer["lbEvents"]</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var rental in ViewBag.RecentRentals)
+                            {
+                                <tr>
+                                    <td>@rental.Subscriber?.FullName</td>
+                                    <td>@rental.StartDate.ToString("yyyy-MM-dd")</td>
+                                    <td>
+                                        @rental.RentalCopies.Count copies
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">@Localizer["lbOverdueBooks"]</h3>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>@Localizer["lbSubscriber"]</th>
+                                <th>@Localizer["lbBookName"]</th>
+                                <th>@Localizer["lbEndDate"]</th>
+                                <th>@Localizer["lbPenaltyPaid"]</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var rental in (List<Rental>)ViewBag.OverdueList)
+                            {
+                                var overdueCopies = rental.RentalCopies.Where(c => c.ReturnDate == null && c.EndDate < DateTime.UtcNow).ToList();
+                                foreach (var rc in overdueCopies)
+                                {
+                                    <tr class="table-danger">
+                                        <td>@rental.Subscriber?.FullName</td>
+                                        <td>@rc.BookCopy?.Book?.Name</td>
+                                        <td>@rc.EndDate.ToString("yyyy-MM-dd")</td>
+                                        <td>
+                                            @(rental.PenaltyPaid ? Localizer["lbPaid"] : Localizer["lbPending"])
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">@Localizer["lbExpiringSubscriptions"]</h3>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>@Localizer["lbSubscriber"]</th>
+                                <th>@Localizer["lbEndDate"]</th>
+                                <th>@Localizer["lbDaysLeft"]</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var sub in ViewBag.ExpiringSubs)
+                            {
+                                var daysLeft = (sub.EndDate - DateTime.UtcNow).Days;
+                                <tr class="@(daysLeft <= 7 ? "table-danger" : (daysLeft <= 14 ? "table-warning" : ""))">
+                                    <td>@sub.Subscriber?.FullName</td>
+                                    <td>@sub.EndDate.ToString("yyyy-MM-dd")</td>
+                                    <td>@daysLeft @Localizer["lbDays"]</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">@Localizer["lbRecentSubscribers"]</h3>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>@Localizer["lbSubscriber"]</th>
+                                <th>@Localizer["lbArea"]</th>
+                                <th>@Localizer["lbGovernorate"]</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var subscriber in ViewBag.RecentSubscribers)
+                            {
+                                <tr>
+                                    <td>@subscriber.FullName</td>
+                                    <td>@subscriber.Area?.Name</td>
+                                    <td>@subscriber.Governorate?.Name</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
