@@ -41,7 +41,6 @@
 <form asp-action="Login" asp-controller="Accounts" method="post">
         @if(ViewBag.ErrorLogin==false)
         {<span class="alert alert-danger w-100">@Localizer["lbMsgErrorLogin"]</span><br /><br />}
-        @await Html.PartialAsync("_LanguageSwitcher")
         <div class="input-group mb-3">
           <input type="email" class="form-control" asp-for="Email" placeholder="Email">
           <div class="input-group-append">
@@ -77,6 +76,8 @@
           <!-- /.col -->
         </div>
       </form>
+
+      @await Html.PartialAsync("_LanguageSwitcher")
 
       <div class="social-auth-links text-center mb-3">
         <p>- OR -</p>

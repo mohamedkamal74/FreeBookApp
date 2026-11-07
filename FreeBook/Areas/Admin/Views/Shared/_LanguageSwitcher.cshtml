@@ -2,7 +2,7 @@
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IStringLocalizer<ResourceWeb> Localizer
 
-<form asp-controller="Localization" asp-action="SetCulture" method="post" class="d-inline ms-3">
+<form asp-area="" asp-controller="Localization" asp-action="SetCulture" method="post" class="d-inline ms-3">
     <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
     <select name="culture" class="form-select form-select-sm" onchange="this.form.submit()" style="width: auto;">
         @if (CultureInfo.CurrentUICulture.Name == "ar")
