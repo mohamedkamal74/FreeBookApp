@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Domin.Entity;
 using Hangfire;
+using Infrastructure.Common;
 using Infrastructure.Common.Interfaces;
 using Infrastructure.IRepository;
 using Microsoft.Extensions.Logging;
@@ -38,7 +39,14 @@ namespace FreeBook.Jobs
             {
                 _logger.LogInformation("Starting overdue notification job");
 
-                var overdue = await _rentalRepo.GetOverdueRentalsAsync();
+                var overdueResult = await _rentalRepo.GetOverdueRentalsAsync();
+                if (!overdueResult.IsSuccess)
+                {
+                    _logger.LogError("Failed to get overdue rentals: {Error}", overdueResult.Error?.Message);
+                    return;
+                }
+
+                var overdue = overdueResult.Value ?? new List<Rental>();
                 int notificationsSent = 0;
 
                 foreach (var rental in overdue)
@@ -46,9 +54,10 @@ namespace FreeBook.Jobs
                     foreach (var copy in rental.RentalCopies.Where(c => c.ReturnDate == null && c.EndDate < DateTime.UtcNow))
                     {
                         var daysOverdue = (DateTime.UtcNow - copy.EndDate).Days;
-                        var subscriber = await _subscriberRepo.FindByIdAsync(rental.SubscriberId);
-                        if (subscriber == null) continue;
+                        var subscriberResult = await _subscriberRepo.FindByIdAsync(rental.SubscriberId);
+                        if (!subscriberResult.IsSuccess || subscriberResult.Value == null) continue;
 
+                        var subscriber = subscriberResult.Value;
                         _logger.LogInformation("Overdue notification for {Subscriber}: {BookTitle} ({Days} days overdue)",
                             subscriber.FullName, copy.BookCopy.Book.Name, daysOverdue);
                         notificationsSent++;

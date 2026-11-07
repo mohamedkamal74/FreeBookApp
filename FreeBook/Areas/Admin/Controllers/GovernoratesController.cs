@@ -1,4 +1,5 @@
 using Domin.Entity;
+using Infrastructure.Common;
 using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Authorization;
@@ -19,9 +20,10 @@ namespace FreeBook.Areas.Admin.Controllers
 
         public async Task<IActionResult> Governorates(GovernorateViewModel model)
         {
+            var result = await _serviceGovernorate.GetAllAsync();
             return View(new GovernorateViewModel
             {
-                Governorates = await _serviceGovernorate.GetAllAsync(),
+                Governorates = result.IsSuccess ? result.Value ?? new List<Governorate>() : new List<Governorate>(),
                 NewGovernorate = new NewGovernorate()
             });
         }
@@ -30,9 +32,10 @@ namespace FreeBook.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteGovernorate(Guid Id)
         {
-            if (await _serviceGovernorate.DeleteAsync(Id))
+            var result = await _serviceGovernorate.DeleteAsync(Id);
+            if (result.IsSuccess)
                 return RedirectToAction(nameof(Governorates));
-            SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, "Cannot delete governorate with associated areas or subscribers");
+            SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, result.Error?.Message ?? "Cannot delete governorate with associated areas or subscribers");
             return RedirectToAction(nameof(Governorates));
         }
 
@@ -43,7 +46,8 @@ namespace FreeBook.Areas.Admin.Controllers
             if (model.NewGovernorate.GovernorateId == null || model.NewGovernorate.GovernorateId == Guid.Empty.ToString())
             {
                 // create
-                if (await _serviceGovernorate.FindByAsync(model.NewGovernorate.Name) != null)
+                var findResult = await _serviceGovernorate.FindByAsync(model.NewGovernorate.Name);
+                if (findResult.IsSuccess && findResult.Value != null)
                     SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDupplicateNameCategory);
                 else
                 {
@@ -52,7 +56,8 @@ namespace FreeBook.Areas.Admin.Controllers
                         Id = Guid.NewGuid(),
                         Name = model.NewGovernorate.Name
                     };
-                    if (await _serviceGovernorate.SaveAsync(newGovernorate))
+                    var saveResult = await _serviceGovernorate.SaveAsync(newGovernorate);
+                    if (saveResult.IsSuccess)
                         SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbSaveMsgRole);
                     else
                         SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbNotSaveMsgRole);
@@ -61,11 +66,12 @@ namespace FreeBook.Areas.Admin.Controllers
             else
             {
                 // update
-                var existingGovernorate = await _serviceGovernorate.FindByIdAsync(Guid.Parse(model.NewGovernorate.GovernorateId));
-                if (existingGovernorate is not null)
+                var existingResult = await _serviceGovernorate.FindByIdAsync(Guid.Parse(model.NewGovernorate.GovernorateId));
+                if (existingResult.IsSuccess && existingResult.Value is not null)
                 {
-                    existingGovernorate.Name = model.NewGovernorate.Name;
-                    if (await _serviceGovernorate.SaveAsync(existingGovernorate))
+                    existingResult.Value.Name = model.NewGovernorate.Name;
+                    var saveResult = await _serviceGovernorate.SaveAsync(existingResult.Value);
+                    if (saveResult.IsSuccess)
                         SessionMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbUpdateMsgRole);
                     else
                         SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbNotUpdateMsgRole);

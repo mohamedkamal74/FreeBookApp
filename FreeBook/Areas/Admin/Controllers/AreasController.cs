@@ -1,4 +1,5 @@
 using Domin.Entity;
+using Infrastructure.Common;
 using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Authorization;
@@ -23,10 +24,12 @@ namespace FreeBook.Areas.Admin.Controllers
 
         public async Task<IActionResult> Areas(AreaViewModel model)
         {
+            var areasResult = await _serviceArea.GetAllAsync();
+            var govResult = await _serviceGovernorate.GetAllAsync();
             return View(new AreaViewModel
             {
-                Areas = await _serviceArea.GetAllAsync(),
-                Governorates = await _serviceGovernorate.GetAllAsync(),
+                Areas = areasResult.IsSuccess ? areasResult.Value ?? new List<Area>() : new List<Area>(),
+                Governorates = govResult.IsSuccess ? govResult.Value ?? new List<Governorate>() : new List<Governorate>(),
                 NewArea = new NewArea()
             });
         }
@@ -35,9 +38,10 @@ namespace FreeBook.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteArea(Guid Id)
         {
-            if (await _serviceArea.DeleteAsync(Id))
+            var result = await _serviceArea.DeleteAsync(Id);
+            if (result.IsSuccess)
                 return RedirectToAction(nameof(Areas));
-            SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, "Cannot delete area with associated subscribers");
+            SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, result.Error?.Message ?? "Cannot delete area with associated subscribers");
             return RedirectToAction(nameof(Areas));
         }
 
@@ -54,7 +58,8 @@ namespace FreeBook.Areas.Admin.Controllers
                     Name = model.NewArea.Name,
                     GovernorateId = model.NewArea.GovernorateId
                 };
-                if (await _serviceArea.SaveAsync(newArea))
+                var saveResult = await _serviceArea.SaveAsync(newArea);
+                if (saveResult.IsSuccess)
                     SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbSaveMsgRole);
                 else
                     SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbNotSaveMsgRole);
@@ -62,12 +67,13 @@ namespace FreeBook.Areas.Admin.Controllers
             else
             {
                 // update
-                var existingArea = await _serviceArea.FindByIdAsync(Guid.Parse(model.NewArea.AreaId));
-                if (existingArea is not null)
+                var existingResult = await _serviceArea.FindByIdAsync(Guid.Parse(model.NewArea.AreaId));
+                if (existingResult.IsSuccess && existingResult.Value is not null)
                 {
-                    existingArea.Name = model.NewArea.Name;
-                    existingArea.GovernorateId = model.NewArea.GovernorateId;
-                    if (await _serviceArea.SaveAsync(existingArea))
+                    existingResult.Value.Name = model.NewArea.Name;
+                    existingResult.Value.GovernorateId = model.NewArea.GovernorateId;
+                    var saveResult = await _serviceArea.SaveAsync(existingResult.Value);
+                    if (saveResult.IsSuccess)
                         SessionMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbUpdateMsgRole);
                     else
                         SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbNotUpdateMsgRole);

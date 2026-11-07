@@ -1,4 +1,5 @@
 using Domin.Entity;
+using Infrastructure.Common;
 using Infrastructure.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -44,7 +45,8 @@ namespace FreeBook.Areas.Admin.Controllers
         public async Task<IActionResult> OverdueBooks()
         {
             var now = DateTime.UtcNow;
-            var rentals = await _serviceRental.GetAllAsync();
+            var rentalsResult = await _serviceRental.GetAllAsync();
+            var rentals = rentalsResult.IsSuccess ? rentalsResult.Value ?? new List<Rental>() : new List<Rental>();
             var overdueRentals = rentals
                 .Where(r => r.RentalCopies.Any(rc => rc.ReturnDate == null && rc.EndDate < now))
                 .OrderBy(r => r.StartDate)
@@ -54,7 +56,8 @@ namespace FreeBook.Areas.Admin.Controllers
 
         public async Task<IActionResult> PopularBooks()
         {
-            var rentals = await _serviceRental.GetAllAsync();
+            var rentalsResult = await _serviceRental.GetAllAsync();
+            var rentals = rentalsResult.IsSuccess ? rentalsResult.Value ?? new List<Rental>() : new List<Rental>();
             var popularBooks = rentals
                 .SelectMany(r => r.RentalCopies)
                 .GroupBy(rc => rc.BookCopy.BookId)
@@ -72,7 +75,8 @@ namespace FreeBook.Areas.Admin.Controllers
 
         public async Task<IActionResult> ActiveSubscribers()
         {
-            var subscribers = await _serviceSubscriber.GetAllAsync();
+            var subsResult = await _serviceSubscriber.GetAllAsync();
+            var subscribers = subsResult.IsSuccess ? subsResult.Value ?? new List<Subscriber>() : new List<Subscriber>();
             var now = DateTime.UtcNow;
             var activeSubs = subscribers
                 .Where(s => s.Subscriptions.Any(sub => sub.StartDate <= now && sub.EndDate >= now))
@@ -83,7 +87,8 @@ namespace FreeBook.Areas.Admin.Controllers
 
         public async Task<IActionResult> ExpiringSubscriptions(int days = 30)
         {
-            var subscriptions = await _serviceSubscription.GetAllAsync();
+            var subsResult = await _serviceSubscription.GetAllAsync();
+            var subscriptions = subsResult.IsSuccess ? subsResult.Value ?? new List<Subscription>() : new List<Subscription>();
             var now = DateTime.UtcNow;
             var future = now.AddDays(days);
             var expiring = subscriptions
@@ -96,8 +101,10 @@ namespace FreeBook.Areas.Admin.Controllers
 
         public async Task<IActionResult> RentalHistory(Guid? subscriberId = null)
         {
-            var rentals = await _serviceRental.GetAllAsync();
-            var subscribers = await _serviceSubscriber.GetAllAsync();
+            var rentalsResult = await _serviceRental.GetAllAsync();
+            var subsResult = await _serviceSubscriber.GetAllAsync();
+            var rentals = rentalsResult.IsSuccess ? rentalsResult.Value ?? new List<Rental>() : new List<Rental>();
+            var subscribers = subsResult.IsSuccess ? subsResult.Value ?? new List<Subscriber>() : new List<Subscriber>();
 
             if (subscriberId.HasValue)
             {
@@ -111,8 +118,10 @@ namespace FreeBook.Areas.Admin.Controllers
 
         public async Task<IActionResult> BooksByCategory()
         {
-            var books = await _serviceBook.GetAllAsync();
-            var categories = await _serviceCategory.GetAllAsync();
+            var booksResult = await _serviceBook.GetAllAsync();
+            var catResult = await _serviceCategory.GetAllAsync();
+            var books = booksResult.IsSuccess ? booksResult.Value ?? new List<Book>() : new List<Book>();
+            var categories = catResult.IsSuccess ? catResult.Value ?? new List<Category>() : new List<Category>();
 
             var booksByCategory = books
                 .Where(b => b.CategoryId.HasValue)
@@ -131,8 +140,10 @@ namespace FreeBook.Areas.Admin.Controllers
 
         public async Task<IActionResult> BooksByAuthor()
         {
-            var books = await _serviceBook.GetAllAsync();
-            var authors = await _serviceAuthor.GetAllAsync();
+            var booksResult = await _serviceBook.GetAllAsync();
+            var authResult = await _serviceAuthor.GetAllAsync();
+            var books = booksResult.IsSuccess ? booksResult.Value ?? new List<Book>() : new List<Book>();
+            var authors = authResult.IsSuccess ? authResult.Value ?? new List<Author>() : new List<Author>();
 
             var booksByAuthor = books
                 .Where(b => b.AuthorId != Guid.Empty)

@@ -1,4 +1,5 @@
 using Domin.Entity;
+using Infrastructure.Common;
 using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Authorization;
@@ -27,10 +28,12 @@ namespace FreeBook.Areas.Admin.Controllers
 
         public async Task<IActionResult> Subscriptions(SubscriptionViewModel model)
         {
+            var subsResult = await _serviceSubscription.GetAllAsync();
+            var subsResult2 = await _serviceSubscriber.GetAllAsync();
             return View(new SubscriptionViewModel
             {
-                Subscriptions = await _serviceSubscription.GetAllAsync(),
-                Subscribers = await _serviceSubscriber.GetAllAsync(),
+                Subscriptions = subsResult.IsSuccess ? subsResult.Value ?? new List<Subscription>() : new List<Subscription>(),
+                Subscribers = subsResult2.IsSuccess ? subsResult2.Value ?? new List<Subscriber>() : new List<Subscriber>(),
                 NewSubscription = new NewSubscription()
             });
         }
@@ -39,7 +42,8 @@ namespace FreeBook.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteSubscription(Guid Id)
         {
-            if (await _serviceSubscription.DeleteAsync(Id))
+            var result = await _serviceSubscription.DeleteAsync(Id);
+            if (result.IsSuccess)
                 return RedirectToAction(nameof(Subscriptions));
             return RedirectToAction(nameof(Subscriptions));
         }
@@ -64,7 +68,8 @@ namespace FreeBook.Areas.Admin.Controllers
                     CreatedById = userId,
                     CreatedOn = DateTime.UtcNow
                 };
-                if (await _serviceSubscription.SaveAsync(newSubscription))
+                var saveResult = await _serviceSubscription.SaveAsync(newSubscription);
+                if (saveResult.IsSuccess)
                     SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbSaveMsgRole);
                 else
                     SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbNotSaveMsgRole);
@@ -72,14 +77,15 @@ namespace FreeBook.Areas.Admin.Controllers
             else
             {
                 // update
-                var existingSubscription = await _serviceSubscription.FindByIdAsync(Guid.Parse(model.NewSubscription.SubscriptionId));
-                if (existingSubscription is not null)
+                var existingResult = await _serviceSubscription.FindByIdAsync(Guid.Parse(model.NewSubscription.SubscriptionId));
+                if (existingResult.IsSuccess && existingResult.Value is not null)
                 {
-                    existingSubscription.SubscriberId = model.NewSubscription.SubscriberId;
-                    existingSubscription.StartDate = model.NewSubscription.StartDate;
-                    existingSubscription.EndDate = model.NewSubscription.EndDate;
-                    existingSubscription.CreatedById = userId;
-                    if (await _serviceSubscription.SaveAsync(existingSubscription))
+                    existingResult.Value.SubscriberId = model.NewSubscription.SubscriberId;
+                    existingResult.Value.StartDate = model.NewSubscription.StartDate;
+                    existingResult.Value.EndDate = model.NewSubscription.EndDate;
+                    existingResult.Value.CreatedById = userId;
+                    var saveResult = await _serviceSubscription.SaveAsync(existingResult.Value);
+                    if (saveResult.IsSuccess)
                         SessionMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbUpdateMsgRole);
                     else
                         SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbNotUpdateMsgRole);

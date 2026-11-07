@@ -1,4 +1,5 @@
 using Domin.Entity;
+using Infrastructure.Common;
 using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Authorization;
@@ -23,10 +24,12 @@ namespace FreeBook.Areas.Admin.Controllers
 
         public async Task<IActionResult> BookCopies(BookCopyViewModel model)
         {
+            var copiesResult = await _serviceBookCopy.GetAllAsync();
+            var booksResult = await _serviceBook.GetAllAsync();
             return View(new BookCopyViewModel
             {
-                BookCopies = await _serviceBookCopy.GetAllAsync(),
-                Books = await _serviceBook.GetAllAsync(),
+                BookCopies = copiesResult.IsSuccess ? copiesResult.Value ?? new List<BookCopy>() : new List<BookCopy>(),
+                Books = booksResult.IsSuccess ? booksResult.Value ?? new List<Book>() : new List<Book>(),
                 NewBookCopy = new NewBookCopy()
             });
         }
@@ -35,7 +38,8 @@ namespace FreeBook.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteBookCopy(Guid Id)
         {
-            if (await _serviceBookCopy.DeleteAsync(Id))
+            var result = await _serviceBookCopy.DeleteAsync(Id);
+            if (result.IsSuccess)
                 return RedirectToAction(nameof(BookCopies));
             return RedirectToAction(nameof(BookCopies));
         }
@@ -55,7 +59,8 @@ namespace FreeBook.Areas.Admin.Controllers
                     SerialNumber = model.NewBookCopy.SerialNumber,
                     IsAvailableForRental = model.NewBookCopy.IsAvailableForRental
                 };
-                if (await _serviceBookCopy.SaveAsync(newBookCopy))
+                var saveResult = await _serviceBookCopy.SaveAsync(newBookCopy);
+                if (saveResult.IsSuccess)
                     SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbSaveMsgRole);
                 else
                     SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbNotSaveMsgRole);
@@ -63,14 +68,15 @@ namespace FreeBook.Areas.Admin.Controllers
             else
             {
                 // update
-                var existingCopy = await _serviceBookCopy.FindByIdAsync(Guid.Parse(model.NewBookCopy.BookCopyId));
-                if (existingCopy is not null)
+                var existingResult = await _serviceBookCopy.FindByIdAsync(Guid.Parse(model.NewBookCopy.BookCopyId));
+                if (existingResult.IsSuccess && existingResult.Value is not null)
                 {
-                    existingCopy.BookId = model.NewBookCopy.BookId;
-                    existingCopy.EditionNumber = model.NewBookCopy.EditionNumber;
-                    existingCopy.SerialNumber = model.NewBookCopy.SerialNumber;
-                    existingCopy.IsAvailableForRental = model.NewBookCopy.IsAvailableForRental;
-                    if (await _serviceBookCopy.SaveAsync(existingCopy))
+                    existingResult.Value.BookId = model.NewBookCopy.BookId;
+                    existingResult.Value.EditionNumber = model.NewBookCopy.EditionNumber;
+                    existingResult.Value.SerialNumber = model.NewBookCopy.SerialNumber;
+                    existingResult.Value.IsAvailableForRental = model.NewBookCopy.IsAvailableForRental;
+                    var saveResult = await _serviceBookCopy.SaveAsync(existingResult.Value);
+                    if (saveResult.IsSuccess)
                         SessionMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbUpdateMsgRole);
                     else
                         SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbNotUpdateMsgRole);

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Domin.Entity;
 using Hangfire;
+using Infrastructure.Common;
 using Infrastructure.Common.Interfaces;
 using Infrastructure.IRepository;
 using Microsoft.Extensions.Logging;
@@ -44,13 +45,21 @@ namespace FreeBook.Jobs
 
                 foreach (var days in daysToCheck)
                 {
-                    var expiring = await _subRepo.GetExpiringSubscriptionsAsync(days);
+                    var expiringResult = await _subRepo.GetExpiringSubscriptionsAsync(days);
+                    if (!expiringResult.IsSuccess)
+                    {
+                        _logger.LogError("Failed to get expiring subscriptions: {Error}", expiringResult.Error?.Message);
+                        continue;
+                    }
+
+                    var expiring = expiringResult.Value ?? new List<Subscription>();
 
                     foreach (var sub in expiring)
                     {
-                        var subscriber = await _subscriberRepo.FindByIdAsync(sub.SubscriberId);
-                        if (subscriber == null) continue;
+                        var subscriberResult = await _subscriberRepo.FindByIdAsync(sub.SubscriberId);
+                        if (!subscriberResult.IsSuccess || subscriberResult.Value == null) continue;
 
+                        var subscriber = subscriberResult.Value;
                         _logger.LogInformation("Subscription expiring for {Subscriber} in {Days} days", subscriber.FullName, days);
                         notificationsSent++;
                     }

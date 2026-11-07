@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Domin.Entity;
+using Infrastructure.Common;
 
 namespace Infrastructure.IRepository
 {
     public interface IRentalRepository : IServiceRepository<Rental>
     {
-        Task<List<Rental>> GetOverdueRentalsAsync();
-        Task<Rental?> GetActiveRentalBySubscriberAsync(Guid subscriberId);
+        Task<Result<List<Rental>>> GetOverdueRentalsAsync();
+        Task<Result<Rental?>> GetActiveRentalBySubscriberAsync(Guid subscriberId);
     }
 }

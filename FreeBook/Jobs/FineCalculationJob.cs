@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Domin.Entity;
 using Hangfire;
+using Infrastructure.Common;
 using Infrastructure.Common.Configuration;
 using Infrastructure.Common.Interfaces;
 using Infrastructure.IRepository;
@@ -42,7 +43,14 @@ namespace FreeBook.Jobs
             {
                 _logger.LogInformation("Starting daily fine calculation job");
 
-                var overdueRentals = await _rentalRepo.GetOverdueRentalsAsync();
+                var overdueResult = await _rentalRepo.GetOverdueRentalsAsync();
+                if (!overdueResult.IsSuccess)
+                {
+                    _logger.LogError("Failed to get overdue rentals: {Error}", overdueResult.Error?.Message);
+                    return;
+                }
+
+                var overdueRentals = overdueResult.Value ?? new List<Rental>();
                 var now = DateTime.UtcNow;
                 int finesApplied = 0;
 
@@ -57,12 +65,18 @@ namespace FreeBook.Jobs
                         if (fine > _fineSettings.MaxFinePerBook) fine = _fineSettings.MaxFinePerBook;
 
                         rental.TotalFine = (rental.TotalFine ?? 0) + fine;
-                        await _rentalRepo.SaveAsync(rental);
+                        var saveResult = await _rentalRepo.SaveAsync(rental);
+                        if (!saveResult.IsSuccess)
+                        {
+                            _logger.LogWarning("Failed to save rental {RentalId}: {Error}", rental.Id, saveResult.Error?.Message);
+                            continue;
+                        }
                         finesApplied++;
 
-                        var subscriber = await _subscriberRepo.FindByIdAsync(rental.SubscriberId);
-                        if (subscriber != null)
+                        var subscriberResult = await _subscriberRepo.FindByIdAsync(rental.SubscriberId);
+                        if (subscriberResult.IsSuccess && subscriberResult.Value != null)
                         {
+                            var subscriber = subscriberResult.Value;
                             if (subscriber.HasWhatsApp && !string.IsNullOrEmpty(subscriber.MobileNumber))
                             {
                                 await _smsService.SendAsync(subscriber.MobileNumber,

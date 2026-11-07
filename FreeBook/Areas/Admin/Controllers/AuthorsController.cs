@@ -1,4 +1,5 @@
 using Domin.Entity;
+using Infrastructure.Common;
 using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Authorization;
@@ -22,9 +23,10 @@ namespace FreeBook.Areas.Admin.Controllers
 
         public async Task<IActionResult> Authors(AuthorViewModel model)
         {
+            var authorsResult = await _serviceAuthor.GetAllActiveAsync();
             return View(new AuthorViewModel
             {
-                Authors = await _serviceAuthor.GetAllActiveAsync(),
+                Authors = authorsResult.IsSuccess ? authorsResult.Value ?? new List<Author>() : new List<Author>(),
                 NewAuthor = new NewAuthor()
             });
         }
@@ -34,8 +36,12 @@ namespace FreeBook.Areas.Admin.Controllers
         public async Task<IActionResult> DeleteAuthor(Guid Id)
         {
             var userId = _userManager.GetUserId(User);
-            if (userId is not null && await _serviceAuthor.DeleteAsync(Id))
-                return RedirectToAction(nameof(Authors));
+            if (userId is not null)
+            {
+                var result = await _serviceAuthor.DeleteAsync(Id);
+                if (result.IsSuccess)
+                    return RedirectToAction(nameof(Authors));
+            }
             return RedirectToAction(nameof(Authors));
         }
 
@@ -50,7 +56,8 @@ namespace FreeBook.Areas.Admin.Controllers
             if (model.NewAuthor.AuthorId == null || model.NewAuthor.AuthorId == Guid.Empty.ToString())
             {
                 // create
-                if (await _serviceAuthor.FindByNameAsync(model.NewAuthor.Name) != null)
+                var findResult = await _serviceAuthor.FindByNameAsync(model.NewAuthor.Name);
+                if (findResult.IsSuccess && findResult.Value != null)
                     SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDupplicateNameCategory);
                 else
                 {
@@ -59,7 +66,8 @@ namespace FreeBook.Areas.Admin.Controllers
                         Id = Guid.NewGuid(),
                         Name = model.NewAuthor.Name
                     };
-                    if (await _serviceAuthor.SaveAsync(newAuthor))
+                    var saveResult = await _serviceAuthor.SaveAsync(newAuthor);
+                    if (saveResult.IsSuccess)
                         SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbSaveMsgRole);
                     else
                         SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbNotSaveMsgRole);
@@ -68,11 +76,12 @@ namespace FreeBook.Areas.Admin.Controllers
             else
             {
                 // update
-                var existingAuthor = await _serviceAuthor.FindByIdAsync(Guid.Parse(model.NewAuthor.AuthorId));
-                if (existingAuthor is not null)
+                var existingAuthorResult = await _serviceAuthor.FindByIdAsync(Guid.Parse(model.NewAuthor.AuthorId));
+                if (existingAuthorResult.IsSuccess && existingAuthorResult.Value is not null)
                 {
-                    existingAuthor.Name = model.NewAuthor.Name;
-                    if (await _serviceAuthor.SaveAsync(existingAuthor))
+                    existingAuthorResult.Value.Name = model.NewAuthor.Name;
+                    var saveResult = await _serviceAuthor.SaveAsync(existingAuthorResult.Value);
+                    if (saveResult.IsSuccess)
                         SessionMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbUpdateMsgRole);
                     else
                         SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbNotUpdateMsgRole);

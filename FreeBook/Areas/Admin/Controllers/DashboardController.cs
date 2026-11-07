@@ -1,4 +1,5 @@
 using Domin.Entity;
+using Infrastructure.Common;
 using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Authorization;
@@ -33,11 +34,17 @@ namespace FreeBook.Areas.Admin.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var books = await _serviceBook.GetAllAsync();
-            var copies = await _serviceBookCopy.GetAllAsync();
-            var subscribers = await _serviceSubscriber.GetAllAsync();
-            var subscriptions = await _serviceSubscription.GetAllAsync();
-            var rentals = await _serviceRental.GetAllAsync();
+            var booksResult = await _serviceBook.GetAllAsync();
+            var copiesResult = await _serviceBookCopy.GetAllAsync();
+            var subsResult = await _serviceSubscriber.GetAllAsync();
+            var subsResult2 = await _serviceSubscription.GetAllAsync();
+            var rentalsResult = await _serviceRental.GetAllAsync();
+
+            var books = booksResult.IsSuccess ? booksResult.Value ?? new List<Book>() : new List<Book>();
+            var copies = copiesResult.IsSuccess ? copiesResult.Value ?? new List<BookCopy>() : new List<BookCopy>();
+            var subscribers = subsResult.IsSuccess ? subsResult.Value ?? new List<Subscriber>() : new List<Subscriber>();
+            var subscriptions = subsResult2.IsSuccess ? subsResult2.Value ?? new List<Subscription>() : new List<Subscription>();
+            var rentals = rentalsResult.IsSuccess ? rentalsResult.Value ?? new List<Rental>() : new List<Rental>();
 
             var now = DateTime.UtcNow;
             var activeRentals = rentals.Where(r => r.RentalCopies.Any(rc => rc.ReturnDate == null)).ToList();
