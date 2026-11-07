@@ -20,6 +20,11 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.14" />
+    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.16" />
+    <PackageReference Include="Hangfire.SqlServer" Version="1.8.16" />
+    <PackageReference Include="CloudinaryDotNet" Version="1.26.2" />
+    <PackageReference Include="Twilio" Version="6.20.0" />
+    <PackageReference Include="MailKit" Version="4.7.1" />
   </ItemGroup>
 
   <ItemGroup>

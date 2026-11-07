@@ -4,11 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Domin.Entity;
 using Infrastructure.Data;
+using Infrastructure.IRepository;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.IRepository.ServiceRepository
 {
-    public class ServicesSubscription : IServiceRepository<Subscription>
+    public class ServicesSubscription : ISubscriptionRepository
     {
         private readonly FreeBookDbContext _context;
 

@@ -3,6 +3,8 @@ using System.Threading.RateLimiting;
 using Domin.Entity;
 using FreeBook.Data;
 using FreeBook.Middleware;
+using Hangfire;
+using Infrastructure.Common.Configuration;
 using Infrastructure.Data;
 using Infrastructure.IRepository;
 using Infrastructure.IRepository.ServiceRepository;
@@ -60,11 +62,22 @@ builder.Services.AddScoped<IServiceRepositoryLog<LogCategory>, ServiceLogCategor
 builder.Services.AddScoped<Infrastructure.IRepository.IAuthorRepository, Infrastructure.IRepository.ServiceRepository.ServicesAuthor>();
 builder.Services.AddScoped<IServiceRepository<Book>, Infrastructure.IRepository.ServiceRepository.ServicesBook>();
 builder.Services.AddScoped<IServiceRepository<BookCopy>, Infrastructure.IRepository.ServiceRepository.ServicesBookCopy>();
-builder.Services.AddScoped<IServiceRepository<Rental>, Infrastructure.IRepository.ServiceRepository.ServicesRental>();
+builder.Services.AddScoped<Infrastructure.IRepository.IRentalRepository, Infrastructure.IRepository.ServiceRepository.ServicesRental>();
 builder.Services.AddScoped<IServiceRepository<Subscriber>, Infrastructure.IRepository.ServiceRepository.ServicesSubscriber>();
-builder.Services.AddScoped<IServiceRepository<Subscription>, Infrastructure.IRepository.ServiceRepository.ServicesSubscription>();
+builder.Services.AddScoped<Infrastructure.IRepository.ISubscriptionRepository, Infrastructure.IRepository.ServiceRepository.ServicesSubscription>();
 builder.Services.AddScoped<IServiceRepository<Governorate>, Infrastructure.IRepository.ServiceRepository.ServicesGovernorate>();
 builder.Services.AddScoped<IServiceRepository<Area>, Infrastructure.IRepository.ServiceRepository.ServicesArea>();
+
+// Core services
+builder.Services.AddScoped<Infrastructure.Common.Interfaces.IEmailService, Infrastructure.Services.EmailService>();
+builder.Services.AddScoped<Infrastructure.Common.Interfaces.IImageService, Infrastructure.Services.CloudinaryImageService>();
+builder.Services.AddScoped<Infrastructure.Common.Interfaces.ISmsService, Infrastructure.Services.TwilioSmsService>();
+
+// Background jobs
+builder.Services.AddScoped<FreeBook.Jobs.FineCalculationJob>();
+builder.Services.AddScoped<FreeBook.Jobs.ExpiryCheckJob>();
+builder.Services.AddScoped<FreeBook.Jobs.OverdueNotificationJob>();
+builder.Services.AddScoped<FreeBook.Jobs.CleanupJob>();
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -76,6 +89,12 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.ExpireTimeSpan = TimeSpan.FromHours(8);
     options.SlidingExpiration = true;
 });
+
+// Configuration binding
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Email"));
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
+builder.Services.Configure<TwilioSettings>(builder.Configuration.GetSection("Twilio"));
+builder.Services.Configure<FineSettings>(builder.Configuration.GetSection("FineConfig"));
 
 // Localization configuration
 var localizationSection = builder.Configuration.GetSection("Localization");
@@ -92,6 +111,25 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
         new QueryStringRequestCultureProvider(),
         new AcceptLanguageHeaderRequestCultureProvider()
     };
+});
+
+// Hangfire configuration
+builder.Services.AddHangfire(config =>
+    config.UseSqlServerStorage(builder.Configuration.GetConnectionString("BookConnection"),
+        new Hangfire.SqlServer.SqlServerStorageOptions
+        {
+            CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+            SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+            QueuePollInterval = TimeSpan.Zero,
+            UseRecommendedIsolationLevel = true,
+            DisableGlobalLocks = true
+        }));
+
+builder.Services.AddHangfireServer(options =>
+{
+    options.ServerName = "Bookify.Server";
+    options.WorkerCount = Environment.ProcessorCount;
+    options.Queues = new[] { "default", "emails", "notifications", "fines", "reports" };
 });
 
 
@@ -120,6 +158,16 @@ app.UseRateLimiter();
 app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Hangfire Dashboard
+var hangfirePath = app.Configuration["Hangfire:DashboardPath"] ?? "/hangfire";
+app.UseHangfireDashboard(hangfirePath, new DashboardOptions
+{
+    Authorization = new[] { new HangfireAdminAuthorizationFilter() },
+    DashboardTitle = "Bookify Background Jobs",
+    StatsPollingInterval = 30000
+});
+
 app.MapRazorPages();
 app.MapHealthChecks("/health");
 
@@ -140,6 +188,18 @@ if (app.Configuration.GetValue<bool>("Startup:MigrateOnStartup")
     || app.Configuration.GetValue<bool>("Startup:SeedAdmin"))
 {
     await DatabaseInitializer.InitializeAsync(app.Services, app.Configuration, app.Logger);
+}
+
+// Schedule recurring jobs
+using (var scope = app.Services.CreateScope())
+{
+    var recurringJobManager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
+
+    // These will be registered once the job classes are created
+    // recurringJobManager.AddOrUpdate<FineCalculationJob>("daily-fines", x => x.CalculateDailyFinesAsync(), Cron.Daily(2, 0));
+    // recurringJobManager.AddOrUpdate<ExpiryCheckJob>("expiry-check", x => x.CheckExpiringSubscriptionsAsync(), Cron.Daily(8, 0));
+    // recurringJobManager.AddOrUpdate<OverdueNotificationJob>("overdue-notifications", x => x.SendOverdueNotificationsAsync(), Cron.Daily(9, 0));
+    // recurringJobManager.AddOrUpdate<CleanupJob>("cleanup-old-jobs", x => x.CleanupAsync(), Cron.Weekly(DayOfWeek.Sunday, 3, 0));
 }
 
 app.Run();

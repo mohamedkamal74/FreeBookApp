@@ -19,6 +19,8 @@ namespace Domin.Entity
 
         public bool PenaltyPaid { get; set; } = false;
 
+        public decimal? TotalFine { get; set; }
+
         public ICollection<RentalCopy> RentalCopies { get; set; } = new List<RentalCopy>();
     }
 }

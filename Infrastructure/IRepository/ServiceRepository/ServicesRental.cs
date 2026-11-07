@@ -4,11 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Domin.Entity;
 using Infrastructure.Data;
+using Infrastructure.IRepository;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.IRepository.ServiceRepository
 {
-    public class ServicesRental : IServiceRepository<Rental>
+    public class ServicesRental : IRentalRepository
     {
         private readonly FreeBookDbContext _context;
 
@@ -91,6 +92,7 @@ namespace Infrastructure.IRepository.ServiceRepository
                 {
                     result.SubscriberId = model.SubscriberId;
                     result.PenaltyPaid = model.PenaltyPaid;
+                    result.TotalFine = model.TotalFine;
                     _context.Rentals.Update(result);
                 }
 
