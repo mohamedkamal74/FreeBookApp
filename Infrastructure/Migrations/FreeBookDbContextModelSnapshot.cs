@@ -51,6 +51,21 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasDefaultValueSql("(newid())");
 
+                    b.Property<string>("CreatedById")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastUpdatedById")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastUpdatedOn")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -302,6 +317,9 @@ namespace Infrastructure.Migrations
 
                     b.Property<Guid>("SubscriberId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal?>("TotalFine")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 

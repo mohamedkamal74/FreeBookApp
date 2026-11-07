@@ -1,11 +1,13 @@
 ﻿@inject IStringLocalizer<ResourceWeb> Localizer
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
 <!DOCTYPE html>
 <html lang="@CultureInfo.CurrentUICulture.Name" dir="@(CultureInfo.CurrentUICulture.Name == "ar" ? "rtl" : "ltr")">
 <head>
-<title>Course</title>
+<title>@Localizer["lbHomePage"]</title>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="description" content="Course Project">
+<meta name="description" content="@Localizer["lbWelcomeDesc"]">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" type="text/css" href="~/web/styles/bootstrap4/bootstrap.min.css">
 @if (CultureInfo.CurrentUICulture.Name == "ar")
@@ -31,7 +33,7 @@
 			<div class="logo_container">
 				<div class="logo">
 					<img src="~/web/images/logo.png" alt="">
-					<span>course</span>
+					<span>Bookify</span>
 				</div>
 			</div>
 
@@ -39,12 +41,27 @@
 			<nav class="main_nav_container">
 				<div class="main_nav">
 					<ul class="main_nav_list">
-						<li class="main_nav_item"><a href="#">home</a></li>
-						<li class="main_nav_item"><a href="#">about us</a></li>
-						<li class="main_nav_item"><a href="courses.html">courses</a></li>
-						<li class="main_nav_item"><a href="elements.html">elements</a></li>
-						<li class="main_nav_item"><a href="news.html">news</a></li>
-						<li class="main_nav_item"><a href="contact.html">contact</a></li>
+						<li class="main_nav_item"><a asp-controller="Home" asp-action="Index">@Localizer["lbHome"]</a></li>
+						
+						@if (SignInManager.IsSignedIn(User))
+						{
+							<li class="main_nav_item"><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index">@Localizer["lbDashboard"]</a></li>
+							<li class="main_nav_item"><a asp-area="Admin" asp-controller="Categories" asp-action="Categories">@Localizer["lbCategories"]</a></li>
+							<li class="main_nav_item"><a asp-area="Admin" asp-controller="Authors" asp-action="Authors">@Localizer["lbAuthors"]</a></li>
+							<li class="main_nav_item"><a href="#" class="text-muted" title="@Localizer["lbComingSoon"]">@Localizer["lbManageBook"] <span class="badge bg-warning ms-1">@Localizer["lbComingSoon"]</span></a></li>
+							<li class="main_nav_item"><a asp-area="Admin" asp-controller="BookCopies" asp-action="BookCopies">@Localizer["lbBookCopies"]</a></li>
+							<li class="main_nav_item"><a asp-area="Admin" asp-controller="Subscribers" asp-action="Subscribers">@Localizer["lbSubscribers"]</a></li>
+							<li class="main_nav_item"><a asp-area="Admin" asp-controller="Rentals" asp-action="Rentals">@Localizer["lbRentals"]</a></li>
+							<li class="main_nav_item"><a asp-area="Admin" asp-controller="Reports" asp-action="Index">@Localizer["lbReports"]</a></li>
+						}
+						else
+						{
+							<li class="main_nav_item"><a asp-area="Admin" asp-controller="Accounts" asp-action="Login">@Localizer["lbAdminLogin"]</a></li>
+						}
+						
+						<li class="main_nav_item"><a href="/hangfire" target="_blank">@Localizer["lbHangfire"]</a></li>
+						<li class="main_nav_item"><a href="/swagger" target="_blank">@Localizer["lbSwagger"]</a></li>
+						<li class="main_nav_item"><a href="/health">@Localizer["lbHealth"]</a></li>
 					</ul>
 				</div>
 			</nav>
@@ -74,12 +91,27 @@
 		<div class="menu_inner menu_mm">
 			<div class="menu menu_mm">
 				<ul class="menu_list menu_mm">
-					<li class="menu_item menu_mm"><a href="#">Home</a></li>
-					<li class="menu_item menu_mm"><a href="#">About us</a></li>
-					<li class="menu_item menu_mm"><a href="courses.html">Courses</a></li>
-					<li class="menu_item menu_mm"><a href="elements.html">Elements</a></li>
-					<li class="menu_item menu_mm"><a href="news.html">News</a></li>
-					<li class="menu_item menu_mm"><a href="contact.html">Contact</a></li>
+					<li class="menu_item menu_mm"><a asp-controller="Home" asp-action="Index">@Localizer["lbHome"]</a></li>
+					
+					@if (SignInManager.IsSignedIn(User))
+					{
+						<li class="menu_item menu_mm"><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index">@Localizer["lbDashboard"]</a></li>
+						<li class="menu_item menu_mm"><a asp-area="Admin" asp-controller="Categories" asp-action="Categories">@Localizer["lbCategories"]</a></li>
+						<li class="menu_item menu_mm"><a asp-area="Admin" asp-controller="Authors" asp-action="Authors">@Localizer["lbAuthors"]</a></li>
+						<li class="menu_item menu_mm"><a href="#" class="text-muted" title="@Localizer["lbComingSoon"]">@Localizer["lbManageBook"] <span class="badge bg-warning ms-1">@Localizer["lbComingSoon"]</span></a></li>
+						<li class="menu_item menu_mm"><a asp-area="Admin" asp-controller="BookCopies" asp-action="BookCopies">@Localizer["lbBookCopies"]</a></li>
+						<li class="menu_item menu_mm"><a asp-area="Admin" asp-controller="Subscribers" asp-action="Subscribers">@Localizer["lbSubscribers"]</a></li>
+						<li class="menu_item menu_mm"><a asp-area="Admin" asp-controller="Rentals" asp-action="Rentals">@Localizer["lbRentals"]</a></li>
+						<li class="menu_item menu_mm"><a asp-area="Admin" asp-controller="Reports" asp-action="Index">@Localizer["lbReports"]</a></li>
+					}
+					else
+					{
+						<li class="menu_item menu_mm"><a asp-area="Admin" asp-controller="Accounts" asp-action="Login">@Localizer["lbAdminLogin"]</a></li>
+					}
+					
+					<li class="menu_item menu_mm"><a href="/hangfire" target="_blank">@Localizer["lbHangfire"]</a></li>
+					<li class="menu_item menu_mm"><a href="/swagger" target="_blank">@Localizer["lbSwagger"]</a></li>
+					<li class="menu_item menu_mm"><a href="/health">@Localizer["lbHealth"]</a></li>
 				</ul>
 
 				<!-- Menu Social -->
@@ -94,7 +126,7 @@
 					</ul>
 				</div>
 
-				<div class="menu_copyright menu_mm">Colorlib All rights reserved</div>
+				<div class="menu_copyright menu_mm">Bookify All rights reserved</div>
 			</div>
 
 		</div>
@@ -114,7 +146,7 @@
 					<div class="hero_slide_background" style="background-image:url(web/images/slider_background.jpg)"></div>
 					<div class="hero_slide_container d-flex flex-column align-items-center justify-content-center">
 						<div class="hero_slide_content text-center">
-							<h1 data-animation-in="fadeInUp" data-animation-out="animate-out fadeOut">Get your <span>Education</span> today!</h1>
+							<h1 data-animation-in="fadeInUp" data-animation-out="animate-out fadeOut">@Localizer["lbWelcome"] <span>@Localizer["lbWelcomeDesc"]</span>!</h1>
 						</div>
 					</div>
 				</div>
@@ -124,7 +156,7 @@
 					<div class="hero_slide_background" style="background-image:url(web/images/slider_background.jpg)"></div>
 					<div class="hero_slide_container d-flex flex-column align-items-center justify-content-center">
 						<div class="hero_slide_content text-center">
-							<h1 data-animation-in="fadeInUp" data-animation-out="animate-out fadeOut">Get your <span>Education</span> today!</h1>
+							<h1 data-animation-in="fadeInUp" data-animation-out="animate-out fadeOut">@Localizer["lbWelcome"] <span>@Localizer["lbWelcomeDesc"]</span>!</h1>
 						</div>
 					</div>
 				</div>
@@ -134,7 +166,7 @@
 					<div class="hero_slide_background" style="background-image:url(web/images/slider_background.jpg)"></div>
 					<div class="hero_slide_container d-flex flex-column align-items-center justify-content-center">
 						<div class="hero_slide_content text-center">
-							<h1 data-animation-in="fadeInUp" data-animation-out="animate-out fadeOut">Get your <span>Education</span> today!</h1>
+							<h1 data-animation-in="fadeInUp" data-animation-out="animate-out fadeOut">@Localizer["lbWelcome"] <span>@Localizer["lbWelcomeDesc"]</span>!</h1>
 						</div>
 					</div>
 				</div>
@@ -156,8 +188,8 @@
 						<div class="hero_box d-flex flex-row align-items-center justify-content-start">
 							<img src="~/web/images/earth-globe.svg" class="svg" alt="">
 							<div class="hero_box_content">
-								<h2 class="hero_box_title">Online Courses</h2>
-								<a href="courses.html" class="hero_box_link">view more</a>
+								<h2 class="hero_box_title">@Localizer["lbCategories"]</h2>
+								<a asp-area="Admin" asp-controller="Categories" asp-action="Categories" class="hero_box_link">@Localizer["lbViewReport"]</a>
 							</div>
 						</div>
 					</div>
@@ -166,8 +198,8 @@
 						<div class="hero_box d-flex flex-row align-items-center justify-content-start">
 							<img src="~/web/images/books.svg" class="svg" alt="">
 							<div class="hero_box_content">
-								<h2 class="hero_box_title">Our Library</h2>
-								<a href="courses.html" class="hero_box_link">view more</a>
+								<h2 class="hero_box_title">@Localizer["lbManageBook"]</h2>
+								<a href="#" class="hero_box_link text-muted" title="@Localizer["lbComingSoon"]">@Localizer["lbViewReport"] <span class="badge bg-warning">@Localizer["lbComingSoon"]</span></a>
 							</div>
 						</div>
 					</div>
@@ -176,8 +208,8 @@
 						<div class="hero_box d-flex flex-row align-items-center justify-content-start">
 							<img src="~/web/images/professor.svg" class="svg" alt="">
 							<div class="hero_box_content">
-								<h2 class="hero_box_title">Our Teachers</h2>
-								<a href="teachers.html" class="hero_box_link">view more</a>
+								<h2 class="hero_box_title">@Localizer["lbAuthors"]</h2>
+								<a asp-area="Admin" asp-controller="Authors" asp-action="Authors" class="hero_box_link">@Localizer["lbViewReport"]</a>
 							</div>
 						</div>
 					</div>
@@ -202,7 +234,7 @@
 				<div class="row">
 					<div class="col">
 						<div class="section_title text-center">
-							<h1>Subscribe to newsletter</h1>
+							<h1>@Localizer["lbHomePage"]</h1>
 						</div>
 					</div>
 				</div>
@@ -212,8 +244,8 @@
 						<div class="newsletter_form_container mx-auto">
 							<form action="post">
 								<div class="newsletter_form d-flex flex-md-row flex-column flex-xs-column align-items-center justify-content-center">
-									<input id="newsletter_email" class="newsletter_email" type="email" placeholder="Email Address" required="required" data-error="Valid email is required.">
-									<button id="newsletter_submit" type="submit" class="newsletter_submit_btn trans_300" value="Submit">Subscribe</button>
+									<input id="newsletter_email" class="newsletter_email" type="email" placeholder="@Localizer["lbEmailUser"]" required="required" data-error="Valid email is required.">
+									<button id="newsletter_submit" type="submit" class="newsletter_submit_btn trans_300" value="Submit">@Localizer["lbBtnSave"]</button>
 								</div>
 							</form>
 						</div>
@@ -234,25 +266,27 @@
 						<div class="logo_container">
 							<div class="logo">
 								<img src="~/web/images/logo.png" alt="">
-								<span>course</span>
+								<span>Bookify</span>
 							</div>
 						</div>
 
-						<p class="footer_about_text">In aliquam, augue a gravida rutrum, ante nisl fermentum nulla, vitae tempor nisl ligula vel nunc. Proin quis mi malesuada, finibus tortor fermentum, tempor lacus.</p>
+						<p class="footer_about_text">@Localizer["lbWelcomeDesc"]</p>
 
 					</div>
 
 					<!-- Footer Column - Menu -->
 
 					<div class="col-lg-3 footer_col">
-						<div class="footer_column_title">Menu</div>
+						<div class="footer_column_title">@Localizer["lbCategories"]</div>
 						<div class="footer_column_content">
 							<ul>
-								<li class="footer_list_item"><a href="#">Home</a></li>
-								<li class="footer_list_item"><a href="#">About Us</a></li>
-								<li class="footer_list_item"><a href="courses.html">Courses</a></li>
-								<li class="footer_list_item"><a href="news.html">News</a></li>
-								<li class="footer_list_item"><a href="contact.html">Contact</a></li>
+								<li class="footer_list_item"><a asp-controller="Home" asp-action="Index">@Localizer["lbHome"]</a></li>
+								<li class="footer_list_item"><a asp-area="Admin" asp-controller="Accounts" asp-action="Login">@Localizer["lbAdminLogin"]</a></li>
+								<li class="footer_list_item"><a asp-area="Admin" asp-controller="Categories" asp-action="Categories">@Localizer["lbCategories"]</a></li>
+								<li class="footer_list_item"><a asp-area="Admin" asp-controller="Authors" asp-action="Authors">@Localizer["lbAuthors"]</a></li>
+								<li class="footer_list_item"><a href="/hangfire" target="_blank">@Localizer["lbHangfire"]</a></li>
+								<li class="footer_list_item"><a href="/swagger" target="_blank">@Localizer["lbSwagger"]</a></li>
+								<li class="footer_list_item"><a href="/health">@Localizer["lbHealth"]</a></li>
 							</ul>
 						</div>
 					</div>
@@ -260,14 +294,16 @@
 					<!-- Footer Column - Usefull Links -->
 
 					<div class="col-lg-3 footer_col">
-						<div class="footer_column_title">Usefull Links</div>
+						<div class="footer_column_title">@Localizer["lbReports"]</div>
 						<div class="footer_column_content">
 							<ul>
-								<li class="footer_list_item"><a href="#">Testimonials</a></li>
-								<li class="footer_list_item"><a href="#">FAQ</a></li>
-								<li class="footer_list_item"><a href="#">Community</a></li>
-								<li class="footer_list_item"><a href="#">Campus Pictures</a></li>
-								<li class="footer_list_item"><a href="#">Tuitions</a></li>
+								<li class="footer_list_item"><a asp-area="Admin" asp-controller="Reports" asp-action="OverdueBooks">@Localizer["lbViewOverdueBooks"]</a></li>
+								<li class="footer_list_item"><a asp-area="Admin" asp-controller="Reports" asp-action="PopularBooks">@Localizer["lbViewPopularBooks"]</a></li>
+								<li class="footer_list_item"><a asp-area="Admin" asp-controller="Reports" asp-action="ActiveSubscribers">@Localizer["lbViewActiveSubscribers"]</a></li>
+								<li class="footer_list_item"><a asp-area="Admin" asp-controller="Reports" asp-action="ExpiringSubscriptions">@Localizer["lbViewExpiringSubscriptions"]</a></li>
+								<li class="footer_list_item"><a asp-area="Admin" asp-controller="Reports" asp-action="RentalHistory">@Localizer["lbViewRentalHistory"]</a></li>
+								<li class="footer_list_item"><a asp-area="Admin" asp-controller="Reports" asp-action="BooksByCategory">@Localizer["lbViewBooksByCategory"]</a></li>
+								<li class="footer_list_item"><a asp-area="Admin" asp-controller="Reports" asp-action="BooksByAuthor">@Localizer["lbViewBooksByAuthor"]</a></li>
 							</ul>
 						</div>
 					</div>
@@ -275,24 +311,24 @@
 					<!-- Footer Column - Contact -->
 
 					<div class="col-lg-3 footer_col">
-						<div class="footer_column_title">Contact</div>
+						<div class="footer_column_title">@Localizer["lbAdminLogin"]</div>
 						<div class="footer_column_content">
 							<ul>
 								<li class="footer_contact_item">
 									<div class="footer_contact_icon">
-										<img src="~/web/images/placeholder.svg" alt="https://www.flaticon.com/authors/lucy-g">
+										<img src="~/web/images/placeholder.svg" alt="">
 									</div>
 									Blvd Libertad, 34 m05200 Arévalo
 								</li>
 								<li class="footer_contact_item">
 									<div class="footer_contact_icon">
-										<img src="~/web/images/smartphone.svg" alt="https://www.flaticon.com/authors/lucy-g">
+										<img src="~/web/images/smartphone.svg" alt="">
 									</div>
 									0034 37483 2445 322
 								</li>
 								<li class="footer_contact_item">
 									<div class="footer_contact_icon">
-										<img src="~/web/images/envelope.svg" alt="https://www.flaticon.com/authors/lucy-g">
+										<img src="~/web/images/envelope.svg" alt="">
 									</div>hello@company.com
 								</li>
 							</ul>

@@ -390,4 +390,31 @@
   <data name="lbAreasCount" xml:space="preserve">
     <value>Areas Count</value>
   </data>
+  <data name="lbAdminLogin" xml:space="preserve">
+    <value>Admin Login</value>
+  </data>
+  <data name="lbComingSoon" xml:space="preserve">
+    <value>Coming Soon</value>
+  </data>
+  <data name="lbHangfire" xml:space="preserve">
+    <value>Hangfire</value>
+  </data>
+  <data name="lbSwagger" xml:space="preserve">
+    <value>API Docs</value>
+  </data>
+  <data name="lbHealth" xml:space="preserve">
+    <value>Health Check</value>
+  </data>
+  <data name="lbHome" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="lbWelcome" xml:space="preserve">
+    <value>Welcome to Bookify</value>
+  </data>
+  <data name="lbWelcomeDesc" xml:space="preserve">
+    <value>Library Management System</value>
+  </data>
+  <data name="lbPublicNotice" xml:space="preserve">
+    <value>Please login to access dashboard</value>
+  </data>
 </root>
