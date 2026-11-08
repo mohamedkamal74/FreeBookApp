@@ -528,4 +528,61 @@
   <data name="lbSubscriber" xml:space="preserve">
     <value>مشترك</value>
   </data>
+  <data name="lbWelcome" xml:space="preserve">
+    <value>مرحباً بكم في Bookify</value>
+  </data>
+  <data name="lbWelcomeDesc" xml:space="preserve">
+    <value>نظام إدارة المكتبة</value>
+  </data>
+  <data name="lbAdminLogin" xml:space="preserve">
+    <value>دخول الإدارة</value>
+  </data>
+  <data name="lbComingSoon" xml:space="preserve">
+    <value>قريباً</value>
+  </data>
+  <data name="lbHangfire" xml:space="preserve">
+    <value>المهام المجدولة</value>
+  </data>
+  <data name="lbSwagger" xml:space="preserve">
+    <value>توثيق API</value>
+  </data>
+  <data name="lbHealth" xml:space="preserve">
+    <value>حالة النظام</value>
+  </data>
+  <data name="lbHome" xml:space="preserve">
+    <value>الرئيسية</value>
+  </data>
+  <data name="lbPublicNotice" xml:space="preserve">
+    <value>يرجى تسجيل الدخول للوصول للوحة التحكم</value>
+  </data>
+  <data name="lbActiveSubscribers" xml:space="preserve">
+    <value>المشتركين النشطين</value>
+  </data>
+  <data name="lbAuthor" xml:space="preserve">
+    <value>مؤلف</value>
+  </data>
+  <data name="lbBookName" xml:space="preserve">
+    <value>اسم الكتاب</value>
+  </data>
+  <data name="lbBooksByAuthor" xml:space="preserve">
+    <value>الكتب حسب المؤلف</value>
+  </data>
+  <data name="lbBooksByCategory" xml:space="preserve">
+    <value>الكتب حسب الفئة</value>
+  </data>
+  <data name="lbCategory" xml:space="preserve">
+    <value>فئة</value>
+  </data>
+  <data name="lbDaysOverdue" xml:space="preserve">
+    <value>أيام متأخرة</value>
+  </data>
+  <data name="lbEmail" xml:space="preserve">
+    <value>البريد الإلكتروني</value>
+  </data>
+  <data name="lbPenaltyPaid" xml:space="preserve">
+    <value>تم دفع الغرامة</value>
+  </data>
+  <data name="lbRentalHistory" xml:space="preserve">
+    <value>تاريخ الاستعارات</value>
+  </data>
 </root>

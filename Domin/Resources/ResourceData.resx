@@ -201,4 +201,13 @@
   <data name="PenaltyPaid" xml:space="preserve">
     <value>الغرامة مدفوعة</value>
   </data>
+  <data name="SubscriberId" xml:space="preserve">
+    <value>معرف المشترك</value>
+  </data>
+  <data name="StartDate" xml:space="preserve">
+    <value>تاريخ البداية</value>
+  </data>
+  <data name="SubCtegoryName" xml:space="preserve">
+    <value>اسم الفئة الفرعية</value>
+  </data>
 </root>

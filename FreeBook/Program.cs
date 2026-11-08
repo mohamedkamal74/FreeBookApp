@@ -34,7 +34,11 @@ try
     builder.Host.UseSerilog();
 
     // Add services to the container.
-    builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+    // NOTE: Do not set ResourcesPath here. The resource class is FreeBook.Resources.ResourceWeb
+    // and the files live in Resources/, so the default lookup name already resolves to
+    // "FreeBook.Resources.ResourceWeb". Setting ResourcesPath = "Resources" would make the
+    // localizer look for "FreeBook.Resources.Resources.ResourceWeb" and fail.
+    builder.Services.AddLocalization();
 
     builder.Services.AddControllersWithViews()
         .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
@@ -60,7 +64,21 @@ try
     builder.Services.AddSession();
     builder.Services.AddDbContext<FreeBookDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("BookConnection")));
-    builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<FreeBookDbContext>();
+    builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+        .AddEntityFrameworkStores<FreeBookDbContext>()
+        .AddDefaultTokenProviders();
+
+    builder.Services.ConfigureApplicationCookie(options =>
+    {
+        options.LoginPath = "/Admin/Accounts/Login";
+        options.AccessDeniedPath = "/Admin/Home/Denied";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+        options.ExpireTimeSpan = TimeSpan.FromHours(8);
+        options.SlidingExpiration = true;
+    });
+
     builder.Services.AddRazorPages();
     builder.Services.Configure<IdentityOptions>(options =>
     {
@@ -79,8 +97,10 @@ try
     builder.Services.AddScoped<IServiceRepository<Book>, Infrastructure.IRepository.ServiceRepository.ServicesBook>();
     builder.Services.AddScoped<IServiceRepository<BookCopy>, Infrastructure.IRepository.ServiceRepository.ServicesBookCopy>();
     builder.Services.AddScoped<Infrastructure.IRepository.IRentalRepository, Infrastructure.IRepository.ServiceRepository.ServicesRental>();
+    builder.Services.AddScoped<IServiceRepository<Rental>, Infrastructure.IRepository.ServiceRepository.ServicesRental>();
     builder.Services.AddScoped<IServiceRepository<Subscriber>, Infrastructure.IRepository.ServiceRepository.ServicesSubscriber>();
     builder.Services.AddScoped<Infrastructure.IRepository.ISubscriptionRepository, Infrastructure.IRepository.ServiceRepository.ServicesSubscription>();
+    builder.Services.AddScoped<IServiceRepository<Subscription>, Infrastructure.IRepository.ServiceRepository.ServicesSubscription>();
     builder.Services.AddScoped<IServiceRepository<Governorate>, Infrastructure.IRepository.ServiceRepository.ServicesGovernorate>();
     builder.Services.AddScoped<IServiceRepository<Area>, Infrastructure.IRepository.ServiceRepository.ServicesArea>();
 
@@ -94,17 +114,6 @@ try
     builder.Services.AddScoped<FreeBook.Jobs.ExpiryCheckJob>();
     builder.Services.AddScoped<FreeBook.Jobs.OverdueNotificationJob>();
     builder.Services.AddScoped<FreeBook.Jobs.CleanupJob>();
-
-    builder.Services.ConfigureApplicationCookie(options =>
-    {
-        options.LoginPath = "/Admin";
-        options.AccessDeniedPath = "/Admin/Home/Denied";
-        options.Cookie.HttpOnly = true;
-        options.Cookie.SameSite = SameSiteMode.Lax;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-        options.ExpireTimeSpan = TimeSpan.FromHours(8);
-        options.SlidingExpiration = true;
-    });
 
     // Configuration binding
     builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Email"));

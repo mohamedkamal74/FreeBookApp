@@ -3,6 +3,23 @@
     ViewData["Title"] = "Dashboard";
 }
 
+<style>
+    .small-box-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .small-box-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .small-box-link:hover .small-box {
+        transform: none;
+        box-shadow: none;
+    }
+</style>
+
 <div class="content-wrapper">
     <div class="content-header">
         <div class="container-fluid">
@@ -16,92 +33,108 @@
 
     <div class="row">
         <div class="col-lg-3 col-6">
-            <div class="small-box bg-info">
-                <div class="inner">
-                    <h3>@ViewBag.TotalBooks</h3>
-                    <p>@Localizer["lbTotalBooks"]</p>
+            <a asp-area="Admin" asp-controller="Categories" asp-action="Categories" class="small-box-link">
+                <div class="small-box bg-info">
+                    <div class="inner">
+                        <h3>@ViewBag.TotalBooks</h3>
+                        <p>@Localizer["lbTotalBooks"]</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-book"></i>
+                    </div>
                 </div>
-                <div class="icon">
-                    <i class="fas fa-book"></i>
-                </div>
-            </div>
+            </a>
         </div>
         <div class="col-lg-3 col-6">
-            <div class="small-box bg-success">
-                <div class="inner">
-                    <h3>@ViewBag.AvailableCopies</h3>
-                    <p>@Localizer["lbAvailableCopies"]</p>
+            <a asp-area="Admin" asp-controller="BookCopies" asp-action="BookCopies" class="small-box-link">
+                <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3>@ViewBag.AvailableCopies</h3>
+                        <p>@Localizer["lbAvailableCopies"]</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-book-reader"></i>
+                    </div>
                 </div>
-                <div class="icon">
-                    <i class="fas fa-book-reader"></i>
-                </div>
-            </div>
+            </a>
         </div>
         <div class="col-lg-3 col-6">
-            <div class="small-box bg-warning">
-                <div class="inner">
-                    <h3>@ViewBag.TotalSubscribers</h3>
-                    <p>@Localizer["lbTotalSubscribers"]</p>
+            <a asp-area="Admin" asp-controller="Subscribers" asp-action="Subscribers" class="small-box-link">
+                <div class="small-box bg-warning">
+                    <div class="inner">
+                        <h3>@ViewBag.TotalSubscribers</h3>
+                        <p>@Localizer["lbTotalSubscribers"]</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-users"></i>
+                    </div>
                 </div>
-                <div class="icon">
-                    <i class="fas fa-users"></i>
-                </div>
-            </div>
+            </a>
         </div>
         <div class="col-lg-3 col-6">
-            <div class="small-box bg-primary">
-                <div class="inner">
-                    <h3>@ViewBag.ActiveSubscriptions</h3>
-                    <p>@Localizer["lbActiveSubscriptions"]</p>
+            <a asp-area="Admin" asp-controller="Subscriptions" asp-action="Subscriptions" class="small-box-link">
+                <div class="small-box bg-primary">
+                    <div class="inner">
+                        <h3>@ViewBag.ActiveSubscriptions</h3>
+                        <p>@Localizer["lbActiveSubscriptions"]</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-id-card"></i>
+                    </div>
                 </div>
-                <div class="icon">
-                    <i class="fas fa-id-card"></i>
-                </div>
-            </div>
+            </a>
         </div>
         <div class="col-lg-3 col-6">
-            <div class="small-box bg-danger">
-                <div class="inner">
-                    <h3>@ViewBag.ActiveRentals</h3>
-                    <p>@Localizer["lbActiveRentals"]</p>
+            <a asp-area="Admin" asp-controller="Rentals" asp-action="Rentals" class="small-box-link">
+                <div class="small-box bg-danger">
+                    <div class="inner">
+                        <h3>@ViewBag.ActiveRentals</h3>
+                        <p>@Localizer["lbActiveRentals"]</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-hand-holding"></i>
+                    </div>
                 </div>
-                <div class="icon">
-                    <i class="fas fa-hand-holding"></i>
-                </div>
-            </div>
+            </a>
         </div>
         <div class="col-lg-3 col-6">
-            <div class="small-box bg-danger">
-                <div class="inner">
-                    <h3>@ViewBag.OverdueRentals</h3>
-                    <p>@Localizer["lbOverdueBooks"]</p>
+            <a asp-area="Admin" asp-controller="Rentals" asp-action="Rentals" asp-route-filter="overdue" class="small-box-link">
+                <div class="small-box bg-danger">
+                    <div class="inner">
+                        <h3>@ViewBag.OverdueRentals</h3>
+                        <p>@Localizer["lbOverdueBooks"]</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
                 </div>
-                <div class="icon">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
-            </div>
+            </a>
         </div>
         <div class="col-lg-3 col-6">
-            <div class="small-box bg-info">
-                <div class="inner">
-                    <h3>@ViewBag.ExpiringSubscriptions</h3>
-                    <p>@Localizer["lbExpiringSubscriptions"]</p>
+            <a asp-area="Admin" asp-controller="Subscriptions" asp-action="Subscriptions" asp-route-filter="expiring" class="small-box-link">
+                <div class="small-box bg-info">
+                    <div class="inner">
+                        <h3>@ViewBag.ExpiringSubscriptions</h3>
+                        <p>@Localizer["lbExpiringSubscriptions"]</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
                 </div>
-                <div class="icon">
-                    <i class="fas fa-calendar-alt"></i>
-                </div>
-            </div>
+            </a>
         </div>
         <div class="col-lg-3 col-6">
-            <div class="small-box bg-secondary">
-                <div class="inner">
-                    <h3>@ViewBag.BlacklistedSubscribers</h3>
-                    <p>@Localizer["lbBlacklistedSubscribers"]</p>
+            <a asp-area="Admin" asp-controller="Subscribers" asp-action="Subscribers" asp-route-filter="blacklisted" class="small-box-link">
+                <div class="small-box bg-secondary">
+                    <div class="inner">
+                        <h3>@ViewBag.BlacklistedSubscribers</h3>
+                        <p>@Localizer["lbBlacklistedSubscribers"]</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-user-slash"></i>
+                    </div>
                 </div>
-                <div class="icon">
-                    <i class="fas fa-user-slash"></i>
-                </div>
-            </div>
+            </a>
         </div>
     </div>
 

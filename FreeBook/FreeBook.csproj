@@ -37,6 +37,15 @@
     <EmbeddedResource Update="Resources\ResourceWeb.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>ResourceWeb.Designer.cs</LastGenOutput>
+      <ResourceFileName>FreeBook.Resources.ResourceWeb</ResourceFileName>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\ResourceWeb.ar.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <ResourceFileName>FreeBook.Resources.ResourceWeb</ResourceFileName>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\ResourceWeb.en.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <ResourceFileName>FreeBook.Resources.ResourceWeb</ResourceFileName>
     </EmbeddedResource>
   </ItemGroup>
 

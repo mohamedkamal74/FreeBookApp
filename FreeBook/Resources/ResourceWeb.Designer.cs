@@ -32,19 +32,19 @@ namespace FreeBook.Resources {
         internal ResourceWeb() {
         }
         
-        /// <summary>
-        ///   Returns the cached ResourceManager instance used by this class.
-        /// </summary>
-        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Resources.ResourceManager ResourceManager {
-            get {
-                if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FreeBook.Resources.ResourceWeb", typeof(ResourceWeb).Assembly);
-                    resourceMan = temp;
-                }
-                return resourceMan;
-            }
+/// <summary>
+///   Returns the cached ResourceManager instance used by this class.
+/// </summary>
+[global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
+public static global::System.Resources.ResourceManager ResourceManager {
+    get {
+        if (object.ReferenceEquals(resourceMan, null)) {
+            global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FreeBook.Resources.ResourceWeb", typeof(ResourceWeb).Assembly);
+            resourceMan = temp;
         }
+        return resourceMan;
+    }
+}
         
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all

@@ -286,8 +286,6 @@ namespace FreeBook.Areas.Admin.Controllers
 
 
         [AllowAnonymous]
-        [Authorize(Roles = "Admin,User")]
-
         public IActionResult Login()
         {
             return View();
@@ -295,7 +293,6 @@ namespace FreeBook.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [AllowAnonymous]
-        [Authorize(Roles = "Admin,User")]
         [EnableRateLimiting("login")]
 
         public async Task<IActionResult> Login(LoginViewModel model)
@@ -304,7 +301,7 @@ namespace FreeBook.Areas.Admin.Controllers
             {
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
                 if (result.Succeeded)
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
                 else
                     ViewBag.ErrorLogin = false;
 
