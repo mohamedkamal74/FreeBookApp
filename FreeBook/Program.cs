@@ -138,24 +138,30 @@ try
         };
     });
 
-    // Hangfire configuration
-    builder.Services.AddHangfire(config =>
-        config.UseSqlServerStorage(builder.Configuration.GetConnectionString("BookConnection"),
-            new Hangfire.SqlServer.SqlServerStorageOptions
-            {
-                CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
-                SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
-                QueuePollInterval = TimeSpan.Zero,
-                UseRecommendedIsolationLevel = true,
-                DisableGlobalLocks = true
-            }));
+    // Hangfire configuration. Can be disabled with Hangfire:Enabled=false so the host
+    // does not need a reachable SQL Server (tests run without LocalDB, e.g. on Linux CI).
+    var hangfireEnabled = builder.Configuration.GetValue("Hangfire:Enabled", true);
 
-    builder.Services.AddHangfireServer(options =>
+    if (hangfireEnabled)
     {
-        options.ServerName = "Bookify.Server";
-        options.WorkerCount = Environment.ProcessorCount;
-        options.Queues = new[] { "default", "emails", "notifications", "fines", "reports" };
-    });
+        builder.Services.AddHangfire(config =>
+            config.UseSqlServerStorage(builder.Configuration.GetConnectionString("BookConnection"),
+                new Hangfire.SqlServer.SqlServerStorageOptions
+                {
+                    CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+                    SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+                    QueuePollInterval = TimeSpan.Zero,
+                    UseRecommendedIsolationLevel = true,
+                    DisableGlobalLocks = true
+                }));
+
+        builder.Services.AddHangfireServer(options =>
+        {
+            options.ServerName = "Bookify.Server";
+            options.WorkerCount = Environment.ProcessorCount;
+            options.Queues = new[] { "default", "emails", "notifications", "fines", "reports" };
+        });
+    }
 
 
     var app = builder.Build();
@@ -185,13 +191,16 @@ try
     app.UseAuthorization();
 
     // Hangfire Dashboard
-    var hangfirePath = app.Configuration["Hangfire:DashboardPath"] ?? "/hangfire";
-    app.UseHangfireDashboard(hangfirePath, new DashboardOptions
+    if (hangfireEnabled)
     {
-        Authorization = new[] { new HangfireAdminAuthorizationFilter() },
-        DashboardTitle = "Bookify Background Jobs",
-        StatsPollingInterval = 30000
-    });
+        var hangfirePath = app.Configuration["Hangfire:DashboardPath"] ?? "/hangfire";
+        app.UseHangfireDashboard(hangfirePath, new DashboardOptions
+        {
+            Authorization = new[] { new HangfireAdminAuthorizationFilter() },
+            DashboardTitle = "Bookify Background Jobs",
+            StatsPollingInterval = 30000
+        });
+    }
 
     app.MapRazorPages();
     app.MapHealthChecks("/health");
@@ -216,14 +225,17 @@ try
     }
 
     // Schedule recurring jobs
-    using (var scope = app.Services.CreateScope())
+    if (hangfireEnabled)
     {
-        var recurringJobManager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
+        using (var scope = app.Services.CreateScope())
+        {
+            var recurringJobManager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
 
-        recurringJobManager.AddOrUpdate<FineCalculationJob>("daily-fines", x => x.CalculateDailyFinesAsync(), Cron.Daily(2, 0), TimeZoneInfo.Local, "fines");
-        recurringJobManager.AddOrUpdate<ExpiryCheckJob>("expiry-check", x => x.CheckExpiringSubscriptionsAsync(), Cron.Daily(8, 0), TimeZoneInfo.Local, "notifications");
-        recurringJobManager.AddOrUpdate<OverdueNotificationJob>("overdue-notifications", x => x.SendOverdueNotificationsAsync(), Cron.Daily(9, 0), TimeZoneInfo.Local, "notifications");
-        recurringJobManager.AddOrUpdate<CleanupJob>("cleanup-old-jobs", x => x.CleanupAsync(), Cron.Weekly(DayOfWeek.Sunday, 3, 0), TimeZoneInfo.Local, "default");
+            recurringJobManager.AddOrUpdate<FineCalculationJob>("daily-fines", x => x.CalculateDailyFinesAsync(), Cron.Daily(2, 0), TimeZoneInfo.Local, "fines");
+            recurringJobManager.AddOrUpdate<ExpiryCheckJob>("expiry-check", x => x.CheckExpiringSubscriptionsAsync(), Cron.Daily(8, 0), TimeZoneInfo.Local, "notifications");
+            recurringJobManager.AddOrUpdate<OverdueNotificationJob>("overdue-notifications", x => x.SendOverdueNotificationsAsync(), Cron.Daily(9, 0), TimeZoneInfo.Local, "notifications");
+            recurringJobManager.AddOrUpdate<CleanupJob>("cleanup-old-jobs", x => x.CleanupAsync(), Cron.Weekly(DayOfWeek.Sunday, 3, 0), TimeZoneInfo.Local, "default");
+        }
     }
 
     app.Run();
