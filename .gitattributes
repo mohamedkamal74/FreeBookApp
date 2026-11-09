@@ -3,6 +3,10 @@
 ###############################################################################
 * text=auto
 
+# .editorconfig sets end_of_line = crlf. Force CRLF on checkout on every OS so
+# `dotnet format --verify-no-changes` behaves identically on Linux CI.
+*.cs text eol=crlf
+
 ###############################################################################
 # Set default behavior for command prompt diff.
 #
