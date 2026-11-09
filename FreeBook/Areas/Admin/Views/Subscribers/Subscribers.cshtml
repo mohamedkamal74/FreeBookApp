@@ -26,7 +26,7 @@
         </div>
         <div class="card-tools">
             <button type="button" class="btn btn-outline-primary rounded-pill mr-5 mt-2" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="Rest()">
-                @Localizer["lbBtnSaveNewUser"]
+                @Localizer["lbBtnSaveNewSubscriber"]
             </button>
         </div>
         <div class="card-body">
@@ -59,7 +59,7 @@
                                 <input type="checkbox" disabled checked="@subscriber.IsBlackListed" style="width:30px;height:30px"/>
                             </td>
                             <td>
-                                <input type="button" class="btn btn-info btn-sm" onclick="Edit('@subscriber.Id','@subscriber.FirstName','@subscriber.LastName','@subscriber.NationalId','@subscriber.MobileNumber','@subscriber.HasWhatsApp','@subscriber.Email','@subscriber.AreaId','@subscriber.GovernorateId','@subscriber.Address','@subscriber.IsBlackListed','@subscriber.DateOfBirth')" value="@Localizer["lbBtnEdit"]" data-bs-toggle="modal" data-bs-target="#exampleModal" />
+                                <input type="button" class="btn btn-info btn-sm" onclick="Edit('@subscriber.Id','@subscriber.FirstName','@subscriber.LastName','@subscriber.NationalId','@subscriber.MobileNumber','@(subscriber.HasWhatsApp ? "true" : "false")','@subscriber.Email','@subscriber.AreaId','@subscriber.GovernorateId','@subscriber.Address','@(subscriber.IsBlackListed ? "true" : "false")','@subscriber.DateOfBirth.ToString("yyyy-MM-dd")')" value="@Localizer["lbBtnEdit"]" data-bs-toggle="modal" data-bs-target="#exampleModal" />
                                 <input type="button" class="btn btn-danger btn-sm" onclick="DeleteSubscriber('@subscriber.Id')" value="@Localizer["lbbtnDelete"]"/>
                                 <input type="button" class="btn btn-warning btn-sm" onclick="ToggleBlacklist('@subscriber.Id')" value="@(subscriber.IsBlackListed ? Localizer["lbActiveUser"] : Localizer["lbIsBlackListed"])" />
                             </td>
@@ -75,7 +75,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="title">@Localizer["lbBtnSaveNewUser"]</h5>
+                    <h5 class="modal-title" id="subscriberModalTitle">@Localizer["lbBtnSaveNewSubscriber"]</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -155,7 +155,7 @@
                                 <textarea asp-for="NewSubscriber.Address" class="form-control" id="address" rows="3"></textarea>
                                 <span asp-validation-for="NewSubscriber.Address" class="text-danger"></span>
                             </div>
-                            <input type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="btnSave"/>
+                            <input type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="subscriberModalBtnSave"/>
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </form>
                 </div>
@@ -205,10 +205,12 @@
         <script src="~/Models/Subscribers.js"></script>
 
         <script>
-            let lbTitleEdit='@Html.Raw(Localizer["lbTitleEdit"])';
+            let lbTitleEditSubscriber='@Html.Raw(Localizer["lbTitleEditSubscriber"])';
+            let lbEdit='@Html.Raw(Localizer["lbEdit"])';
             let lbUpdate='@Html.Raw(Localizer["lbUpdate"])';
-            let lbBtnSaveNewRole='@Html.Raw(Localizer["lbBtnSaveNewRole"])';
+            let lbBtnSaveNewSubscriber='@Html.Raw(Localizer["lbBtnSaveNewSubscriber"])';
             let lbBtnSave='@Html.Raw(Localizer["lbBtnSave"])';
+            let lbTitleDeleteMsg='@Html.Raw(Localizer["lbTitleDeleteMsg"])';
             let lmTextMsgDelete='@Html.Raw(Localizer["lmTextMsgDelete"])';
             let lbconfirmButtonText='@Html.Raw(Localizer["lbconfirmButtonText"])';
             let lbCancelButtonText='@Html.Raw(Localizer["lbCancelButtonText"])';

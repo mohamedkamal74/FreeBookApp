@@ -48,11 +48,8 @@
   <data name="RoleName" xml:space="preserve">
     <value>Role name is required</value>
   </data>
-  <data name="SubCtegoryName" xml:space="preserve">
+  <data name="SubCategoryName" xml:space="preserve">
     <value>Subcategory name is required</value>
-  </data>
-  <data name="AuthorName" xml:space="preserve">
-    <value>Author name is required</value>
   </data>
   <data name="FirstName" xml:space="preserve">
     <value>First name is required</value>
@@ -104,8 +101,5 @@
   </data>
   <data name="StartDate" xml:space="preserve">
     <value>Start date</value>
-  </data>
-  <data name="SubCtegoryName" xml:space="preserve">
-    <value>Subcategory name</value>
   </data>
 </root>

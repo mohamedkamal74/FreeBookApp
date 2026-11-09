@@ -22,7 +22,7 @@ namespace Infrastructure.Services
             _logger = logger;
         }
 
-        public async Task SendAsync(string to, string subject, string htmlBody, string textBody = null)
+        public async Task SendAsync(string to, string subject, string htmlBody, string? textBody = null)
         {
             try
             {

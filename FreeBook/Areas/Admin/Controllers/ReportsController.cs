@@ -125,7 +125,7 @@ namespace FreeBook.Areas.Admin.Controllers
 
             var booksByCategory = books
                 .Where(b => b.CategoryId.HasValue)
-                .GroupBy(b => b.CategoryId.Value)
+                .GroupBy(b => b.CategoryId!.Value)
                 .Select(g => new
                 {
                     Category = categories.FirstOrDefault(c => c.Id == g.Key),

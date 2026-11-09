@@ -137,6 +137,12 @@ namespace FreeBook.Areas.Admin.Controllers
             if (model.NewRegister is null)
                 return RedirectToAction("Register", "Accounts");
 
+            // The user form only posts NewRegister. The ChangePassword fields live in a
+            // different modal/form, but they are part of RegisterViewModel and their
+            // [Required] attributes would otherwise make every Register POST invalid.
+            ModelState.Remove("changePassword.NewPassword");
+            ModelState.Remove("changePassword.ConfirmPassword");
+
             if (ModelState.IsValid)
             {
                 var files = HttpContext.Request.Form.Files;

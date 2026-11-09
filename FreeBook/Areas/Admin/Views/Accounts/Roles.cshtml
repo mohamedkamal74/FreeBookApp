@@ -1,5 +1,4 @@
-﻿
-@model RolesViewModel
+﻿@model RolesViewModel
 @inject IStringLocalizer<ResourceWeb> Localizer
 @{
     ViewData["Title"] = "Roles";
@@ -30,7 +29,7 @@
             </div>
             <div class="card-tools">
                 <!-- Button trigger modal -->
-        
+
 <button type="button" class="btn btn-outline-primary rounded-pill mr-5 mt-2" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="Rest()">
 @Localizer["lbBtnSaveNewRole"]
 </button>
@@ -68,16 +67,17 @@
     <input type="button" class="btn btn-danger btn-sm" onclick="DeleteRoles('@item.Id')" value="@Localizer["lbbtnDelete"]"/>
 </td>
                     </tr>
-                    
+
                 }
-               
+
                 </tbody>
-             
-            
-              </table>  
+
+              </table>
             <!-- /.card-body -->
           </div>
 </div>
+
+
 
 
 
@@ -86,26 +86,26 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="title">@Localizer["lbBtnSaveNewRole"]</h5>
+        <h5 class="modal-title" id="roleModalTitle">@Localizer["lbBtnSaveNewRole"]</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
 
        <form asp-action="Roles" asp-controller="Accounts" method="post">
-           <div class="form-group">
-          <input type="text" asp-for="NewRole.RoleId" hidden class="form-control" id="roleId"/>
+            <div class="form-group">
+           <input type="text" asp-for="NewRole.RoleId" hidden class="form-control" id="roleId"/>
 
 <label class="control-label" asp-for="NewRole.RoleName">@Localizer["lbNameRole"]</label>
 <input type="text" asp-for="NewRole.RoleName" class="form-control" id="roleName"/>
 <span asp-validation-for="NewRole.RoleName" class="text-danger"></span>
 </div>
-<input  type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="btnSave"/>
+<input  type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="roleModalBtnSave"/>
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 
        </form>
       </div>
       <div class="modal-footer">
-       
+
       </div>
     </div>
   </div>
@@ -127,9 +127,10 @@
   icon: 'success',
   title:'@Context.Session.GetString(Helper.Title)',
   text:' @Html.Raw(Context.Session.GetString(Helper.Msg))',
-   confirmButtonText:'@Localizer["lbOk"]'
+confirmButtonText:'@Localizer["lbOk"]'
 
- 
+
+
 })
         </script>
     }
@@ -141,7 +142,8 @@
   text: '@Html.Raw(Context.Session.GetString(Helper.Msg))',
   confirmButtonText:'@Localizer["lbOk"]'
 
- 
+
+
 })
         </script>
     }
@@ -157,10 +159,8 @@ Context.Session.SetString("msgType","");
      let lbEditNewRole='@Html.Raw(Localizer["lbEditNewRole"])';
      let lbSave='@Html.Raw(Localizer["lbSave"])';
 
+
 </script>
 
 
 }
-
-
-

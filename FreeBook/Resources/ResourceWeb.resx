@@ -555,34 +555,40 @@
   <data name="lbPublicNotice" xml:space="preserve">
     <value>يرجى تسجيل الدخول للوصول للوحة التحكم</value>
   </data>
-  <data name="lbActiveSubscribers" xml:space="preserve">
-    <value>المشتركين النشطين</value>
+  <data name="lbBtnSaveNewArea" xml:space="preserve">
+    <value>إضافة منطقة جديدة</value>
   </data>
-  <data name="lbAuthor" xml:space="preserve">
-    <value>مؤلف</value>
+  <data name="lbBtnSaveNewAuthor" xml:space="preserve">
+    <value>إضافة ناشر جديد</value>
   </data>
-  <data name="lbBookName" xml:space="preserve">
-    <value>اسم الكتاب</value>
+  <data name="lbBtnSaveNewBookCopy" xml:space="preserve">
+    <value>إضافة نسخة كتاب جديدة</value>
   </data>
-  <data name="lbBooksByAuthor" xml:space="preserve">
-    <value>الكتب حسب المؤلف</value>
+  <data name="lbBtnSaveNewGovernorate" xml:space="preserve">
+    <value>إضافة محافظة جديدة</value>
   </data>
-  <data name="lbBooksByCategory" xml:space="preserve">
-    <value>الكتب حسب الفئة</value>
+  <data name="lbBtnSaveNewSubscriber" xml:space="preserve">
+    <value>إضافة مشترك جديد</value>
   </data>
-  <data name="lbCategory" xml:space="preserve">
-    <value>فئة</value>
+  <data name="lbBtnSaveNewSubscription" xml:space="preserve">
+    <value>إضافة اشتراك جديد</value>
   </data>
-  <data name="lbDaysOverdue" xml:space="preserve">
-    <value>أيام متأخرة</value>
+  <data name="lbTitleEditArea" xml:space="preserve">
+    <value>تعديل المنطقة</value>
   </data>
-  <data name="lbEmail" xml:space="preserve">
-    <value>البريد الإلكتروني</value>
+  <data name="lbTitleEditAuthor" xml:space="preserve">
+    <value>تعديل الناشر</value>
   </data>
-  <data name="lbPenaltyPaid" xml:space="preserve">
-    <value>تم دفع الغرامة</value>
+  <data name="lbTitleEditBookCopy" xml:space="preserve">
+    <value>تعديل نسخة الكتاب</value>
   </data>
-  <data name="lbRentalHistory" xml:space="preserve">
-    <value>تاريخ الاستعارات</value>
+  <data name="lbTitleEditGovernorate" xml:space="preserve">
+    <value>تعديل المحافظة</value>
+  </data>
+  <data name="lbTitleEditSubscriber" xml:space="preserve">
+    <value>تعديل المشترك</value>
+  </data>
+  <data name="lbTitleEditSubscription" xml:space="preserve">
+    <value>تعديل الاشتراك</value>
   </data>
 </root>

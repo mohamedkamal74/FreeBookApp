@@ -40,8 +40,8 @@ namespace Infrastructure.Common
         }
 
         public static Result<T> Success(T value) => new(value);
-        public static Result<T> Failure(Error error) => new(error);
-        public static Result<T> Failure(string code, string message, object? details = null) => new(new Error(code, message, details));
+        public new static Result<T> Failure(Error error) => new(error);
+        public new static Result<T> Failure(string code, string message, object? details = null) => new(new Error(code, message, details));
 
         public static implicit operator Result<T>(T value) => Success(value);
     }

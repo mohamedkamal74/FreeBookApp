@@ -417,4 +417,40 @@
   <data name="lbPublicNotice" xml:space="preserve">
     <value>يرجى تسجيل الدخول للوصول للوحة التحكم</value>
   </data>
+  <data name="lbBtnSaveNewArea" xml:space="preserve">
+    <value>إضافة منطقة جديدة</value>
+  </data>
+  <data name="lbBtnSaveNewAuthor" xml:space="preserve">
+    <value>إضافة ناشر جديد</value>
+  </data>
+  <data name="lbBtnSaveNewBookCopy" xml:space="preserve">
+    <value>إضافة نسخة كتاب جديدة</value>
+  </data>
+  <data name="lbBtnSaveNewGovernorate" xml:space="preserve">
+    <value>إضافة محافظة جديدة</value>
+  </data>
+  <data name="lbBtnSaveNewSubscriber" xml:space="preserve">
+    <value>إضافة مشترك جديد</value>
+  </data>
+  <data name="lbBtnSaveNewSubscription" xml:space="preserve">
+    <value>إضافة اشتراك جديد</value>
+  </data>
+  <data name="lbTitleEditArea" xml:space="preserve">
+    <value>تعديل المنطقة</value>
+  </data>
+  <data name="lbTitleEditAuthor" xml:space="preserve">
+    <value>تعديل الناشر</value>
+  </data>
+  <data name="lbTitleEditBookCopy" xml:space="preserve">
+    <value>تعديل نسخة الكتاب</value>
+  </data>
+  <data name="lbTitleEditGovernorate" xml:space="preserve">
+    <value>تعديل المحافظة</value>
+  </data>
+  <data name="lbTitleEditSubscriber" xml:space="preserve">
+    <value>تعديل المشترك</value>
+  </data>
+  <data name="lbTitleEditSubscription" xml:space="preserve">
+    <value>تعديل الاشتراك</value>
+  </data>
 </root>

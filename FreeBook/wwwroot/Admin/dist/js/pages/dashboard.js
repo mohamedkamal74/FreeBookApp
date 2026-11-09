@@ -9,6 +9,12 @@ $(function () {
 
   'use strict'
 
+  // Only run the demo dashboard widgets when the dashboard markup is present;
+  // this file is included by the shared admin layout on every page.
+  if (!document.getElementById('sparkline-1')) {
+    return
+  }
+
   // Make the dashboard widgets sortable Using jquery UI
   $('.connectedSortable').sortable({
     placeholder         : 'sort-highlight',

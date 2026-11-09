@@ -26,7 +26,7 @@
         </div>
         <div class="card-tools">
             <button type="button" class="btn btn-outline-primary rounded-pill mr-5 mt-2" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="Rest()">
-                @Localizer["lbBtnSaveNewCategory"]
+                @Localizer["lbBtnSaveNewArea"]
             </button>
         </div>
         <div class="card-body">
@@ -60,7 +60,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="title">@Localizer["lbBtnSaveNewCategory"]</h5>
+                    <h5 class="modal-title" id="areaModalTitle">@Localizer["lbBtnSaveNewArea"]</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -80,7 +80,7 @@
                                 </select>
                                 <span asp-validation-for="NewArea.GovernorateId" class="text-danger"></span>
                             </div>
-                            <input type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="btnSave"/>
+                            <input type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="areaModalBtnSave"/>
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </form>
                 </div>
@@ -125,9 +125,13 @@
         <script src="~/Models/Areas.js"></script>
 
         <script>
-            let lbTitleEdit='@Html.Raw(Localizer["lbTitleEdit"])';
+            let lbTitleEditArea='@Html.Raw(Localizer["lbTitleEditArea"])';
             let lbEdit='@Html.Raw(Localizer["lbEdit"])';
-            let lbBtnSaveNewCategory='@Html.Raw(Localizer["lbBtnSaveNewCategory"])';
+            let lbBtnSaveNewArea='@Html.Raw(Localizer["lbBtnSaveNewArea"])';
             let lbSave='@Html.Raw(Localizer["lbSave"])';
+            let lbTitleDeleteMsg='@Html.Raw(Localizer["lbTitleDeleteMsg"])';
+            let lmTextMsgDelete='@Html.Raw(Localizer["lmTextMsgDelete"])';
+            let lbconfirmButtonText='@Html.Raw(Localizer["lbconfirmButtonText"])';
+            let lbCancelButtonText='@Html.Raw(Localizer["lbCancelButtonText"])';
         </script>
     }

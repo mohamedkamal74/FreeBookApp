@@ -23,15 +23,17 @@ function DeleteRoles(id) {
 }
 
 Edit = (id, name) => {
-    document.getElementById('title').innerHTML = lbTitleEdit;
-    document.getElementById('btnSave').value = lbEdit;
+    clearValidation(document.getElementById('exampleModal'));
+    document.getElementById('roleModalTitle').innerHTML = lbTitleEdit;
+    document.getElementById('roleModalBtnSave').value = lbEdit;
     document.getElementById('roleId').value = id;
     document.getElementById('roleName').value = name;
 }
 
 Rest = () => {
-    document.getElementById('title').innerHTML = lbEditNewRole;
-    document.getElementById('btnSave').value = lbSave;
+    clearValidation(document.getElementById('exampleModal'));
+    document.getElementById('roleModalTitle').innerHTML = lbEditNewRole;
+    document.getElementById('roleModalBtnSave').value = lbSave;
     document.getElementById('roleId').value = "";
     document.getElementById('roleName').value = "";
 }

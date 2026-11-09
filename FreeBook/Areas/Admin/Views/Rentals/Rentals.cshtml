@@ -66,8 +66,8 @@
                                     {
                                         var minReturn = returned.Min(rc => rc.ReturnDate);
                                         var maxReturn = returned.Max(rc => rc.ReturnDate);
-                                        @minReturn.Value.ToString("yyyy-MM-dd")
-                                        @if (minReturn != maxReturn) { <text> - @maxReturn.Value.ToString("yyyy-MM-dd")</text> }
+                                        @minReturn!.Value.ToString("yyyy-MM-dd")
+                                        @if (minReturn != maxReturn) { <text> - @maxReturn!.Value.ToString("yyyy-MM-dd")</text> }
                                     }
                                     else
                                     {

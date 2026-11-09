@@ -167,5 +167,167 @@ namespace Domin.Resources {
                 return ResourceManager.GetString("RoleName", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to يجب ادخال العنوان.
+        /// </summary>
+        public static string Address {
+            get {
+                return ResourceManager.GetString("Address", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to يجب ادخال اسم المنطقة.
+        /// </summary>
+        public static string AreaName {
+            get {
+                return ResourceManager.GetString("AreaName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to يجب ادخال رقم الطبعة.
+        /// </summary>
+        public static string EditionNumber {
+            get {
+                return ResourceManager.GetString("EditionNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to يجب ادخال البريد الالكتروني.
+        /// </summary>
+        public static string Email {
+            get {
+                return ResourceManager.GetString("Email", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to تاريخ الانتهاء.
+        /// </summary>
+        public static string EndDate {
+            get {
+                return ResourceManager.GetString("EndDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to يجب ادخال الاسم الاول.
+        /// </summary>
+        public static string FirstName {
+            get {
+                return ResourceManager.GetString("FirstName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to يجب ادخال اسم المحافظة.
+        /// </summary>
+        public static string GovernorateName {
+            get {
+                return ResourceManager.GetString("GovernorateName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to القائمة السوداء.
+        /// </summary>
+        public static string IsBlackListed {
+            get {
+                return ResourceManager.GetString("IsBlackListed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to يجب ادخال اسم العائلة.
+        /// </summary>
+        public static string LastName {
+            get {
+                return ResourceManager.GetString("LastName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to يجب ادخال رقم الموبايل.
+        /// </summary>
+        public static string MobileNumber {
+            get {
+                return ResourceManager.GetString("MobileNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to يجب ادخال الرقم القومي.
+        /// </summary>
+        public static string NationalId {
+            get {
+                return ResourceManager.GetString("NationalId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to الغرامة مدفوعة.
+        /// </summary>
+        public static string PenaltyPaid {
+            get {
+                return ResourceManager.GetString("PenaltyPaid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to تاريخ الاستعارة.
+        /// </summary>
+        public static string RentalDate {
+            get {
+                return ResourceManager.GetString("RentalDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to تاريخ الإرجاع.
+        /// </summary>
+        public static string ReturnDate {
+            get {
+                return ResourceManager.GetString("ReturnDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to يجب ادخال الرقم التسلسلي.
+        /// </summary>
+        public static string SerialNumber {
+            get {
+                return ResourceManager.GetString("SerialNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to تاريخ البداية.
+        /// </summary>
+        public static string StartDate {
+            get {
+                return ResourceManager.GetString("StartDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to اسم الفئة الفرعية.
+        /// </summary>
+        public static string SubCategoryName {
+            get {
+                return ResourceManager.GetString("SubCategoryName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to معرف المشترك.
+        /// </summary>
+        public static string SubscriberId {
+            get {
+                return ResourceManager.GetString("SubscriberId", resourceCulture);
+            }
+        }
     }
 }

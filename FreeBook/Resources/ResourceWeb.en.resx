@@ -417,37 +417,43 @@
   <data name="lbPublicNotice" xml:space="preserve">
     <value>Please login to access dashboard</value>
   </data>
-  <data name="lbActiveSubscribers" xml:space="preserve">
-    <value>Active Subscribers</value>
-  </data>
-  <data name="lbAuthor" xml:space="preserve">
-    <value>Author</value>
-  </data>
-  <data name="lbBookName" xml:space="preserve">
-    <value>Book Name</value>
-  </data>
-  <data name="lbBooksByAuthor" xml:space="preserve">
-    <value>Books by Author</value>
-  </data>
-  <data name="lbBooksByCategory" xml:space="preserve">
-    <value>Books by Category</value>
-  </data>
-  <data name="lbCategory" xml:space="preserve">
-    <value>Category</value>
-  </data>
-  <data name="lbDaysOverdue" xml:space="preserve">
-    <value>Days Overdue</value>
-  </data>
-  <data name="lbEmail" xml:space="preserve">
-    <value>Email</value>
-  </data>
-  <data name="lbPenaltyPaid" xml:space="preserve">
-    <value>Penalty Paid</value>
-  </data>
-  <data name="lbRentalHistory" xml:space="preserve">
-    <value>Rental History</value>
-  </data>
   <data name="lbSubscriber" xml:space="preserve">
     <value>Subscriber</value>
+  </data>
+  <data name="lbBtnSaveNewArea" xml:space="preserve">
+    <value>Add New Area</value>
+  </data>
+  <data name="lbBtnSaveNewAuthor" xml:space="preserve">
+    <value>Add New Author</value>
+  </data>
+  <data name="lbBtnSaveNewBookCopy" xml:space="preserve">
+    <value>Add New Book Copy</value>
+  </data>
+  <data name="lbBtnSaveNewGovernorate" xml:space="preserve">
+    <value>Add New Governorate</value>
+  </data>
+  <data name="lbBtnSaveNewSubscriber" xml:space="preserve">
+    <value>Add New Subscriber</value>
+  </data>
+  <data name="lbBtnSaveNewSubscription" xml:space="preserve">
+    <value>Add New Subscription</value>
+  </data>
+  <data name="lbTitleEditArea" xml:space="preserve">
+    <value>Edit Area</value>
+  </data>
+  <data name="lbTitleEditAuthor" xml:space="preserve">
+    <value>Edit Author</value>
+  </data>
+  <data name="lbTitleEditBookCopy" xml:space="preserve">
+    <value>Edit Book Copy</value>
+  </data>
+  <data name="lbTitleEditGovernorate" xml:space="preserve">
+    <value>Edit Governorate</value>
+  </data>
+  <data name="lbTitleEditSubscriber" xml:space="preserve">
+    <value>Edit Subscriber</value>
+  </data>
+  <data name="lbTitleEditSubscription" xml:space="preserve">
+    <value>Edit Subscription</value>
   </data>
 </root>

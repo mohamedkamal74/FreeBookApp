@@ -1,4 +1,3 @@
-﻿
 $(document).ready(function () {
     $('#tableRoles').DataTable({
         "autoWidth": false,
@@ -48,8 +47,12 @@ function DeleteUser(id) {
 }
 
 Edit = (id, name, email, image, role, active) => {
-    document.getElementById('title').innerHTML = lbTitleEdit;
-    document.getElementById('btnSave').value = lbUpdate;
+    // Clear validation state before populating edit data
+    const modal = document.getElementById('exampleModal');
+    clearValidation(modal);
+
+    document.getElementById('userModalTitle').innerHTML = lbTitleEdit;
+    document.getElementById('userModalBtnSave').value = lbUpdate;
     document.getElementById('userId').value = id;
     document.getElementById('userName').value = name;
     document.getElementById('userEmail').value = email;
@@ -61,18 +64,30 @@ Edit = (id, name, email, image, role, active) => {
         Active.checked = false;
     $('#grPassword').hide();
     $('#confPassword').hide();
-    document.getElementById('userPassword').value = "$$$$$$";
-    document.getElementById('userConfirm').value = "$$$$$$";
-    document.getElementById('image').hidden = false;
-    document.getElementById('image').src = lbPathImageUser + image;
-    document.getElementById('imagehidden').value = image;
-
+    // Placeholder only: the update path never reads the password, but the field
+    // still has to satisfy [Required] + [MinLength(8)] + [Compare].
+    document.getElementById('userPassword').value = "$$$$$$$$";
+    document.getElementById('userConfirm').value = "$$$$$$$$";
+    var imageElement = document.getElementById('image');
+    var imageName = image || '';
+    if (imageName) {
+        imageElement.hidden = false;
+        imageElement.src = lbPathImageUser + '/' + imageName;
+    } else {
+        imageElement.hidden = true;
+        imageElement.removeAttribute('src');
+    }
+    document.getElementById('imagehidden').value = imageName;
     
 }
 
 Rest = () => {
-    document.getElementById('title').innerHTML = lbBtnSaveNewRole
-    document.getElementById('btnSave').value = lbBtnSave;
+    // Clear validation state before resetting form
+    const modal = document.getElementById('exampleModal');
+    clearValidation(modal);
+
+    document.getElementById('userModalTitle').innerHTML = lbBtnSaveNewUser
+    document.getElementById('userModalBtnSave').value = lbBtnSave;
     document.getElementById('userId').value = "";
     document.getElementById('userName').value ="" ;
     document.getElementById('userEmail').value = "";
@@ -84,11 +99,8 @@ Rest = () => {
     document.getElementById('userPassword').value = "";
     document.getElementById('userConfirm').value = "";
     document.getElementById('image').hidden = true;
-
-
 }
 
 function ChangePassword(id) {
     document.getElementById('userPassId').value = id;
 }
-
