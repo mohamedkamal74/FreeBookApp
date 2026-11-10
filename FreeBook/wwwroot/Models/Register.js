@@ -5,38 +5,8 @@ $(document).ready(function () {
     });
 });
 
-//function DeleteUser(id) {
-//    Swal.fire({
-//        title: lbTitleDeleteMsg,
-//        text: lmTextMsgDelete,
-//        icon: 'warning',
-//        showCancelButton: true,
-//        confirmButtonColor: '#3085d6',
-//        cancelButtonColor: '#d33',
-//        confirmButtonText: lbconfirmButtonText,
-//        cancelButtonText: lbCancelButtonText
-//    }).then((result) => {
-//        if (result.isConfirmed) {
-//            window.location.href = `/Admin/Accounts/DeleteUser?userId=${id}`;
-//            Swal.fire(
-//                lbTitleDeletedOk,
-//                lbTitleDeleteMsg,
-//                lbSuccess
-//            )
-//        }
-//    })
-//}
-
 function DeleteUser(id) {
-    Swal.fire({
-        title: 'هل انت متاكد ؟',
-        text: "لن تتمكن من التراجع !",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
+    confirmDelete().then((result) => {
         if (result.isConfirmed) {
             const form = document.getElementById('deleteForm');
             form.action = '/Admin/Accounts/DeleteUser';

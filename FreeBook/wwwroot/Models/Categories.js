@@ -19,15 +19,7 @@ function postDelete(url, id) {
 }
 
 function Delete(id) {
-    Swal.fire({
-        title: 'هل انت متاكد ؟',
-        text: "لن تتمكن من التراجع !",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
+    confirmDelete().then((result) => {
         if (result.isConfirmed) {
             postDelete('/Admin/Categories/Delete', id);
         }
@@ -35,15 +27,7 @@ function Delete(id) {
 }
 
 function DeleteLog(id) {
-    Swal.fire({
-        title: 'هل انت متاكد ؟',
-        text: "لن تتمكن من التراجع !",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
+    confirmDelete().then((result) => {
         if (result.isConfirmed) {
             postDelete('/Admin/Categories/DeleteLog', id);
         }
