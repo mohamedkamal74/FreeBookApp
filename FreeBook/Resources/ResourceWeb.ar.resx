@@ -465,4 +465,37 @@
   <data name="lbMsgNotUpdateCategory" xml:space="preserve">
     <value>لم يتم تعديل الفئة</value>
   </data>
+  <data name="lbActiveSubscribers" xml:space="preserve">
+    <value>مشتركون نشطون</value>
+  </data>
+  <data name="lbAuthor" xml:space="preserve">
+    <value>مؤلف</value>
+  </data>
+  <data name="lbBookName" xml:space="preserve">
+    <value>اسم الكتاب</value>
+  </data>
+  <data name="lbBooksByAuthor" xml:space="preserve">
+    <value>كتب المؤلف</value>
+  </data>
+  <data name="lbBooksByCategory" xml:space="preserve">
+    <value>كتب الفئة</value>
+  </data>
+  <data name="lbCategory" xml:space="preserve">
+    <value>فئة</value>
+  </data>
+  <data name="lbDaysOverdue" xml:space="preserve">
+    <value>أيام متأخرة</value>
+  </data>
+  <data name="lbEmail" xml:space="preserve">
+    <value>البريد الإلكتروني</value>
+  </data>
+  <data name="lbPenaltyPaid" xml:space="preserve">
+    <value>تم دفع الغرامة</value>
+  </data>
+  <data name="lbRentalHistory" xml:space="preserve">
+    <value>تاريخ الاستعارة</value>
+  </data>
+  <data name="lbSubscriber" xml:space="preserve">
+    <value>مشترك</value>
+  </data>
 </root>

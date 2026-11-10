@@ -468,4 +468,37 @@
   <data name="lbMsgNotUpdateCategory" xml:space="preserve">
     <value>Category not updated</value>
   </data>
+  <data name="lbActiveSubscribers" xml:space="preserve">
+    <value>Active Subscribers</value>
+  </data>
+  <data name="lbAuthor" xml:space="preserve">
+    <value>Author</value>
+  </data>
+  <data name="lbBookName" xml:space="preserve">
+    <value>Book Name</value>
+  </data>
+  <data name="lbBooksByAuthor" xml:space="preserve">
+    <value>Books by Author</value>
+  </data>
+  <data name="lbBooksByCategory" xml:space="preserve">
+    <value>Books by Category</value>
+  </data>
+  <data name="lbCategory" xml:space="preserve">
+    <value>Category</value>
+  </data>
+  <data name="lbDaysOverdue" xml:space="preserve">
+    <value>Days Overdue</value>
+  </data>
+  <data name="lbEmail" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="lbPenaltyPaid" xml:space="preserve">
+    <value>Penalty Paid</value>
+  </data>
+  <data name="lbRentalHistory" xml:space="preserve">
+    <value>Rental History</value>
+  </data>
+  <data name="lbSubscriber" xml:space="preserve">
+    <value>Subscriber</value>
+  </data>
 </root>
