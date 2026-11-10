@@ -45,7 +45,7 @@
                             <td>@item.Name</td>
                             <td>@item.Areas.Count</td>
                             <td>
-                                <input type="button" class="btn btn-info btn-sm" onclick="Edit('@item.Id','@item.Name')" value="@Localizer["lbBtnEdit"]" data-bs-toggle="modal" data-bs-target="#exampleModal" />
+                                <input type="button" class="btn btn-info btn-sm" onclick="Edit('@item.Id','@Js.Encode(item.Name)')" value="@Localizer["lbBtnEdit"]" data-bs-toggle="modal" data-bs-target="#exampleModal" />
                                 <input type="button" class="btn btn-danger btn-sm" onclick="DeleteGovernorate('@item.Id')" value="@Localizer["lbbtnDelete"]" />
                             </td>
                         </tr>

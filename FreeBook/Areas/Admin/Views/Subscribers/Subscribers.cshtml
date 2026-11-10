@@ -59,7 +59,7 @@
                                 <input type="checkbox" disabled checked="@subscriber.IsBlackListed" style="width:30px;height:30px"/>
                             </td>
                             <td>
-                                <input type="button" class="btn btn-info btn-sm" onclick="Edit('@subscriber.Id','@subscriber.FirstName','@subscriber.LastName','@subscriber.NationalId','@subscriber.MobileNumber','@(subscriber.HasWhatsApp ? "true" : "false")','@subscriber.Email','@subscriber.AreaId','@subscriber.GovernorateId','@subscriber.Address','@(subscriber.IsBlackListed ? "true" : "false")','@subscriber.DateOfBirth.ToString("yyyy-MM-dd")')" value="@Localizer["lbBtnEdit"]" data-bs-toggle="modal" data-bs-target="#exampleModal" />
+                                <input type="button" class="btn btn-info btn-sm" onclick="Edit('@subscriber.Id','@Js.Encode(subscriber.FirstName)','@Js.Encode(subscriber.LastName)','@Js.Encode(subscriber.NationalId)','@Js.Encode(subscriber.MobileNumber)','@(subscriber.HasWhatsApp ? "true" : "false")','@Js.Encode(subscriber.Email)','@subscriber.AreaId','@subscriber.GovernorateId','@Js.Encode(subscriber.Address)','@(subscriber.IsBlackListed ? "true" : "false")','@subscriber.DateOfBirth.ToString("yyyy-MM-dd")')" value="@Localizer["lbBtnEdit"]" data-bs-toggle="modal" data-bs-target="#exampleModal" />
                                 <input type="button" class="btn btn-danger btn-sm" onclick="DeleteSubscriber('@subscriber.Id')" value="@Localizer["lbbtnDelete"]"/>
                                 <input type="button" class="btn btn-warning btn-sm" onclick="ToggleBlacklist('@subscriber.Id')" value="@(subscriber.IsBlackListed ? Localizer["lbActiveUser"] : Localizer["lbIsBlackListed"])" />
                             </td>
