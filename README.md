@@ -1,5 +1,7 @@
 # FreeBook (Bookify)
 
+[![CI](https://github.com/mohamedkamal74/FreeBookApp/actions/workflows/ci.yml/badge.svg)](https://github.com/mohamedkamal74/FreeBookApp/actions/workflows/ci.yml)
+
 A small ASP.NET Core MVC book-catalog app with an admin area, built on **.NET 10**,
 **EF Core 10**, **SQL Server**, and **ASP.NET Identity**.
 
