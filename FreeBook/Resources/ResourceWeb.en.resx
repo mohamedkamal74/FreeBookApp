@@ -159,6 +159,9 @@
   <data name="lbTitleEdit" xml:space="preserve">
     <value>Edit User Group</value>
   </data>
+  <data name="lbTitleEditUser" xml:space="preserve">
+    <value>Edit User</value>
+  </data>
   <data name="lbTitleEditCategory" xml:space="preserve">
     <value>Edit Category</value>
   </data>

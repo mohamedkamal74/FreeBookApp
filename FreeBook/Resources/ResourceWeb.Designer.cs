@@ -502,6 +502,15 @@ public static global::System.Resources.ResourceManager ResourceManager {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Edit User.
+        /// </summary>
+        public static string lbTitleEditUser {
+            get {
+                return ResourceManager.GetString("lbTitleEditUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to تعديل الفئة.
         /// </summary>
         public static string lbTitleEditCategory {

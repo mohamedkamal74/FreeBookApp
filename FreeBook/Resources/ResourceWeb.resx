@@ -142,7 +142,7 @@
     <value>اضف مجموعة مستخدم جديد</value>
   </data>
   <data name="lbBtnSaveNewUser" xml:space="preserve">
-    <value>اضف مجموعة مستخدم جديد</value>
+    <value>اضافة مستخدم جديد</value>
   </data>
   <data name="lbCancelButtonText" xml:space="preserve">
     <value>الغاء</value>
@@ -263,6 +263,9 @@
   </data>
   <data name="lbTitleEdit" xml:space="preserve">
     <value>تعديل مجموعة المستخدم</value>
+  </data>
+  <data name="lbTitleEditUser" xml:space="preserve">
+    <value>تعديل المستخدم</value>
   </data>
   <data name="lbTitleEditCategory" xml:space="preserve">
     <value>تعديل الفئة</value>

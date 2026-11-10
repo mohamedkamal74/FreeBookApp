@@ -162,6 +162,9 @@
   <data name="lbTitleEdit" xml:space="preserve">
     <value>تعديل مجموعة المستخدم</value>
   </data>
+  <data name="lbTitleEditUser" xml:space="preserve">
+    <value>تعديل المستخدم</value>
+  </data>
   <data name="lbTitleEditCategory" xml:space="preserve">
     <value>تعديل الفئة</value>
   </data>
