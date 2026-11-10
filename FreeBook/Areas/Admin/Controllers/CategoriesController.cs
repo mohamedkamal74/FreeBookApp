@@ -86,9 +86,9 @@ namespace FreeBook.Areas.Admin.Controllers
                     var saveResult = await _serviceCategory.SaveAsync(model.NewCategory);
                     var logResult = await _serviceCategoryLog.SaveAsync(model.NewCategory.Id, Guid.Parse(userId));
                     if (saveResult.IsSuccess && logResult.IsSuccess)
-                        SessionMsg(Helper.Success, "تم الحفظ بنجاح", "تم حفظ  الفئة بنجاح");
+                        SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbSaveMsgCategory);
                     else
-                        SessionMsg(Helper.Error, "حدث خطا في الحفظ", "لم يتم حفظ اسم الفئة");
+                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSaveCategory);
                 }
 
             }
@@ -98,9 +98,9 @@ namespace FreeBook.Areas.Admin.Controllers
                 var saveResult = await _serviceCategory.SaveAsync(model.NewCategory);
                 var logResult = await _serviceCategoryLog.UpdateAsync(model.NewCategory.Id, Guid.Parse(userId));
                 if (saveResult.IsSuccess && logResult.IsSuccess)
-                    SessionMsg(Helper.Success, "تم التعديل بنجاح", "تم تعديل  الفئة بنجاح");
+                    SessionMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbUpdateMsgCategory);
                 else
-                    SessionMsg(Helper.Error, "حدث خطا في التعديل", "لم يتم تعديل اسم الفئة");
+                    SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbMsgNotUpdateCategory);
             }
 
             return RedirectToAction(nameof(Categories));

@@ -456,4 +456,13 @@
   <data name="lbTitleEditSubscription" xml:space="preserve">
     <value>Edit Subscription</value>
   </data>
+  <data name="lbSaveMsgCategory" xml:space="preserve">
+    <value>Category saved successfully</value>
+  </data>
+  <data name="lbUpdateMsgCategory" xml:space="preserve">
+    <value>Category updated successfully</value>
+  </data>
+  <data name="lbMsgNotUpdateCategory" xml:space="preserve">
+    <value>Category not updated</value>
+  </data>
 </root>

@@ -554,5 +554,32 @@ public static global::System.Resources.ResourceManager ResourceManager {
                 return ResourceManager.GetString("lmTextMsgDelete", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Category saved successfully.
+        /// </summary>
+        public static string lbSaveMsgCategory {
+            get {
+                return ResourceManager.GetString("lbSaveMsgCategory", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Category updated successfully.
+        /// </summary>
+        public static string lbUpdateMsgCategory {
+            get {
+                return ResourceManager.GetString("lbUpdateMsgCategory", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Category not updated.
+        /// </summary>
+        public static string lbMsgNotUpdateCategory {
+            get {
+                return ResourceManager.GetString("lbMsgNotUpdateCategory", resourceCulture);
+            }
+        }
     }
 }

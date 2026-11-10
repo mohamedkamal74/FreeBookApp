@@ -591,4 +591,13 @@
   <data name="lbTitleEditSubscription" xml:space="preserve">
     <value>تعديل الاشتراك</value>
   </data>
+  <data name="lbSaveMsgCategory" xml:space="preserve">
+    <value>تم حفظ الفئة بنجاح</value>
+  </data>
+  <data name="lbUpdateMsgCategory" xml:space="preserve">
+    <value>تم تعديل الفئة بنجاح</value>
+  </data>
+  <data name="lbMsgNotUpdateCategory" xml:space="preserve">
+    <value>لم يتم تعديل الفئة</value>
+  </data>
 </root>
