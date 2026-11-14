@@ -83,7 +83,7 @@ namespace FreeBook.Areas.Admin.Controllers
                 // create
                 var findResult = await _serviceSubscriber.FindByAsync(model.NewSubscriber.NationalId);
                 if (findResult.IsSuccess && findResult.Value != null)
-                    SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDupplicateNameCategory);
+                    SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDuplicateName);
                 else
                 {
                     var newSubscriber = new Subscriber
@@ -105,9 +105,9 @@ namespace FreeBook.Areas.Admin.Controllers
                     };
                     var saveResult = await _serviceSubscriber.SaveAsync(newSubscriber);
                     if (saveResult.IsSuccess)
-                        SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbSaveMsgRole);
+                        SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbMsgSavedOk);
                     else
-                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbNotSaveMsgRole);
+                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSavedOk);
                 }
             }
             else
@@ -116,24 +116,33 @@ namespace FreeBook.Areas.Admin.Controllers
                 var existingResult = await _serviceSubscriber.FindByIdAsync(Guid.Parse(model.NewSubscriber.SubscriberId));
                 if (existingResult.IsSuccess && existingResult.Value is not null)
                 {
-                    existingResult.Value.FirstName = model.NewSubscriber.FirstName;
-                    existingResult.Value.LastName = model.NewSubscriber.LastName;
-                    existingResult.Value.DateOfBirth = model.NewSubscriber.DateOfBirth;
-                    existingResult.Value.NationalId = model.NewSubscriber.NationalId;
-                    existingResult.Value.MobileNumber = model.NewSubscriber.MobileNumber;
-                    existingResult.Value.HasWhatsApp = model.NewSubscriber.HasWhatsApp;
-                    existingResult.Value.Email = model.NewSubscriber.Email;
-                    existingResult.Value.ImageUrl = model.NewSubscriber.ImageUrl;
-                    existingResult.Value.ImageThumbnailUrl = model.NewSubscriber.ImageThumbnailUrl;
-                    existingResult.Value.AreaId = model.NewSubscriber.AreaId;
-                    existingResult.Value.GovernorateId = model.NewSubscriber.GovernorateId;
-                    existingResult.Value.Address = model.NewSubscriber.Address;
-                    existingResult.Value.IsBlackListed = model.NewSubscriber.IsBlackListed;
-                    var saveResult = await _serviceSubscriber.SaveAsync(existingResult.Value);
-                    if (saveResult.IsSuccess)
-                        SessionMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbUpdateMsgRole);
+                    // Check for duplicate NationalId (excluding self)
+                    var findResult = await _serviceSubscriber.FindByAsync(model.NewSubscriber.NationalId);
+                    if (findResult.IsSuccess && findResult.Value != null && findResult.Value.Id != existingResult.Value.Id)
+                    {
+                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDuplicateName);
+                    }
                     else
-                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbNotUpdateMsgRole);
+                    {
+                        existingResult.Value.FirstName = model.NewSubscriber.FirstName;
+                        existingResult.Value.LastName = model.NewSubscriber.LastName;
+                        existingResult.Value.DateOfBirth = model.NewSubscriber.DateOfBirth;
+                        existingResult.Value.NationalId = model.NewSubscriber.NationalId;
+                        existingResult.Value.MobileNumber = model.NewSubscriber.MobileNumber;
+                        existingResult.Value.HasWhatsApp = model.NewSubscriber.HasWhatsApp;
+                        existingResult.Value.Email = model.NewSubscriber.Email;
+                        existingResult.Value.ImageUrl = model.NewSubscriber.ImageUrl;
+                        existingResult.Value.ImageThumbnailUrl = model.NewSubscriber.ImageThumbnailUrl;
+                        existingResult.Value.AreaId = model.NewSubscriber.AreaId;
+                        existingResult.Value.GovernorateId = model.NewSubscriber.GovernorateId;
+                        existingResult.Value.Address = model.NewSubscriber.Address;
+                        existingResult.Value.IsBlackListed = model.NewSubscriber.IsBlackListed;
+                        var saveResult = await _serviceSubscriber.SaveAsync(existingResult.Value);
+                        if (saveResult.IsSuccess)
+                            SessionMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbMsgUpdatedOk);
+                        else
+                            SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbMsgNotUpdatedOk);
+                    }
                 }
             }
 

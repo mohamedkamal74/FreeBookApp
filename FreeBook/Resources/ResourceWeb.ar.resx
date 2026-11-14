@@ -498,4 +498,19 @@
   <data name="lbSubscriber" xml:space="preserve">
     <value>مشترك</value>
   </data>
+  <data name="lbMsgSavedOk" xml:space="preserve">
+    <value>تم الحفظ بنجاح</value>
+  </data>
+  <data name="lbMsgUpdatedOk" xml:space="preserve">
+    <value>تم التعديل بنجاح</value>
+  </data>
+  <data name="lbMsgNotSavedOk" xml:space="preserve">
+    <value>لم يتم الحفظ</value>
+  </data>
+  <data name="lbMsgNotUpdatedOk" xml:space="preserve">
+    <value>لم يتم التعديل</value>
+  </data>
+  <data name="lbMsgDuplicateName" xml:space="preserve">
+    <value>هذا الاسم موجود بالفعل!</value>
+  </data>
 </root>

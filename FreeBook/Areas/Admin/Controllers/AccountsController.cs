@@ -188,14 +188,14 @@ namespace FreeBook.Areas.Admin.Controllers
                         //Succeded
                         var role = await _userManager.AddToRoleAsync(user, model.NewRegister.RoleName);
                         if (role.Succeeded)
-                            SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbSaveMsgRole);
+                            SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbMsgSavedOk);
                         else
-                            SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbNotSaveMsgRole);
+                            SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSavedOk);
                     }
                     else
                     {
                         //Not Succeded
-                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbNotSaveMsgRole);
+                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSavedOk);
                     }
                 }
                 else
@@ -204,7 +204,7 @@ namespace FreeBook.Areas.Admin.Controllers
                     var userUpdate = await _userManager.FindByIdAsync(user.Id);
                     if (userUpdate is null)
                     {
-                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbNotSaveMsgRole);
+                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbMsgNotUpdatedOk);
                         return RedirectToAction("Register", "Accounts");
                     }
 
@@ -223,15 +223,15 @@ namespace FreeBook.Areas.Admin.Controllers
                         var addRole = await _userManager.AddToRoleAsync(userUpdate, model.NewRegister.RoleName);
                         if (addRole.Succeeded)
 
-                            SessionMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbUpdateMsgRole);
+                            SessionMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbMsgUpdatedOk);
                         else
 
-                            SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbNotSaveMsgRole);
+                            SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbMsgNotUpdatedOk);
                     }
                     else
                     {
                         //Not Succeded
-                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbNotSaveMsgRole);
+                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbMsgNotUpdatedOk);
                     }
                 }
                 return RedirectToAction("Register", "Accounts");

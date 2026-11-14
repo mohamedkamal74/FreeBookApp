@@ -48,7 +48,7 @@ namespace FreeBook.Areas.Admin.Controllers
                 // create
                 var findResult = await _serviceGovernorate.FindByAsync(model.NewGovernorate.Name);
                 if (findResult.IsSuccess && findResult.Value != null)
-                    SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDupplicateNameCategory);
+                    SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDuplicateName);
                 else
                 {
                     var newGovernorate = new Governorate
@@ -58,9 +58,9 @@ namespace FreeBook.Areas.Admin.Controllers
                     };
                     var saveResult = await _serviceGovernorate.SaveAsync(newGovernorate);
                     if (saveResult.IsSuccess)
-                        SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbSaveMsgRole);
+                        SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbMsgSavedOk);
                     else
-                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbNotSaveMsgRole);
+                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSavedOk);
                 }
             }
             else
@@ -69,12 +69,21 @@ namespace FreeBook.Areas.Admin.Controllers
                 var existingResult = await _serviceGovernorate.FindByIdAsync(Guid.Parse(model.NewGovernorate.GovernorateId));
                 if (existingResult.IsSuccess && existingResult.Value is not null)
                 {
-                    existingResult.Value.Name = model.NewGovernorate.Name;
-                    var saveResult = await _serviceGovernorate.SaveAsync(existingResult.Value);
-                    if (saveResult.IsSuccess)
-                        SessionMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbUpdateMsgRole);
+                    // Check for duplicate name (excluding self)
+                    var findResult = await _serviceGovernorate.FindByAsync(model.NewGovernorate.Name);
+                    if (findResult.IsSuccess && findResult.Value != null && findResult.Value.Id != existingResult.Value.Id)
+                    {
+                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDuplicateName);
+                    }
                     else
-                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbNotUpdateMsgRole);
+                    {
+                        existingResult.Value.Name = model.NewGovernorate.Name;
+                        var saveResult = await _serviceGovernorate.SaveAsync(existingResult.Value);
+                        if (saveResult.IsSuccess)
+                            SessionMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbMsgUpdatedOk);
+                        else
+                            SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbMsgNotUpdatedOk);
+                    }
                 }
             }
 

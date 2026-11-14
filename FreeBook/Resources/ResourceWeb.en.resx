@@ -501,4 +501,19 @@
   <data name="lbSubscriber" xml:space="preserve">
     <value>Subscriber</value>
   </data>
+  <data name="lbMsgSavedOk" xml:space="preserve">
+    <value>Saved successfully</value>
+  </data>
+  <data name="lbMsgUpdatedOk" xml:space="preserve">
+    <value>Updated successfully</value>
+  </data>
+  <data name="lbMsgNotSavedOk" xml:space="preserve">
+    <value>The record was not saved</value>
+  </data>
+  <data name="lbMsgNotUpdatedOk" xml:space="preserve">
+    <value>The record was not updated</value>
+  </data>
+  <data name="lbMsgDuplicateName" xml:space="preserve">
+    <value>This name already exists!</value>
+  </data>
 </root>

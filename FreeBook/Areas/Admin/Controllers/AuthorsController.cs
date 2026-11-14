@@ -58,7 +58,7 @@ namespace FreeBook.Areas.Admin.Controllers
                 // create
                 var findResult = await _serviceAuthor.FindByNameAsync(model.NewAuthor.Name);
                 if (findResult.IsSuccess && findResult.Value != null)
-                    SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDupplicateNameCategory);
+                    SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDuplicateName);
                 else
                 {
                     var newAuthor = new Author
@@ -68,9 +68,9 @@ namespace FreeBook.Areas.Admin.Controllers
                     };
                     var saveResult = await _serviceAuthor.SaveAsync(newAuthor);
                     if (saveResult.IsSuccess)
-                        SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbSaveMsgRole);
+                        SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbMsgSavedOk);
                     else
-                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbNotSaveMsgRole);
+                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSavedOk);
                 }
             }
             else
@@ -79,12 +79,21 @@ namespace FreeBook.Areas.Admin.Controllers
                 var existingAuthorResult = await _serviceAuthor.FindByIdAsync(Guid.Parse(model.NewAuthor.AuthorId));
                 if (existingAuthorResult.IsSuccess && existingAuthorResult.Value is not null)
                 {
-                    existingAuthorResult.Value.Name = model.NewAuthor.Name;
-                    var saveResult = await _serviceAuthor.SaveAsync(existingAuthorResult.Value);
-                    if (saveResult.IsSuccess)
-                        SessionMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbUpdateMsgRole);
+                    // Check for duplicate name (excluding self)
+                    var findResult = await _serviceAuthor.FindByNameAsync(model.NewAuthor.Name);
+                    if (findResult.IsSuccess && findResult.Value != null && findResult.Value.Id != existingAuthorResult.Value.Id)
+                    {
+                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDuplicateName);
+                    }
                     else
-                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbNotUpdateMsgRole);
+                    {
+                        existingAuthorResult.Value.Name = model.NewAuthor.Name;
+                        var saveResult = await _serviceAuthor.SaveAsync(existingAuthorResult.Value);
+                        if (saveResult.IsSuccess)
+                            SessionMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbMsgUpdatedOk);
+                        else
+                            SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbMsgNotUpdatedOk);
+                    }
                 }
             }
 

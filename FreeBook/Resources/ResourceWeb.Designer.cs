@@ -590,5 +590,50 @@ public static global::System.Resources.ResourceManager ResourceManager {
                 return ResourceManager.GetString("lbMsgNotUpdateCategory", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Saved successfully.
+        /// </summary>
+        public static string lbMsgSavedOk {
+            get {
+                return ResourceManager.GetString("lbMsgSavedOk", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Updated successfully.
+        /// </summary>
+        public static string lbMsgUpdatedOk {
+            get {
+                return ResourceManager.GetString("lbMsgUpdatedOk", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The record was not saved.
+        /// </summary>
+        public static string lbMsgNotSavedOk {
+            get {
+                return ResourceManager.GetString("lbMsgNotSavedOk", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The record was not updated.
+        /// </summary>
+        public static string lbMsgNotUpdatedOk {
+            get {
+                return ResourceManager.GetString("lbMsgNotUpdatedOk", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to This name already exists!.
+        /// </summary>
+        public static string lbMsgDuplicateName {
+            get {
+                return ResourceManager.GetString("lbMsgDuplicateName", resourceCulture);
+            }
+        }
     }
 }
