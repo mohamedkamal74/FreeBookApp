@@ -516,4 +516,55 @@
   <data name="lbMsgDuplicateName" xml:space="preserve">
     <value>This name already exists!</value>
   </data>
+  <data name="lbAppTitle" xml:space="preserve">
+    <value>Bookify</value>
+  </data>
+  <data name="lbFooter" xml:space="preserve">
+    <value>Copyright © 2026 Bookify. All rights reserved.</value>
+  </data>
+  <data name="lbVersion" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  <data name="lbLoginSubtitle" xml:space="preserve">
+    <value>Sign in to start your session</value>
+  </data>
+  <data name="lbRememberMe" xml:space="preserve">
+    <value>Remember Me</value>
+  </data>
+  <data name="lbBtnSignIn" xml:space="preserve">
+    <value>Sign In</value>
+  </data>
+  <data name="lbEmailPlaceholder" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="lbPasswordPlaceholder" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="lbSidebarManagement" xml:space="preserve">
+    <value>Management</value>
+  </data>
+  <data name="lbSidebarMemberships" xml:space="preserve">
+    <value>Memberships</value>
+  </data>
+  <data name="lbSidebarLocations" xml:space="preserve">
+    <value>Locations</value>
+  </data>
+  <data name="lbSidebarAdministration" xml:space="preserve">
+    <value>Administration</value>
+  </data>
+  <data name="lbLogin" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="lbLoginWithFacebook" xml:space="preserve">
+    <value>Sign in with Facebook</value>
+  </data>
+  <data name="lbLoginWithGoogle" xml:space="preserve">
+    <value>Sign in with Google</value>
+  </data>
+  <data name="lbForgotPassword" xml:space="preserve">
+    <value>Forgot Password?</value>
+  </data>
+  <data name="lbRegisterNewMembership" xml:space="preserve">
+    <value>Register a new membership</value>
+  </data>
 </root>

@@ -1,0 +1,874 @@
+/*
+ * Bookify Admin Theme — overrides AdminLTE 3 defaults
+ * Load this AFTER adminlte.css so custom properties & overrides win.
+ */
+
+/* ============================================================
+   1) COLOR PALETTE (CSS custom properties)
+   ============================================================ */
+:root {
+  /* Brand */
+  --bk-primary: #6366F1;
+  --bk-primary-hover: #4F46E5;
+  --bk-primary-light: #E0E7FF;
+  --bk-violet: #8B5CF6;
+  --bk-violet-light: #F5F3FF;
+
+  /* Semantic */
+  --bk-success: #10B981;
+  --bk-success-light: #D1FAE5;
+  --bk-danger: #EF4444;
+  --bk-danger-light: #FEE2E2;
+  --bk-warning: #F59E0B;
+  --bk-warning-light: #FEF3C7;
+  --bk-info: #06B6D4;
+  --bk-info-light: #CFFAFE;
+
+  /* Neutrals */
+  --bk-bg: #F8FAFC;
+  --bk-bg-card: #FFFFFF;
+  --bk-border: #E2E8F0;
+  --bk-text: #1E293B;
+  --bk-text-muted: #64748B;
+  --bk-text-light: #94A3B8;
+
+  /* Spacing scale */
+  --bk-space-1: 0.25rem;
+  --bk-space-2: 0.5rem;
+  --bk-space-3: 0.75rem;
+  --bk-space-4: 1rem;
+  --bk-space-5: 1.25rem;
+  --bk-space-6: 1.5rem;
+
+  /* Radius */
+  --bk-radius-sm: 0.375rem;
+  --bk-radius: 0.5rem;
+  --bk-radius-lg: 0.75rem;
+  --bk-radius-xl: 1rem;
+
+  /* Shadows */
+  --bk-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --bk-shadow: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.06);
+  --bk-shadow-md: 0 4px 6px rgba(15, 23, 42, 0.07), 0 2px 4px rgba(15, 23, 42, 0.06);
+  --bk-shadow-lg: 0 10px 15px rgba(15, 23, 42, 0.1), 0 4px 6px rgba(15, 23, 42, 0.05);
+
+  /* Transitions */
+  --bk-transition: 150ms ease;
+}
+
+/* Dark-mode tweaks (AdminLTE uses .dark-mode class on body) */
+body.dark-mode {
+  --bk-bg: #0F172A;
+  --bk-bg-card: #1E293B;
+  --bk-border: #334155;
+  --bk-text: #F1F5F9;
+  --bk-text-muted: #94A3B8;
+  --bk-text-light: #64748B;
+  --bk-primary-light: #312E81;
+  --bk-violet-light: #2E1065;
+}
+
+/* ============================================================
+   2) GLOBAL BASE
+   ============================================================ */
+html,
+body {
+  background-color: var(--bk-bg);
+  color: var(--bk-text);
+  font-family: inherit;
+}
+
+/* Force smooth transitions on common interactive elements */
+a, button, .btn, .card, .form-control, .badge, .dropdown-item,
+.sidebar .nav-link, .nav-tabs .nav-link, .modal-content,
+.table td, .table th, .input-group-text {
+  transition: background-color var(--bk-transition),
+              border-color var(--bk-transition),
+              color var(--bk-transition),
+              box-shadow var(--bk-transition),
+              transform var(--bk-transition);
+}
+
+/* Focus ring consistency */
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--bk-primary-light) !important;
+}
+
+/* ============================================================
+   3) SIDEBAR
+   ============================================================ */
+.main-sidebar {
+  background: linear-gradient(180deg, #1E1B2E 0%, #312E81 100%) !important;
+  box-shadow: var(--bk-shadow-lg);
+  z-index: 1050;
+}
+
+.brand-link {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+  padding: 1.25rem 1rem !important;
+  margin-bottom: 0.5rem;
+}
+
+.brand-image {
+  width: 36px !important;
+  height: 36px !important;
+  background: var(--bk-primary);
+  border-radius: var(--bk-radius);
+  padding: 6px;
+}
+
+.brand-text {
+  color: #fff !important;
+  font-weight: 700 !important;
+  font-size: 1.125rem !important;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+/* Nav items */
+.sidebar .nav-sidebar .nav-item {
+  margin: 2px 0.75rem;
+}
+
+.sidebar .nav-sidebar .nav-link {
+  border-radius: var(--bk-radius);
+  color: rgba(255,255,255,0.85) !important;
+  font-weight: 500;
+  padding: 0.75rem 1rem !important;
+  margin-bottom: 2px;
+}
+
+.sidebar .nav-sidebar .nav-link:hover {
+  background: rgba(255,255,255,0.1) !important;
+  color: #fff !important;
+  transform: translateX(2px);
+}
+
+.sidebar .nav-sidebar .nav-link.active {
+  background: var(--bk-primary) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+  font-weight: 600;
+}
+
+.sidebar .nav-sidebar .nav-link.active .nav-icon {
+  color: #fff !important;
+  transform: scale(1.1);
+}
+
+.sidebar .nav-sidebar .nav-icon {
+  color: rgba(255,255,255,0.7) !important;
+  font-size: 1.1rem;
+  width: 1.5rem;
+  text-align: center;
+}
+
+.sidebar .nav-sidebar .nav-link:hover .nav-icon,
+.sidebar .nav-sidebar .nav-link.active .nav-icon {
+  color: #fff !important;
+}
+
+/* Nav header labels */
+.sidebar .nav-sidebar .nav-header {
+  color: var(--bk-violet) !important;
+  font-weight: 700;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.75rem 1rem 0.25rem !important;
+  margin-top: 0.5rem;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.sidebar .nav-sidebar .nav-header:first-child {
+  border-top: none;
+  margin-top: 0;
+}
+
+/* Treeview sub-items */
+.sidebar .nav-treeview .nav-link {
+  padding-left: 2.5rem !important;
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+.sidebar .nav-treeview .nav-link.active {
+  background: rgba(99, 102, 241, 0.2) !important;
+  color: var(--bk-primary-light) !important;
+  font-weight: 600;
+}
+
+/* User panel */
+.user-panel .image img {
+  border: 2px solid rgba(255,255,255,0.2) !important;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+}
+
+/* ============================================================
+   4) NAVBAR
+   ============================================================ */
+.main-header .navbar {
+  background: var(--bk-bg-card) !important;
+  border-bottom: 1px solid var(--bk-border) !important;
+  box-shadow: var(--bk-shadow-sm);
+}
+
+.main-header .nav-link {
+  color: var(--bk-text) !important;
+  font-weight: 500;
+}
+
+.main-header .nav-link:hover {
+  color: var(--bk-primary) !important;
+  background: var(--bk-primary-light) !important;
+}
+
+/* ============================================================
+   5) CARDS
+   ============================================================ */
+.card {
+  border: 1px solid var(--bk-border) !important;
+  border-radius: var(--bk-radius-lg) !important;
+  box-shadow: var(--bk-shadow) !important;
+  background: var(--bk-bg-card);
+  overflow: hidden;
+}
+
+.card-header {
+  background: var(--bk-bg) !important;
+  border-bottom: 1px solid var(--bk-border) !important;
+  border-radius: var(--bk-radius-lg) var(--bk-radius-lg) 0 0 !important;
+  font-weight: 600;
+  color: var(--bk-text);
+  padding: 1rem 1.25rem !important;
+}
+
+.card-header:first-child {
+  border-radius: var(--bk-radius-lg) !important;
+}
+
+.card-body {
+  padding: 1.25rem !important;
+}
+
+.card-footer {
+  background: var(--bk-bg) !important;
+  border-top: 1px solid var(--bk-border) !important;
+  border-radius: 0 0 var(--bk-radius-lg) var(--bk-radius-lg) !important;
+  padding: 1rem 1.25rem !important;
+}
+
+.card .card {
+  box-shadow: none !important;
+  border: 1px solid var(--bk-border) !important;
+}
+
+/* Card shadow hover */
+.card:hover {
+  box-shadow: var(--bk-shadow-md) !important;
+}
+
+/* ============================================================
+   6) TABLES
+   ============================================================ */
+.table {
+  color: var(--bk-text);
+  margin-bottom: 0;
+}
+
+.table thead th {
+  background: var(--bk-primary-light) !important;
+  color: var(--bk-primary) !important;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid var(--bk-primary) !important;
+  padding: 0.875rem 1rem !important;
+  white-space: nowrap;
+}
+
+.table tbody td {
+  padding: 0.875rem 1rem !important;
+  border-color: var(--bk-border) !important;
+  vertical-align: middle;
+}
+
+.table tbody tr {
+  background: var(--bk-bg-card);
+}
+
+.table tbody tr:hover {
+  background: var(--bk-primary-light) !important;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background: var(--bk-bg) !important;
+}
+
+.table-striped tbody tr:nth-of-type(odd):hover {
+  background: var(--bk-primary-light) !important;
+}
+
+/* ============================================================
+   7) BUTTONS
+   ============================================================ */
+.btn {
+  border-radius: var(--bk-radius) !important;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding: 0.5rem 1.125rem !important;
+  border-width: 1px;
+  box-shadow: var(--bk-shadow-sm);
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--bk-shadow);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: var(--bk-shadow-sm);
+}
+
+.btn-primary {
+  background: var(--bk-primary) !important;
+  border-color: var(--bk-primary) !important;
+  color: #fff !important;
+}
+
+.btn-primary:hover {
+  background: var(--bk-primary-hover) !important;
+  border-color: var(--bk-primary-hover) !important;
+}
+
+.btn-success {
+  background: var(--bk-success) !important;
+  border-color: var(--bk-success) !important;
+  color: #fff !important;
+}
+
+.btn-success:hover {
+  background: #059669 !important;
+  border-color: #059669 !important;
+}
+
+.btn-danger {
+  background: var(--bk-danger) !important;
+  border-color: var(--bk-danger) !important;
+  color: #fff !important;
+}
+
+.btn-danger:hover {
+  background: #DC2626 !important;
+  border-color: #DC2626 !important;
+}
+
+.btn-warning {
+  background: var(--bk-warning) !important;
+  border-color: var(--bk-warning) !important;
+  color: #fff !important;
+}
+
+.btn-warning:hover {
+  background: #D97706 !important;
+  border-color: #D97706 !important;
+}
+
+.btn-info {
+  background: var(--bk-info) !important;
+  border-color: var(--bk-info) !important;
+  color: #fff !important;
+}
+
+.btn-info:hover {
+  background: #0891B2 !important;
+  border-color: #0891B2 !important;
+}
+
+.btn-secondary {
+  background: var(--bk-text-muted) !important;
+  border-color: var(--bk-text-muted) !important;
+  color: #fff !important;
+}
+
+.btn-secondary:hover {
+  background: #475569 !important;
+  border-color: #475569 !important;
+}
+
+.btn-outline-primary {
+  color: var(--bk-primary) !important;
+  border-color: var(--bk-primary) !important;
+  background: transparent !important;
+}
+
+.btn-outline-primary:hover {
+  background: var(--bk-primary) !important;
+  color: #fff !important;
+}
+
+.btn-sm {
+  padding: 0.375rem 0.875rem !important;
+  font-size: 0.8125rem;
+}
+
+.btn-lg {
+  padding: 0.75rem 1.5rem !important;
+  font-size: 1rem;
+}
+
+/* AdminLTE specific buttons */
+.btn-flat {
+  box-shadow: none !important;
+}
+
+.btn-flat:hover {
+  box-shadow: var(--bk-shadow-sm) !important;
+}
+
+/* ============================================================
+   8) BADGES
+   ============================================================ */
+.badge {
+  border-radius: var(--bk-radius) !important;
+  font-weight: 500;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+}
+
+.badge-primary { background: var(--bk-primary-light) !important; color: var(--bk-primary) !important; }
+.badge-success { background: var(--bk-success-light) !important; color: var(--bk-success) !important; }
+.badge-danger  { background: var(--bk-danger-light) !important; color: var(--bk-danger) !important; }
+.badge-warning { background: var(--bk-warning-light) !important; color: #92400E !important; }
+.badge-info    { background: var(--bk-info-light) !important; color: #0E7490 !important; }
+.badge-secondary { background: #E2E8F0 !important; color: #475569 !important; }
+
+/* ============================================================
+   9) FORMS
+   ============================================================ */
+.form-control {
+  border: 1px solid var(--bk-border) !important;
+  border-radius: var(--bk-radius) !important;
+  background: var(--bk-bg-card);
+  color: var(--bk-text);
+  padding: 0.625rem 1rem !important;
+  font-size: 0.9375rem;
+  box-shadow: var(--bk-shadow-sm);
+}
+
+.form-control:focus {
+  border-color: var(--bk-primary) !important;
+  box-shadow: 0 0 0 3px var(--bk-primary-light) !important;
+  background: var(--bk-bg-card);
+}
+
+.form-control::placeholder {
+  color: var(--bk-text-light) !important;
+  opacity: 1;
+}
+
+.form-label {
+  font-weight: 500;
+  color: var(--bk-text);
+  margin-bottom: 0.375rem !important;
+}
+
+.input-group-text {
+  background: var(--bk-bg) !important;
+  border: 1px solid var(--bk-border) !important;
+  color: var(--bk-text-muted) !important;
+  border-radius: var(--bk-radius) !important;
+}
+
+.input-group .form-control {
+  border-left: none !important;
+  border-radius: 0 var(--bk-radius) var(--bk-radius) 0 !important;
+}
+
+.input-group:first-child .input-group-text {
+  border-radius: var(--bk-radius) 0 0 var(--bk-radius) !important;
+}
+
+.input-group:first-child .form-control {
+  border-radius: 0 var(--bk-radius) var(--bk-radius) 0 !important;
+}
+
+/* Checkboxes / radios (iCheck bootstrap) */
+.icheck-primary input[type="checkbox"]:checked + label::before,
+.icheck-primary input[type="radio"]:checked + label::before {
+  background: var(--bk-primary) !important;
+  border-color: var(--bk-primary) !important;
+}
+
+.icheck-primary input[type="checkbox"]:focus + label::before,
+.icheck-primary input[type="radio"]:focus + label::before {
+  box-shadow: 0 0 0 3px var(--bk-primary-light) !important;
+}
+
+/* Select2 */
+.select2-container--default .select2-selection--single {
+  border: 1px solid var(--bk-border) !important;
+  border-radius: var(--bk-radius) !important;
+  height: calc(2.25rem + 2px) !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  line-height: calc(2.25rem - 2px) !important;
+  color: var(--bk-text);
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: calc(2.25rem - 2px) !important;
+}
+
+/* ============================================================
+   10) MODALS
+   ============================================================ */
+.modal-content {
+  border: none !important;
+  border-radius: var(--bk-radius-xl) !important;
+  box-shadow: var(--bk-shadow-lg) !important;
+  background: var(--bk-bg-card);
+}
+
+.modal-header {
+  border-bottom: 1px solid var(--bk-border) !important;
+  border-radius: var(--bk-radius-xl) var(--bk-radius-xl) 0 0 !important;
+  background: var(--bk-primary-light) !important;
+  padding: 1rem 1.25rem !important;
+}
+
+.modal-title {
+  font-weight: 600;
+  color: var(--bk-primary) !important;
+}
+
+.modal-body {
+  padding: 1.5rem !important;
+}
+
+.modal-footer {
+  border-top: 1px solid var(--bk-border) !important;
+  border-radius: 0 0 var(--bk-radius-xl) var(--bk-radius-xl) !important;
+  background: var(--bk-bg) !important;
+  padding: 1rem 1.25rem !important;
+}
+
+.btn-close {
+  opacity: 0.6;
+  filter: none;
+}
+
+.btn-close:hover {
+  opacity: 1;
+}
+
+/* ============================================================
+   11) ALERTS / TOASTS (SweetAlert2 will use its own theme, but)
+   ============================================================ */
+.alert {
+  border: none !important;
+  border-radius: var(--bk-radius) !important;
+  padding: 1rem 1.25rem !important;
+}
+
+.alert-primary   { background: var(--bk-primary-light) !important; color: var(--bk-primary) !important; }
+.alert-success   { background: var(--bk-success-light) !important; color: #065F46 !important; }
+.alert-danger    { background: var(--bk-danger-light) !important; color: #991B1B !important; }
+.alert-warning   { background: var(--bk-warning-light) !important; color: #92400E !important; }
+.alert-info      { background: var(--bk-info-light) !important; color: #0E7490 !important; }
+
+/* ============================================================
+   12) DROPDOWNS
+   ============================================================ */
+.dropdown-menu {
+  border: 1px solid var(--bk-border) !important;
+  border-radius: var(--bk-radius-lg) !important;
+  box-shadow: var(--bk-shadow-md) !important;
+  padding: 0.5rem 0 !important;
+  background: var(--bk-bg-card);
+}
+
+.dropdown-item {
+  padding: 0.625rem 1.25rem !important;
+  color: var(--bk-text) !important;
+  font-weight: 500;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background: var(--bk-primary-light) !important;
+  color: var(--bk-primary) !important;
+}
+
+.dropdown-divider {
+  border-color: var(--bk-border) !important;
+  margin: 0.5rem 0 !important;
+}
+
+/* ============================================================
+   13) TABS
+   ============================================================ */
+.nav-tabs {
+  border-bottom: 2px solid var(--bk-border) !important;
+}
+
+.nav-tabs .nav-link {
+  border: none !important;
+  color: var(--bk-text-muted) !important;
+  font-weight: 500;
+  padding: 0.75rem 1.25rem !important;
+  margin-bottom: -2px;
+  border-radius: var(--bk-radius) var(--bk-radius) 0 0 !important;
+}
+
+.nav-tabs .nav-link:hover {
+  color: var(--bk-text) !important;
+  background: var(--bk-bg) !important;
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--bk-primary) !important;
+  background: var(--bk-primary-light) !important;
+  border-bottom: 2px solid var(--bk-primary) !important;
+  margin-bottom: -2px;
+}
+
+/* ============================================================
+   14) PAGINATION
+   ============================================================ */
+.pagination .page-link {
+  border: 1px solid var(--bk-border) !important;
+  color: var(--bk-text) !important;
+  margin: 0 2px;
+  border-radius: var(--bk-radius) !important;
+  padding: 0.5rem 0.875rem !important;
+}
+
+.pagination .page-link:hover {
+  background: var(--bk-primary-light) !important;
+  color: var(--bk-primary) !important;
+  border-color: var(--bk-primary) !important;
+}
+
+.pagination .page-item.active .page-link {
+  background: var(--bk-primary) !important;
+  border-color: var(--bk-primary) !important;
+  color: #fff !important;
+}
+
+/* ============================================================
+   15) PROGRESS BARS
+   ============================================================ */
+.progress {
+  background: var(--bk-border) !important;
+  border-radius: var(--bk-radius) !important;
+  height: 0.5rem !important;
+}
+
+.progress-bar {
+  background: var(--bk-primary) !important;
+}
+
+/* ============================================================
+   16) SCROLLBARS
+   ============================================================ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bk-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--bk-text-light);
+}
+
+/* ============================================================
+   17) LOGIN PAGE (specific)
+   ============================================================ */
+.login-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1E1B2E 0%, #312E81 50%, #5B21B6 100%) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.login-box {
+  width: 100%;
+  max-width: 420px;
+}
+
+.login-logo {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.login-logo a {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #fff;
+  text-decoration: none;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.login-logo a span {
+  color: #C4B5FD;
+}
+
+.card-login {
+  background: var(--bk-bg-card) !important;
+  border: none !important;
+  border-radius: var(--bk-radius-xl) !important;
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.1) !important;
+  overflow: hidden;
+}
+
+.card-login .card-body {
+  padding: 2rem 2.5rem !important;
+}
+
+.card-login .login-box-msg {
+  color: var(--bk-text-muted);
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.card-login .form-control {
+  background: var(--bk-bg) !important;
+  border-color: var(--bk-border) !important;
+}
+
+.card-login .form-control:focus {
+  background: var(--bk-bg-card) !important;
+}
+
+.card-login .input-group-text {
+  background: var(--bk-bg) !important;
+  border-color: var(--bk-border) !important;
+}
+
+.card-login .btn-primary {
+  width: 100%;
+  padding: 0.875rem !important;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* ============================================================
+   18) RTL SUPPORT (Arabic)
+   ============================================================ */
+[dir="rtl"] {
+  font-family: 'Cairo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+}
+
+[dir="rtl"] .sidebar .nav-sidebar .nav-link {
+  padding-right: 1.5rem !important;
+  padding-left: 1rem !important;
+}
+
+[dir="rtl"] .sidebar .nav-treeview .nav-link {
+  padding-right: 3rem !important;
+  padding-left: 1rem !important;
+}
+
+[dir="rtl"] .sidebar .nav-sidebar .nav-link:hover {
+  transform: translateX(-2px);
+}
+
+[dir="rtl"] .input-group .form-control {
+  border-left: 1px solid var(--bk-border) !important;
+  border-right: none !important;
+  border-radius: var(--bk-radius) 0 0 var(--bk-radius) !important;
+}
+
+[dir="rtl"] .input-group:first-child .form-control {
+  border-radius: var(--bk-radius) 0 0 var(--bk-radius) !important;
+}
+
+[dir="rtl"] .input-group:first-child .input-group-text {
+  border-radius: 0 var(--bk-radius) var(--bk-radius) 0 !important;
+}
+
+[dir="rtl"] .dropdown-menu {
+  text-align: right;
+}
+
+[dir="rtl"] .modal-header {
+  border-radius: var(--bk-radius-xl) var(--bk-radius-xl) 0 0 !important;
+}
+
+[dir="rtl"] .modal-footer {
+  border-radius: 0 0 var(--bk-radius-xl) var(--bk-radius-xl) !important;
+}
+
+/* ============================================================
+   19) FOOTER
+   ============================================================ */
+.main-footer {
+  background: var(--bk-bg-card) !important;
+  border-top: 1px solid var(--bk-border) !important;
+  color: var(--bk-text-muted) !important;
+  padding: 1rem 1.5rem !important;
+}
+
+.main-footer strong {
+  color: var(--bk-text) !important;
+}
+
+/* ============================================================
+   20) CONTENT WRAPPER
+   ============================================================ */
+.content-wrapper {
+  background: var(--bk-bg) !important;
+}
+
+@media (min-width: 992px) {
+  .content-wrapper {
+    margin-left: 250px;
+  }
+}
+
+/* ============================================================
+   21) UTILITIES
+   ============================================================ */
+.shadow-sm { box-shadow: var(--bk-shadow-sm) !important; }
+.shadow    { box-shadow: var(--bk-shadow) !important; }
+.shadow-md { box-shadow: var(--bk-shadow-md) !important; }
+.shadow-lg { box-shadow: var(--bk-shadow-lg) !important; }
+
+.rounded-sm { border-radius: var(--bk-radius-sm) !important; }
+.rounded    { border-radius: var(--bk-radius) !important; }
+.rounded-lg { border-radius: var(--bk-radius-lg) !important; }
+.rounded-xl { border-radius: var(--bk-radius-xl) !important; }
+
+.text-primary   { color: var(--bk-primary) !important; }
+.text-success   { color: var(--bk-success) !important; }
+.text-danger    { color: var(--bk-danger) !important; }
+.text-warning   { color: var(--bk-warning) !important; }
+.text-info      { color: var(--bk-info) !important; }
+.text-muted     { color: var(--bk-text-muted) !important; }
+
+.bg-primary-light   { background: var(--bk-primary-light) !important; }
+.bg-success-light   { background: var(--bk-success-light) !important; }
+.bg-danger-light    { background: var(--bk-danger-light) !important; }
+.bg-warning-light   { background: var(--bk-warning-light) !important; }
+.bg-info-light      { background: var(--bk-info-light) !important; }

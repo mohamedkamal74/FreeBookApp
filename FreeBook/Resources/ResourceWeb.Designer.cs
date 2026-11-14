@@ -635,5 +635,158 @@ public static global::System.Resources.ResourceManager ResourceManager {
                 return ResourceManager.GetString("lbMsgDuplicateName", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Bookify.
+        /// </summary>
+        public static string lbAppTitle {
+            get {
+                return ResourceManager.GetString("lbAppTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Copyright © 2026 Bookify. All rights reserved..
+        /// </summary>
+        public static string lbFooter {
+            get {
+                return ResourceManager.GetString("lbFooter", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Version.
+        /// </summary>
+        public static string lbVersion {
+            get {
+                return ResourceManager.GetString("lbVersion", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Sign in to start your session.
+        /// </summary>
+        public static string lbLoginSubtitle {
+            get {
+                return ResourceManager.GetString("lbLoginSubtitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Remember Me.
+        /// </summary>
+        public static string lbRememberMe {
+            get {
+                return ResourceManager.GetString("lbRememberMe", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Sign In.
+        /// </summary>
+        public static string lbBtnSignIn {
+            get {
+                return ResourceManager.GetString("lbBtnSignIn", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Email.
+        /// </summary>
+        public static string lbEmailPlaceholder {
+            get {
+                return ResourceManager.GetString("lbEmailPlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Password.
+        /// </summary>
+        public static string lbPasswordPlaceholder {
+            get {
+                return ResourceManager.GetString("lbPasswordPlaceholder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Management.
+        /// </summary>
+        public static string lbSidebarManagement {
+            get {
+                return ResourceManager.GetString("lbSidebarManagement", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Memberships.
+        /// </summary>
+        public static string lbSidebarMemberships {
+            get {
+                return ResourceManager.GetString("lbSidebarMemberships", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Locations.
+        /// </summary>
+        public static string lbSidebarLocations {
+            get {
+                return ResourceManager.GetString("lbSidebarLocations", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Administration.
+        /// </summary>
+        public static string lbSidebarAdministration {
+            get {
+                return ResourceManager.GetString("lbSidebarAdministration", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Login.
+        /// </summary>
+        public static string lbLogin {
+            get {
+                return ResourceManager.GetString("lbLogin", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Sign in with Facebook.
+        /// </summary>
+        public static string lbLoginWithFacebook {
+            get {
+                return ResourceManager.GetString("lbLoginWithFacebook", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Sign in with Google.
+        /// </summary>
+        public static string lbLoginWithGoogle {
+            get {
+                return ResourceManager.GetString("lbLoginWithGoogle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Forgot Password?.
+        /// </summary>
+        public static string lbForgotPassword {
+            get {
+                return ResourceManager.GetString("lbForgotPassword", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Register a new membership.
+        /// </summary>
+        public static string lbRegisterNewMembership {
+            get {
+                return ResourceManager.GetString("lbRegisterNewMembership", resourceCulture);
+            }
+        }
     }
 }

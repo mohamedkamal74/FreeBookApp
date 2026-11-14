@@ -618,4 +618,55 @@
   <data name="lbMsgDuplicateName" xml:space="preserve">
     <value>هذا الاسم موجود بالفعل!</value>
   </data>
+  <data name="lbAppTitle" xml:space="preserve">
+    <value>Bookify</value>
+  </data>
+  <data name="lbFooter" xml:space="preserve">
+    <value>Copyright © 2026 Bookify. جميع الحقوق محفوظة.</value>
+  </data>
+  <data name="lbVersion" xml:space="preserve">
+    <value>الإصدار</value>
+  </data>
+  <data name="lbLoginSubtitle" xml:space="preserve">
+    <value>سجل الدخول لبدء جلستك</value>
+  </data>
+  <data name="lbRememberMe" xml:space="preserve">
+    <value>تذكرني</value>
+  </data>
+  <data name="lbBtnSignIn" xml:space="preserve">
+    <value>دخول</value>
+  </data>
+  <data name="lbEmailPlaceholder" xml:space="preserve">
+    <value>البريد الإلكتروني</value>
+  </data>
+  <data name="lbPasswordPlaceholder" xml:space="preserve">
+    <value>كلمة المرور</value>
+  </data>
+  <data name="lbSidebarManagement" xml:space="preserve">
+    <value>الإدارة</value>
+  </data>
+  <data name="lbSidebarMemberships" xml:space="preserve">
+    <value>العضويات</value>
+  </data>
+  <data name="lbSidebarLocations" xml:space="preserve">
+    <value>المواقع</value>
+  </data>
+  <data name="lbSidebarAdministration" xml:space="preserve">
+    <value>النظام</value>
+  </data>
+  <data name="lbLogin" xml:space="preserve">
+    <value>تسجيل الدخول</value>
+  </data>
+  <data name="lbLoginWithFacebook" xml:space="preserve">
+    <value>تسجيل الدخول باستخدام فيسبوك</value>
+  </data>
+  <data name="lbLoginWithGoogle" xml:space="preserve">
+    <value>تسجيل الدخول باستخدام جوجل</value>
+  </data>
+  <data name="lbForgotPassword" xml:space="preserve">
+    <value>نسيت كلمة المرور؟</value>
+  </data>
+  <data name="lbRegisterNewMembership" xml:space="preserve">
+    <value>تسجيل عضوية جديدة</value>
+  </data>
 </root>

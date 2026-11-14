@@ -9,14 +9,12 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>AdminLTE 3 | Log in</title>
+  <title>@Localizer["lbAppTitle"] | @Localizer["lbLogin"]</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="~/Admin/plugins/fontawesome-free/css/all.min.css">
-  <!-- Ionicons -->
-  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
   <!-- icheck bootstrap -->
   <link rel="stylesheet" href="~/Admin/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
   <!-- Theme style -->
@@ -24,25 +22,31 @@
   @if (CultureInfo.CurrentUICulture.Name == "ar")
   {
       <link rel="stylesheet" href="~/Admin/dist/css/bootstrap-rtl.min.css">
+      <!-- Arabic font: Cairo -->
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
   }
-  <!-- Google Font: Source Sans Pro -->
-  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+  <!-- Bookify Theme -->
+  <link rel="stylesheet" href="~/Admin/dist/css/theme.css">
 </head>
 <body class="hold-transition login-page">
 <div class="login-box">
   <div class="login-logo">
-    <a href="../../index2.html"><b>Admin</b>LTE</a>
+    <a href="@Url.Action("Index", "Dashboard", new { area = "Admin" })">
+      <span class="text-white">@Localizer["lbAppTitle"]</span>
+    </a>
   </div>
   <!-- /.login-logo -->
-  <div class="card">
+  <div class="card card-login">
     <div class="card-body login-card-body">
-      <p class="login-box-msg">Sign in to start your session</p>
+      <p class="login-box-msg">@Localizer["lbLoginSubtitle"]</p>
 
 <form asp-action="Login" asp-controller="Accounts" method="post">
         @if(ViewBag.ErrorLogin==false)
         {<span class="alert alert-danger w-100">@Localizer["lbMsgErrorLogin"]</span><br /><br />}
         <div class="input-group mb-3">
-          <input type="email" class="form-control" asp-for="Email" placeholder="Email">
+          <input type="email" class="form-control" asp-for="Email" placeholder="@Localizer["lbEmailPlaceholder"]">
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-envelope"></span>
@@ -51,7 +55,7 @@
         </div>
         <span asp-validation-for="Email" class="text-danger"></span>
         <div class="input-group mb-3">
-          <input type="password" class="form-control" asp-for="Password" placeholder="Password">
+          <input type="password" class="form-control" asp-for="Password" placeholder="@Localizer["lbPasswordPlaceholder"]">
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-lock"></span>
@@ -65,13 +69,13 @@
             <div class="icheck-primary">
               <input type="checkbox" asp-for="RememberMe" id="remember">
               <label for="remember">
-                Remember Me
+                @Localizer["lbRememberMe"]
               </label>
             </div>
           </div>
           <!-- /.col -->
           <div class="col-4">
-            <button type="submit" class="btn btn-primary btn-block btn-flat">Sign In</button>
+            <button type="submit" class="btn btn-primary btn-block">@Localizer["lbBtnSignIn"]</button>
           </div>
           <!-- /.col -->
         </div>
@@ -82,19 +86,19 @@
       <div class="social-auth-links text-center mb-3">
         <p>- OR -</p>
         <a href="#" class="btn btn-block btn-primary">
-          <i class="fab fa-facebook mr-2"></i> Sign in using Facebook
+          <i class="fab fa-facebook mr-2"></i> @Localizer["lbLoginWithFacebook"]
         </a>
         <a href="#" class="btn btn-block btn-danger">
-          <i class="fab fa-google-plus mr-2"></i> Sign in using Google+
+          <i class="fab fa-google mr-2"></i> @Localizer["lbLoginWithGoogle"]
         </a>
       </div>
       <!-- /.social-auth-links -->
 
       <p class="mb-1">
-        <a href="#">I forgot my password</a>
+        <a href="#">@Localizer["lbForgotPassword"]</a>
       </p>
       <p class="mb-0">
-        <a href="register.html" class="text-center">Register a new membership</a>
+        <a href="#" class="text-center">@Localizer["lbRegisterNewMembership"]</a>
       </p>
     </div>
     <!-- /.login-card-body -->

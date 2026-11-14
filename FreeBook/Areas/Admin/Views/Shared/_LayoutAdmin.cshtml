@@ -6,7 +6,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>AdminLTE 3 | Dashboard</title>
+    <title>@Localizer["lbAppTitle"]</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Font Awesome -->
@@ -35,7 +35,13 @@
         <link rel="stylesheet" href="~/Admin/dist/css/custom.css">
         <!-- Responsive RTL -->
         <link rel="stylesheet" href="~/Admin/dist/css/responsive-rtl.css">
+        <!-- Arabic font: Cairo -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
     }
+    <!-- Bookify Theme (loads last to override AdminLTE) -->
+    <link rel="stylesheet" href="~/Admin/dist/css/theme.css">
     <!-- DataTables -->
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -65,9 +71,9 @@
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <!-- Brand Logo -->
             <a href="index3.html" class="brand-link">
-                <img src="~/Admin/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
+                <img src="~/Admin/dist/img/AdminLTELogo.png" alt="Bookify Logo" class="brand-image img-circle elevation-3"
                      style="opacity: .8">
-                <span class="brand-text font-weight-light">AdminLTE 3</span>
+                <span class="brand-text font-weight-light">@Localizer["lbAppTitle"]</span>
             </a>
 
             <!-- Sidebar -->
@@ -99,85 +105,91 @@
 
                 <!-- Sidebar Menu -->
                 <nav class="mt-2 mr-6">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                        <!-- Add icons to the links using the .nav-icon class
-                             with font-awesome or any other icon font library -->
-                        <li class="nav-item has-treeview menu-open">
-                            <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="nav-link active">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="true">
+                        <!-- Dashboard -->
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="nav-link">
                                 <i class="nav-icon fas fa-tachometer-alt"></i>
-                                <p>
-                                    @Localizer["lbDashboard"]
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
+                                <p>@Localizer["lbDashboard"]</p>
                             </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a asp-area="Admin" asp-controller="Accounts" asp-action="Roles" class="nav-link active">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>@Localizer["lbRoles"]</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a asp-area="Admin" asp-controller="Accounts" asp-action="Register" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>@Localizer["lbRegisters"]</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a asp-area="Admin" asp-controller="Categories" asp-action="Categories" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>@Localizer["lbCategories"]</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a asp-area="Admin" asp-controller="Authors" asp-action="Authors" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>@Localizer["lbAuthors"]</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a asp-area="Admin" asp-controller="BookCopies" asp-action="BookCopies" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>@Localizer["lbBookCopies"]</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a asp-area="Admin" asp-controller="Rentals" asp-action="Rentals" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>@Localizer["lbRentals"]</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a asp-area="Admin" asp-controller="Subscribers" asp-action="Subscribers" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>@Localizer["lbSubscribers"]</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a asp-area="Admin" asp-controller="Subscriptions" asp-action="Subscriptions" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>@Localizer["lbSubscriptions"]</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a asp-area="Admin" asp-controller="Governorates" asp-action="Governorates" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>@Localizer["lbGovernorates"]</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a asp-area="Admin" asp-controller="Areas" asp-action="Areas" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>@Localizer["lbAreas"]</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a asp-area="Admin" asp-controller="Reports" asp-action="Index" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>@Localizer["lbReports"]</p>
-                                    </a>
-                                </li>
-                            </ul>
+                        </li>
+
+                        <!-- Management Group -->
+                        <li class="nav-header">@Localizer["lbSidebarManagement"]</li>
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="Categories" asp-action="Categories" class="nav-link">
+                                <i class="nav-icon fas fa-tags"></i>
+                                <p>@Localizer["lbCategories"]</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="Authors" asp-action="Authors" class="nav-link">
+                                <i class="nav-icon fas fa-user-edit"></i>
+                                <p>@Localizer["lbAuthors"]</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="BookCopies" asp-action="BookCopies" class="nav-link">
+                                <i class="nav-icon fas fa-book"></i>
+                                <p>@Localizer["lbBookCopies"]</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="Rentals" asp-action="Rentals" class="nav-link">
+                                <i class="nav-icon fas fa-truck"></i>
+                                <p>@Localizer["lbRentals"]</p>
+                            </a>
+                        </li>
+
+                        <!-- Memberships Group -->
+                        <li class="nav-header">@Localizer["lbSidebarMemberships"]</li>
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="Subscribers" asp-action="Subscribers" class="nav-link">
+                                <i class="nav-icon fas fa-users"></i>
+                                <p>@Localizer["lbSubscribers"]</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="Subscriptions" asp-action="Subscriptions" class="nav-link">
+                                <i class="nav-icon fas fa-id-card"></i>
+                                <p>@Localizer["lbSubscriptions"]</p>
+                            </a>
+                        </li>
+
+                        <!-- Locations Group -->
+                        <li class="nav-header">@Localizer["lbSidebarLocations"]</li>
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="Governorates" asp-action="Governorates" class="nav-link">
+                                <i class="nav-icon fas fa-map-marked-alt"></i>
+                                <p>@Localizer["lbGovernorates"]</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="Areas" asp-action="Areas" class="nav-link">
+                                <i class="nav-icon fas fa-building"></i>
+                                <p>@Localizer["lbAreas"]</p>
+                            </a>
+                        </li>
+
+                        <!-- Administration Group -->
+                        <li class="nav-header">@Localizer["lbSidebarAdministration"]</li>
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="Accounts" asp-action="Roles" class="nav-link">
+                                <i class="nav-icon fas fa-shield-alt"></i>
+                                <p>@Localizer["lbRoles"]</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="Accounts" asp-action="Register" class="nav-link">
+                                <i class="nav-icon fas fa-user-cog"></i>
+                                <p>@Localizer["lbRegisters"]</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="Reports" asp-action="Index" class="nav-link">
+                                <i class="nav-icon fas fa-chart-bar"></i>
+                                <p>@Localizer["lbReports"]</p>
+                            </a>
                         </li>
                     </ul>
                 </nav>
@@ -192,10 +204,9 @@
         </div>
         <!-- /.content-wrapper -->
         <footer class="main-footer">
-            <strong>Copyright &copy; 2014-2019 <a href="http://adminlte.io">AdminLTE.io</a>.</strong>
-            All rights reserved.
+            <strong>@Localizer["lbFooter"]</strong>
             <div class="float-right d-none d-sm-inline-block">
-                <b>Version</b> 3.0.0-rc.1
+                <b>@Localizer["lbVersion"]</b> 1.0.0
             </div>
         </footer>
 
@@ -274,6 +285,22 @@
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
     <!-- Shared helpers (clearValidation, confirmDelete) -->
     <script src="~/Models/Common.js"></script>
+    <!-- Sidebar active link highlighter -->
+    <script>
+        (function () {
+            var path = window.location.pathname.toLowerCase();
+            $('.nav-sidebar .nav-link').each(function () {
+                var href = $(this).attr('href');
+                if (href && path.indexOf(href.toLowerCase()) !== -1 && href !== '#') {
+                    $(this).addClass('active');
+                }
+            });
+            // Also handle Dashboard root
+            if (path === '/admin' || path === '/admin/dashboard' || path === '/admin/dashboard/index') {
+                $('.nav-sidebar a[href="/Admin/Dashboard/Index"], .nav-sidebar a[href="/admin/dashboard/index"]').addClass('active');
+            }
+        })();
+    </script>
     @await RenderSectionAsync("script",required:false)
     @await RenderSectionAsync("Scripts", required: false)
 </body>
