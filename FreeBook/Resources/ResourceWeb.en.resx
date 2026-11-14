@@ -498,9 +498,6 @@
   <data name="lbRentalHistory" xml:space="preserve">
     <value>Rental History</value>
   </data>
-  <data name="lbSubscriber" xml:space="preserve">
-    <value>Subscriber</value>
-  </data>
   <data name="lbMsgSavedOk" xml:space="preserve">
     <value>Saved successfully</value>
   </data>
