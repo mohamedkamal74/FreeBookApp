@@ -1,4 +1,5 @@
 using Domin.Entity;
+using FreeBook.Models;
 using Infrastructure.Common;
 using Infrastructure.IRepository;
 using Microsoft.AspNetCore.Authorization;
@@ -61,9 +62,8 @@ namespace FreeBook.Areas.Admin.Controllers
             var popularBooks = rentals
                 .SelectMany(r => r.RentalCopies)
                 .GroupBy(rc => rc.BookCopy.BookId)
-                .Select(g => new
+                .Select(g => new PopularBookReport
                 {
-                    BookId = g.Key,
                     Book = g.First().BookCopy.Book,
                     RentalCount = g.Count()
                 })
@@ -126,7 +126,7 @@ namespace FreeBook.Areas.Admin.Controllers
             var booksByCategory = books
                 .Where(b => b.CategoryId.HasValue)
                 .GroupBy(b => b.CategoryId!.Value)
-                .Select(g => new
+                .Select(g => new BooksByCategoryReport
                 {
                     Category = categories.FirstOrDefault(c => c.Id == g.Key),
                     Count = g.Count()
@@ -148,7 +148,7 @@ namespace FreeBook.Areas.Admin.Controllers
             var booksByAuthor = books
                 .Where(b => b.AuthorId != Guid.Empty)
                 .GroupBy(b => b.AuthorId)
-                .Select(g => new
+                .Select(g => new BooksByAuthorReport
                 {
                     Author = authors.FirstOrDefault(a => a.Id == g.Key),
                     Count = g.Count()

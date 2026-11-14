@@ -94,6 +94,7 @@ try
     builder.Services.AddScoped<IServiceRepositoryLog<LogCategory>, ServiceLogCategory>();
 
     builder.Services.AddScoped<Infrastructure.IRepository.IAuthorRepository, Infrastructure.IRepository.ServiceRepository.ServicesAuthor>();
+    builder.Services.AddScoped<IServiceRepository<Author>, Infrastructure.IRepository.ServiceRepository.ServicesAuthor>();
     builder.Services.AddScoped<IServiceRepository<Book>, Infrastructure.IRepository.ServiceRepository.ServicesBook>();
     builder.Services.AddScoped<IServiceRepository<BookCopy>, Infrastructure.IRepository.ServiceRepository.ServicesBookCopy>();
     builder.Services.AddScoped<Infrastructure.IRepository.IRentalRepository, Infrastructure.IRepository.ServiceRepository.ServicesRental>();
