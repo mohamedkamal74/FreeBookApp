@@ -360,6 +360,9 @@
   <data name="lbViewBooksByAuthor" xml:space="preserve">
     <value>View Books by Author</value>
   </data>
+  <data name="lbLearnMore" xml:space="preserve">
+    <value>Learn more</value>
+  </data>
   <data name="lbViewReport" xml:space="preserve">
     <value>View Report</value>
   </data>

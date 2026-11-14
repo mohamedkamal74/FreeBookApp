@@ -465,6 +465,9 @@
   <data name="lbViewBooksByAuthor" xml:space="preserve">
     <value>عرض الكتب حسب المؤلف</value>
   </data>
+  <data name="lbLearnMore" xml:space="preserve">
+    <value>اعرف المزيد</value>
+  </data>
   <data name="lbViewReport" xml:space="preserve">
     <value>عرض التقرير</value>
   </data>
