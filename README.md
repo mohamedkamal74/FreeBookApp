@@ -20,10 +20,10 @@ A small ASP.NET Core MVC book-catalog app with an admin area, built on **.NET 10
 
 - .NET SDK **10.0.x**
 - SQL Server **LocalDB** (default local dev database)
-- Optional: global EF tool `dotnet-ef` 10.0.3
+- Optional: global EF tool `dotnet-ef` 10.0.14
 
 ```powershell
-dotnet tool install --global dotnet-ef --version 10.0.3
+dotnet tool install --global dotnet-ef --version 10.0.14
 ```
 
 ## Setup
