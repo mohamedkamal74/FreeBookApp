@@ -482,6 +482,31 @@ a, button, .btn, .card, .form-control, .badge, .dropdown-item,
   margin-bottom: 0.375rem !important;
 }
 
+/* Language switcher (_LanguageSwitcher.cshtml) */
+.lang-switcher {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+}
+
+.lang-switcher select {
+  max-width: 100%;
+  padding: var(--bk-space-1) var(--bk-space-3);
+  font-family: inherit;
+  font-size: 0.875rem;
+  color: var(--bk-text);
+  background-color: var(--bk-bg-card);
+  border: 1px solid var(--bk-border);
+  border-radius: var(--bk-radius);
+  cursor: pointer;
+}
+
+.lang-switcher select:focus {
+  outline: none;
+  border-color: var(--bk-primary);
+  box-shadow: 0 0 0 3px var(--bk-primary-light);
+}
+
 .input-group-text {
   background: var(--bk-bg) !important;
   border: 1px solid var(--bk-border) !important;

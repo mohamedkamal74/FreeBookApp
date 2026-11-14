@@ -180,6 +180,9 @@
   <data name="lmTextMsgDelete" xml:space="preserve">
     <value>You will not be able to undo this!</value>
   </data>
+  <data name="lbLanguage" xml:space="preserve">
+    <value>Language</value>
+  </data>
   <data name="lbLangArabic" xml:space="preserve">
     <value>Arabic</value>
   </data>

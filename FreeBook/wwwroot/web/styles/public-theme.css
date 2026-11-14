@@ -499,18 +499,25 @@ img {
   font-size: 1.25rem;
 }
 
-.header-side select {
+.lang-switcher {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+}
+
+.lang-switcher select {
+  max-width: 100%;
   padding: var(--bk-space-1) var(--bk-space-3);
   font-family: inherit;
   font-size: 0.875rem;
   color: var(--bk-text);
-  background: var(--bk-bg-card);
+  background-color: var(--bk-bg-card);
   border: 1px solid var(--bk-border);
   border-radius: var(--bk-radius);
   cursor: pointer;
 }
 
-.header-side select:focus {
+.lang-switcher select:focus {
   outline: none;
   border-color: var(--bk-primary);
   box-shadow: 0 0 0 3px var(--bk-primary-light);
