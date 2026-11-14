@@ -2,153 +2,207 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @using Microsoft.AspNetCore.Identity
 
-<div class="container py-5">
-    <div class="row mb-4">
-        <div class="col-12 text-center">
-            <h1 class="display-4">@Localizer["lbWelcome"]</h1>
-            <p class="lead text-muted">@Localizer["lbWelcomeDesc"]</p>
+<!-- ============================================================
+     HERO SECTION
+     ============================================================ -->
+<section class="hero" aria-labelledby="hero-title">
+    <div class="hero-background"></div>
+    <div class="hero-pattern"></div>
+    
+    <div class="hero-content container-custom">
+        <span class="hero-badge animate-fade-in-up">
+            <i class="fas fa-book-open"></i>
+            Bookify
+        </span>
+        
+        <h1 id="hero-title" class="hero-title animate-fade-in-up animate-delay-1">
+            @Localizer["lbWelcome"] <span>@Localizer["lbWelcomeDesc"]</span>
+        </h1>
+        
+        <p class="hero-subtitle animate-fade-in-up animate-delay-2">
+            @Localizer["lbHeroSubtitle"]
+        </p>
+        
+        <div class="hero-actions animate-fade-in-up animate-delay-3">
+            @if (SignInManager.IsSignedIn(User))
+            {
+                <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="btn btn-primary btn-lg">
+                    <i class="fas fa-tachometer-alt"></i>
+                    @Localizer["lbDashboard"]
+                </a>
+                <a asp-area="Admin" asp-controller="Categories" asp-action="Categories" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-tags"></i>
+                    @Localizer["lbCategories"]
+                </a>
+            }
+            else
+            {
+                <a asp-area="Admin" asp-controller="Accounts" asp-action="Login" class="btn btn-primary btn-lg">
+                    <i class="fas fa-sign-in-alt"></i>
+                    @Localizer["lbAdminLogin"]
+                </a>
+                <a href="/health" class="btn btn-outline btn-lg">
+                    <i class="fas fa-heartbeat"></i>
+                    @Localizer["lbHealth"]
+                </a>
+            }
         </div>
     </div>
+</section>
 
-    @if (SignInManager.IsSignedIn(User))
-    {
-        <!-- Authenticated User Dashboard -->
-        <div class="row g-3">
-            <div class="col-md-4">
-                <a class="card text-decoration-none text-dark h-100 border-0 shadow-sm hover-shadow" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
-                    <div class="card-body text-center py-4">
-                        <i class="fas fa-tachometer-alt fa-3x text-primary mb-3"></i>
-                        <h5 class="card-title">@Localizer["lbDashboard"]</h5>
-                        <p class="card-text text-muted small">@Localizer["lbViewReport"]</p>
-                    </div>
-                </a>
-            </div>
-            <div class="col-md-4">
-                <a class="card text-decoration-none text-dark h-100 border-0 shadow-sm hover-shadow" asp-area="Admin" asp-controller="Categories" asp-action="Categories">
-                    <div class="card-body text-center py-4">
-                        <i class="fas fa-tags fa-3x text-success mb-3"></i>
-                        <h5 class="card-title">@Localizer["lbCategories"]</h5>
-                        <p class="card-text text-muted small">@Localizer["lbViewReport"]</p>
-                    </div>
-                </a>
-            </div>
-            <div class="col-md-4">
-                <a class="card text-decoration-none text-dark h-100 border-0 shadow-sm hover-shadow" asp-area="Admin" asp-controller="Authors" asp-action="Authors">
-                    <div class="card-body text-center py-4">
-                        <i class="fas fa-pen-fancy fa-3x text-info mb-3"></i>
-                        <h5 class="card-title">@Localizer["lbAuthors"]</h5>
-                        <p class="card-text text-muted small">@Localizer["lbViewReport"]</p>
-                    </div>
-                </a>
-            </div>
-            <div class="col-md-4">
-                <a class="card text-decoration-none text-muted h-100 border-0 shadow-sm" href="#" title="@Localizer["lbComingSoon"]">
-                    <div class="card-body text-center py-4">
-                        <i class="fas fa-book fa-3x text-warning mb-3"></i>
-                        <h5 class="card-title">@Localizer["lbManageBook"] <span class="badge bg-warning ms-1">@Localizer["lbComingSoon"]</span></h5>
-                        <p class="card-text text-muted small">@Localizer["lbComingSoon"]</p>
-                    </div>
-                </a>
-            </div>
-            <div class="col-md-4">
-                <a class="card text-decoration-none text-dark h-100 border-0 shadow-sm hover-shadow" asp-area="Admin" asp-controller="BookCopies" asp-action="BookCopies">
-                    <div class="card-body text-center py-4">
-                        <i class="fas fa-copy fa-3x text-secondary mb-3"></i>
-                        <h5 class="card-title">@Localizer["lbBookCopies"]</h5>
-                        <p class="card-text text-muted small">@Localizer["lbViewReport"]</p>
-                    </div>
-                </a>
-            </div>
-            <div class="col-md-4">
-                <a class="card text-decoration-none text-dark h-100 border-0 shadow-sm hover-shadow" asp-area="Admin" asp-controller="Subscribers" asp-action="Subscribers">
-                    <div class="card-body text-center py-4">
-                        <i class="fas fa-users fa-3x text-danger mb-3"></i>
-                        <h5 class="card-title">@Localizer["lbSubscribers"]</h5>
-                        <p class="card-text text-muted small">@Localizer["lbViewReport"]</p>
-                    </div>
-                </a>
-            </div>
-            <div class="col-md-4">
-                <a class="card text-decoration-none text-dark h-100 border-0 shadow-sm hover-shadow" asp-area="Admin" asp-controller="Rentals" asp-action="Rentals">
-                    <div class="card-body text-center py-4">
-                        <i class="fas fa-book-reader fa-3x text-dark mb-3"></i>
-                        <h5 class="card-title">@Localizer["lbRentals"]</h5>
-                        <p class="card-text text-muted small">@Localizer["lbViewReport"]</p>
-                    </div>
-                </a>
-            </div>
-            <div class="col-md-4">
-                <a class="card text-decoration-none text-dark h-100 border-0 shadow-sm hover-shadow" asp-area="Admin" asp-controller="Reports" asp-action="Index">
-                    <div class="card-body text-center py-4">
-                        <i class="fas fa-chart-bar fa-3x text-dark mb-3"></i>
-                        <h5 class="card-title">@Localizer["lbReports"]</h5>
-                        <p class="card-text text-muted small">@Localizer["lbViewReport"]</p>
-                    </div>
-                </a>
-            </div>
-            <div class="col-md-4">
-                <a class="card text-decoration-none text-dark h-100 border-0 shadow-sm hover-shadow" href="/hangfire" target="_blank">
-                    <div class="card-body text-center py-4">
-                        <i class="fas fa-tasks fa-3x text-primary mb-3"></i>
-                        <h5 class="card-title">@Localizer["lbHangfire"]</h5>
-                        <p class="card-text text-muted small">Background Jobs</p>
-                    </div>
-                </a>
-            </div>
-            <div class="col-md-4">
-                <a class="card text-decoration-none text-dark h-100 border-0 shadow-sm hover-shadow" href="/swagger" target="_blank">
-                    <div class="card-body text-center py-4">
-                        <i class="fas fa-code fa-3x text-success mb-3"></i>
-                        <h5 class="card-title">@Localizer["lbSwagger"]</h5>
-                        <p class="card-text text-muted small">API Documentation</p>
-                    </div>
-                </a>
-            </div>
-            <div class="col-md-4">
-                <a class="card text-decoration-none text-dark h-100 border-0 shadow-sm hover-shadow" href="/health">
-                    <div class="card-body text-center py-4">
-                        <i class="fas fa-heartbeat fa-3x text-danger mb-3"></i>
-                        <h5 class="card-title">@Localizer["lbHealth"]</h5>
-                        <p class="card-text text-muted small">System Health Check</p>
-                    </div>
-                </a>
-            </div>
-        </div>
-    }
-    else
-    {
-        <!-- Public Landing -->
-        <div class="row g-3 justify-content-center">
-            <div class="col-md-6 col-lg-4">
-                <a class="card text-decoration-none text-dark h-100 border-0 shadow-sm hover-shadow" asp-area="Admin" asp-controller="Accounts" asp-action="Login">
-                    <div class="card-body text-center py-5">
-                        <i class="fas fa-lock fa-4x text-primary mb-3"></i>
-                        <h5 class="card-title">@Localizer["lbAdminLogin"]</h5>
-                        <p class="card-text text-muted">@Localizer["lbPublicNotice"]</p>
-                    </div>
-                </a>
-            </div>
-            <div class="col-md-6 col-lg-4">
-                <a class="card text-decoration-none text-dark h-100 border-0 shadow-sm hover-shadow" href="/health">
-                    <div class="card-body text-center py-5">
-                        <i class="fas fa-heartbeat fa-4x text-danger mb-3"></i>
-                        <h5 class="card-title">@Localizer["lbHealth"]</h5>
-                        <p class="card-text text-muted">@Localizer["lbViewReport"]</p>
-                    </div>
-                </a>
-            </div>
-        </div>
+<!-- ============================================================
+     FEATURES / HERO BOXES
+     ============================================================ -->
+<section class="features" aria-labelledby="features-title">
+    <div class="container-custom">
+        <header class="text-center mb-12 animate-fade-in-up">
+            <h2 id="features-title" class="animate-fade-in-up">@Localizer["lbFeatures"]</h2>
+            <p class="animate-fade-in-up animate-delay-1">@Localizer["lbFeaturesDesc"]</p>
+        </header>
         
-        <div class="mt-5 text-center text-muted">
-            <small>@Localizer["lbPublicNotice"]</small>
+        <div class="features-grid">
+            <article class="feature-card animate-fade-in-up animate-delay-1">
+                <div class="feature-icon">
+                    <i class="fas fa-tags"></i>
+                </div>
+                <h3 class="feature-title">@Localizer["lbCategories"]</h3>
+                <p class="feature-description">@Localizer["lbCategoriesDesc"]</p>
+                <a asp-area="Admin" asp-controller="Categories" asp-action="Categories" class="feature-link">
+                    @Localizer["lbViewReport"]
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </article>
+            
+            <article class="feature-card animate-fade-in-up animate-delay-2">
+                <div class="feature-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <h3 class="feature-title">@Localizer["lbManageBook"]</h3>
+                <p class="feature-description">@Localizer["lbManageBookDesc"]</p>
+                <a href="#" class="feature-link text-muted" title="@Localizer["lbComingSoon"]">
+                    @Localizer["lbViewReport"]
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </article>
+            
+            <article class="feature-card animate-fade-in-up animate-delay-3">
+                <div class="feature-icon">
+                    <i class="fas fa-user-edit"></i>
+                </div>
+                <h3 class="feature-title">@Localizer["lbAuthors"]</h3>
+                <p class="feature-description">@Localizer["lbAuthorsDesc"]</p>
+                <a asp-area="Admin" asp-controller="Authors" asp-action="Authors" class="feature-link">
+                    @Localizer["lbViewReport"]
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </article>
+            
+            <article class="feature-card animate-fade-in-up animate-delay-4">
+                <div class="feature-icon">
+                    <i class="fas fa-copy"></i>
+                </div>
+                <h3 class="feature-title">@Localizer["lbBookCopies"]</h3>
+                <p class="feature-description">@Localizer["lbBookCopiesDesc"]</p>
+                <a asp-area="Admin" asp-controller="BookCopies" asp-action="BookCopies" class="feature-link">
+                    @Localizer["lbViewReport"]
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </article>
+            
+            <article class="feature-card animate-fade-in-up animate-delay-5">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="feature-title">@Localizer["lbSubscribers"]</h3>
+                <p class="feature-description">@Localizer["lbSubscribersDesc"]</p>
+                <a asp-area="Admin" asp-controller="Subscribers" asp-action="Subscribers" class="feature-link">
+                    @Localizer["lbViewReport"]
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </article>
+            
+            <article class="feature-card animate-fade-in-up animate-delay-6">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <h3 class="feature-title">@Localizer["lbReports"]</h3>
+                <p class="feature-description">@Localizer["lbReportsDesc"]</p>
+                <a asp-area="Admin" asp-controller="Reports" asp-action="Index" class="feature-link">
+                    @Localizer["lbViewReport"]
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </article>
         </div>
-    }
-</div>
+    </div>
+</section>
 
-<style>
-.hover-shadow:hover {
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-    transform: translateY(-2px);
-    transition: all 0.2s ease-in-out;
+<!-- ============================================================
+     CTA SECTION
+     ============================================================ -->
+<section class="cta" aria-labelledby="cta-title">
+    <div class="container-custom">
+        <div class="cta-card animate-fade-in-up">
+            <div class="cta-icon">
+                <i class="fas fa-rocket"></i>
+            </div>
+            
+            <h2 id="cta-title" class="cta-title">@Localizer["lbReadyToStart"]</h2>
+            <p class="cta-text">@Localizer["lbReadyToStartDesc"]</p>
+            
+            <div class="cta-actions">
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="btn btn-primary btn-lg">
+                        <i class="fas fa-arrow-right"></i>
+                        @Localizer["lbGoToDashboard"]
+                    </a>
+                }
+                else
+                {
+                    <a asp-area="Admin" asp-controller="Accounts" asp-action="Login" class="btn btn-primary btn-lg">
+                        <i class="fas fa-sign-in-alt"></i>
+                        @Localizer["lbAdminLogin"]
+                    </a>
+                    <a href="/health" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-heartbeat"></i>
+                        @Localizer["lbHealth"]
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+     NEWSLETTER (Footer area - rendered by Layout)
+     ============================================================ -->
+<!-- Newsletter is rendered in _Layout.cshtml footer -->
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const hamburger = document.querySelector('.hamburger');
+            const mobileMenu = document.getElementById('main-nav');
+
+            if (hamburger && mobileMenu) {
+                const setOpen = (open) => {
+                    mobileMenu.classList.toggle('open', open);
+                    hamburger.setAttribute('aria-expanded', open ? 'true' : 'false');
+                    document.body.style.overflow = open ? 'hidden' : '';
+                };
+
+                hamburger.addEventListener('click', () => {
+                    setOpen(!mobileMenu.classList.contains('open'));
+                });
+
+                mobileMenu.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => setOpen(false));
+                });
+
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') setOpen(false);
+                });
+            }
+        });
+    </script>
 }
-</style>

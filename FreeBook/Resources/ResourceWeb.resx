@@ -622,7 +622,7 @@
     <value>Bookify</value>
   </data>
   <data name="lbFooter" xml:space="preserve">
-    <value>Copyright © 2026 Bookify. جميع الحقوق محفوظة.</value>
+    <value>Bookify. جميع الحقوق محفوظة.</value>
   </data>
   <data name="lbVersion" xml:space="preserve">
     <value>الإصدار</value>
@@ -668,5 +668,62 @@
   </data>
   <data name="lbRegisterNewMembership" xml:space="preserve">
     <value>تسجيل عضوية جديدة</value>
+  </data>
+  <data name="lbFeatures" xml:space="preserve">
+    <value>المميزات</value>
+  </data>
+  <data name="lbFeaturesDesc" xml:space="preserve">
+    <value>اكتشف ما يميز Bookify عن البقية</value>
+  </data>
+  <data name="lbCategoriesDesc" xml:space="preserve">
+    <value>نظم كتبك في فئات مرتبة وقابلة للبحث</value>
+  </data>
+  <data name="lbManageBookDesc" xml:space="preserve">
+    <value>إدارة شاملة للكتب والنسخ والطبعات</value>
+  </data>
+  <data name="lbAuthorsDesc" xml:space="preserve">
+    <value>سجل المؤلفين والناشرين مع التفاصيل</value>
+  </data>
+  <data name="lbBookCopiesDesc" xml:space="preserve">
+    <value>تتبع كل نسخة كتاب بحالة توفرها</value>
+  </data>
+  <data name="lbSubscribersDesc" xml:space="preserve">
+    <value>إدارة المشتركين والاشتراكات بسهولة</value>
+  </data>
+  <data name="lbReportsDesc" xml:space="preserve">
+    <value>تقارير مفصلة عن الإعارات والمخالفات</value>
+  </data>
+  <data name="lbReadyToStart" xml:space="preserve">
+    <value>مستعد للبدء؟</value>
+  </data>
+  <data name="lbReadyToStartDesc" xml:space="preserve">
+    <value>انضم إلى آلاف المكتبات التي تثق بـ Bookify</value>
+  </data>
+  <data name="lbGoToDashboard" xml:space="preserve">
+    <value>الذهاب للوحة التحكم</value>
+  </data>
+  <data name="lbToggleMenu" xml:space="preserve">
+    <value>تبديل القائمة</value>
+  </data>
+  <data name="lbCloseMenu" xml:space="preserve">
+    <value>إغلاق القائمة</value>
+  </data>
+  <data name="lbMobileMenu" xml:space="preserve">
+    <value>القائمة المحمولة</value>
+  </data>
+  <data name="lbMobileNavigation" xml:space="preserve">
+    <value>التنقل المحمول</value>
+  </data>
+  <data name="lbMainNavigation" xml:space="preserve">
+    <value>التنقل الرئيسي</value>
+  </data>
+  <data name="lbContactUs" xml:space="preserve">
+    <value>تواصل معنا</value>
+  </data>
+  <data name="lbSkipToContent" xml:space="preserve">
+    <value>انتقل إلى المحتوى الرئيسي</value>
+  </data>
+  <data name="lbHeroSubtitle" xml:space="preserve">
+    <value>أدر الفئات والكتب والمؤلفين والنسخ والمشتركين والتقارير — كل ذلك في منصة مكتبات حديثة واحدة.</value>
   </data>
 </root>

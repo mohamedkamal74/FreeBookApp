@@ -788,5 +788,176 @@ public static global::System.Resources.ResourceManager ResourceManager {
                 return ResourceManager.GetString("lbRegisterNewMembership", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Features.
+        /// </summary>
+        public static string lbFeatures {
+            get {
+                return ResourceManager.GetString("lbFeatures", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Discover what makes Bookify different.
+        /// </summary>
+        public static string lbFeaturesDesc {
+            get {
+                return ResourceManager.GetString("lbFeaturesDesc", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Organize your books in searchable categories.
+        /// </summary>
+        public static string lbCategoriesDesc {
+            get {
+                return ResourceManager.GetString("lbCategoriesDesc", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Comprehensive book, copy, and edition management.
+        /// </summary>
+        public static string lbManageBookDesc {
+            get {
+                return ResourceManager.GetString("lbManageBookDesc", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Track authors and publishers with details.
+        /// </summary>
+        public static string lbAuthorsDesc {
+            get {
+                return ResourceManager.GetString("lbAuthorsDesc", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Track every book copy with availability status.
+        /// </summary>
+        public static string lbBookCopiesDesc {
+            get {
+                return ResourceManager.GetString("lbBookCopiesDesc", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Manage subscribers and subscriptions easily.
+        /// </summary>
+        public static string lbSubscribersDesc {
+            get {
+                return ResourceManager.GetString("lbSubscribersDesc", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Detailed reports on rentals and penalties.
+        /// </summary>
+        public static string lbReportsDesc {
+            get {
+                return ResourceManager.GetString("lbReportsDesc", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Ready to Get Started?.
+        /// </summary>
+        public static string lbReadyToStart {
+            get {
+                return ResourceManager.GetString("lbReadyToStart", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Join thousands of libraries that trust Bookify.
+        /// </summary>
+        public static string lbReadyToStartDesc {
+            get {
+                return ResourceManager.GetString("lbReadyToStartDesc", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Go to Dashboard.
+        /// </summary>
+        public static string lbGoToDashboard {
+            get {
+                return ResourceManager.GetString("lbGoToDashboard", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Toggle Menu.
+        /// </summary>
+        public static string lbToggleMenu {
+            get {
+                return ResourceManager.GetString("lbToggleMenu", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Close Menu.
+        /// </summary>
+        public static string lbCloseMenu {
+            get {
+                return ResourceManager.GetString("lbCloseMenu", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Mobile Menu.
+        /// </summary>
+        public static string lbMobileMenu {
+            get {
+                return ResourceManager.GetString("lbMobileMenu", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Mobile Navigation.
+        /// </summary>
+        public static string lbMobileNavigation {
+            get {
+                return ResourceManager.GetString("lbMobileNavigation", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Main Navigation.
+        /// </summary>
+        public static string lbMainNavigation {
+            get {
+                return ResourceManager.GetString("lbMainNavigation", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Contact Us.
+        /// </summary>
+        public static string lbContactUs {
+            get {
+                return ResourceManager.GetString("lbContactUs", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Skip to main content.
+        /// </summary>
+        public static string lbSkipToContent {
+            get {
+                return ResourceManager.GetString("lbSkipToContent", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Manage categories, books, authors, book copies, subscribers and reports.
+        /// </summary>
+        public static string lbHeroSubtitle {
+            get {
+                return ResourceManager.GetString("lbHeroSubtitle", resourceCulture);
+            }
+        }
     }
 }

@@ -4,376 +4,184 @@
 <!DOCTYPE html>
 <html lang="@CultureInfo.CurrentUICulture.Name" dir="@(CultureInfo.CurrentUICulture.Name == "ar" ? "rtl" : "ltr")">
 <head>
-<title>@Localizer["lbHomePage"]</title>
+<title>Bookify | @Localizer["lbHomePage"]</title>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="description" content="@Localizer["lbWelcomeDesc"]">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Fonts: Inter (EN) + Cairo (AR) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Bootstrap 4 -->
 <link rel="stylesheet" type="text/css" href="~/web/styles/bootstrap4/bootstrap.min.css">
 @if (CultureInfo.CurrentUICulture.Name == "ar")
 {
     <link rel="stylesheet" type="text/css" href="~/web/styles/bootstrap4/bootstrap-rtl.min.css">
 }
+<!-- Font Awesome -->
 <link href="~/web/plugins/fontawesome-free-5.0.1/css/fontawesome-all.css" rel="stylesheet" type="text/css">
-<link rel="stylesheet" type="text/css" href="~/web/plugins/OwlCarousel2-2.2.1/owl.carousel.css">
-<link rel="stylesheet" type="text/css" href="~/web/plugins/OwlCarousel2-2.2.1/owl.theme.default.css">
-<link rel="stylesheet" type="text/css" href="~/web/plugins/OwlCarousel2-2.2.1/animate.css">
-<link rel="stylesheet" type="text/css" href="~/web/styles/main_styles.css">
-<link rel="stylesheet" type="text/css" href="~/web/styles/responsive.css">
+<!-- Bookify Public Theme (loads last to override Bootstrap) -->
+<link rel="stylesheet" type="text/css" href="~/web/styles/public-theme.css">
 </head>
 <body>
 
+<a class="skip-link" href="#main-content">@Localizer["lbSkipToContent"]</a>
+
 <div class="super_container">
 
-	<!-- Header -->
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <!-- Logo -->
+            <a href="@Url.Action("Index", "Home")" class="logo" aria-label="@Localizer["lbHomePage"]">
+                <img src="~/web/images/logo.png" alt="" width="40" height="40">
+                <span>Bookify</span>
+            </a>
 
-	<header class="header d-flex flex-row">
-		<div class="header_content d-flex flex-row align-items-center">
-			<!-- Logo -->
-			<div class="logo_container">
-				<div class="logo">
-					<img src="~/web/images/logo.png" alt="">
-					<span>Bookify</span>
-				</div>
-			</div>
+            <!-- Main Navigation -->
+            <nav class="main-nav" id="main-nav" aria-label="@Localizer["lbMainNavigation"]">
+                <ul class="main-nav-list">
+                    <li class="main-nav-item"><a asp-controller="Home" asp-action="Index">@Localizer["lbHome"]</a></li>
 
-			<!-- Main Navigation -->
-			<nav class="main_nav_container">
-				<div class="main_nav">
-					<ul class="main_nav_list">
-						<li class="main_nav_item"><a asp-controller="Home" asp-action="Index">@Localizer["lbHome"]</a></li>
-						
-						@if (SignInManager.IsSignedIn(User))
-						{
-							<li class="main_nav_item"><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index">@Localizer["lbDashboard"]</a></li>
-							<li class="main_nav_item"><a asp-area="Admin" asp-controller="Categories" asp-action="Categories">@Localizer["lbCategories"]</a></li>
-							<li class="main_nav_item"><a asp-area="Admin" asp-controller="Authors" asp-action="Authors">@Localizer["lbAuthors"]</a></li>
-							<li class="main_nav_item"><a href="#" class="text-muted" title="@Localizer["lbComingSoon"]">@Localizer["lbManageBook"] <span class="badge bg-warning ms-1">@Localizer["lbComingSoon"]</span></a></li>
-							<li class="main_nav_item"><a asp-area="Admin" asp-controller="BookCopies" asp-action="BookCopies">@Localizer["lbBookCopies"]</a></li>
-							<li class="main_nav_item"><a asp-area="Admin" asp-controller="Subscribers" asp-action="Subscribers">@Localizer["lbSubscribers"]</a></li>
-							<li class="main_nav_item"><a asp-area="Admin" asp-controller="Rentals" asp-action="Rentals">@Localizer["lbRentals"]</a></li>
-							<li class="main_nav_item"><a asp-area="Admin" asp-controller="Reports" asp-action="Index">@Localizer["lbReports"]</a></li>
-						}
-						else
-						{
-							<li class="main_nav_item"><a asp-area="Admin" asp-controller="Accounts" asp-action="Login">@Localizer["lbAdminLogin"]</a></li>
-						}
-						
-						<li class="main_nav_item"><a href="/hangfire" target="_blank">@Localizer["lbHangfire"]</a></li>
-						<li class="main_nav_item"><a href="/swagger" target="_blank">@Localizer["lbSwagger"]</a></li>
-						<li class="main_nav_item"><a href="/health">@Localizer["lbHealth"]</a></li>
-					</ul>
-				</div>
-			</nav>
-		</div>
-		<div class="header_side d-flex flex-row justify-content-center align-items-center">
-			@await Html.PartialAsync("_LanguageSwitcher")
-			<img src="~/web/images/phone-call.svg" alt="">
-			<span>+43 4566 7788 2457</span>
-		</div>
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        <li class="main-nav-item"><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index">@Localizer["lbDashboard"]</a></li>
+                        <li class="main-nav-item"><a asp-area="Admin" asp-controller="Categories" asp-action="Categories">@Localizer["lbCategories"]</a></li>
+                        <li class="main-nav-item"><a asp-area="Admin" asp-controller="Authors" asp-action="Authors">@Localizer["lbAuthors"]</a></li>
+                        <li class="main-nav-item"><a href="#" class="text-muted" title="@Localizer["lbComingSoon"]">@Localizer["lbManageBook"] <span class="badge badge-warning">@Localizer["lbComingSoon"]</span></a></li>
+                        <li class="main-nav-item"><a asp-area="Admin" asp-controller="BookCopies" asp-action="BookCopies">@Localizer["lbBookCopies"]</a></li>
+                        <li class="main-nav-item"><a asp-area="Admin" asp-controller="Subscribers" asp-action="Subscribers">@Localizer["lbSubscribers"]</a></li>
+                        <li class="main-nav-item"><a asp-area="Admin" asp-controller="Rentals" asp-action="Rentals">@Localizer["lbRentals"]</a></li>
+                        <li class="main-nav-item"><a asp-area="Admin" asp-controller="Reports" asp-action="Index">@Localizer["lbReports"]</a></li>
+                    }
+                    else
+                    {
+                        <li class="main-nav-item"><a asp-area="Admin" asp-controller="Accounts" asp-action="Login">@Localizer["lbAdminLogin"]</a></li>
+                    }
 
-		<!-- Hamburger -->
-		<div class="hamburger_container">
-			<i class="fas fa-bars trans_200"></i>
-		</div>
+                    <li class="main-nav-item"><a href="/hangfire" target="_blank" rel="noopener">@Localizer["lbHangfire"]</a></li>
+                    <li class="main-nav-item"><a href="/swagger" target="_blank" rel="noopener">@Localizer["lbSwagger"]</a></li>
+                    <li class="main-nav-item"><a href="/health">@Localizer["lbHealth"]</a></li>
+                </ul>
+            </nav>
+        </div>
 
-	</header>
-	
-	<!-- Menu -->
-	<div class="menu_container menu_mm">
+        <div class="header-side">
+            @await Html.PartialAsync("_LanguageSwitcher")
+            <div class="header-contact">
+                <img src="~/web/images/phone-call.svg" alt="" width="20" height="20">
+                <span>+43 4566 7788 2457</span>
+            </div>
 
-		<!-- Menu Close Button -->
-		<div class="menu_close_container">
-			<div class="menu_close"></div>
-		</div>
+            <!-- Hamburger -->
+            <button class="hamburger" type="button" aria-label="@Localizer["lbToggleMenu"]" aria-expanded="false" aria-controls="main-nav">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
 
-		<!-- Menu Items -->
-		<div class="menu_inner menu_mm">
-			<div class="menu menu_mm">
-				<ul class="menu_list menu_mm">
-					<li class="menu_item menu_mm"><a asp-controller="Home" asp-action="Index">@Localizer["lbHome"]</a></li>
-					
-					@if (SignInManager.IsSignedIn(User))
-					{
-						<li class="menu_item menu_mm"><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index">@Localizer["lbDashboard"]</a></li>
-						<li class="menu_item menu_mm"><a asp-area="Admin" asp-controller="Categories" asp-action="Categories">@Localizer["lbCategories"]</a></li>
-						<li class="menu_item menu_mm"><a asp-area="Admin" asp-controller="Authors" asp-action="Authors">@Localizer["lbAuthors"]</a></li>
-						<li class="menu_item menu_mm"><a href="#" class="text-muted" title="@Localizer["lbComingSoon"]">@Localizer["lbManageBook"] <span class="badge bg-warning ms-1">@Localizer["lbComingSoon"]</span></a></li>
-						<li class="menu_item menu_mm"><a asp-area="Admin" asp-controller="BookCopies" asp-action="BookCopies">@Localizer["lbBookCopies"]</a></li>
-						<li class="menu_item menu_mm"><a asp-area="Admin" asp-controller="Subscribers" asp-action="Subscribers">@Localizer["lbSubscribers"]</a></li>
-						<li class="menu_item menu_mm"><a asp-area="Admin" asp-controller="Rentals" asp-action="Rentals">@Localizer["lbRentals"]</a></li>
-						<li class="menu_item menu_mm"><a asp-area="Admin" asp-controller="Reports" asp-action="Index">@Localizer["lbReports"]</a></li>
-					}
-					else
-					{
-						<li class="menu_item menu_mm"><a asp-area="Admin" asp-controller="Accounts" asp-action="Login">@Localizer["lbAdminLogin"]</a></li>
-					}
-					
-					<li class="menu_item menu_mm"><a href="/hangfire" target="_blank">@Localizer["lbHangfire"]</a></li>
-					<li class="menu_item menu_mm"><a href="/swagger" target="_blank">@Localizer["lbSwagger"]</a></li>
-					<li class="menu_item menu_mm"><a href="/health">@Localizer["lbHealth"]</a></li>
-				</ul>
+    <main id="main-content">
+        @RenderBody()
+    </main>
 
-				<!-- Menu Social -->
-				
-				<div class="menu_social_container menu_mm">
-					<ul class="menu_social menu_mm">
-						<li class="menu_social_item menu_mm"><a href="#"><i class="fab fa-pinterest"></i></a></li>
-						<li class="menu_social_item menu_mm"><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
-						<li class="menu_social_item menu_mm"><a href="#"><i class="fab fa-instagram"></i></a></li>
-						<li class="menu_social_item menu_mm"><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-						<li class="menu_social_item menu_mm"><a href="#"><i class="fab fa-twitter"></i></a></li>
-					</ul>
-				</div>
+	    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer-grid container-custom">
+            <!-- Footer Column - About -->
+            <div class="footer-brand">
+                <a href="@Url.Action("Index", "Home")" class="footer-logo" aria-label="@Localizer["lbHomePage"]">
+                    <img src="~/web/images/logo.png" alt="" width="40" height="40">
+                    <span>Bookify</span>
+                </a>
+                <p class="footer-tagline">@Localizer["lbWelcomeDesc"]</p>
+                
+                <div class="footer-social">
+                    <a href="#" aria-label="Pinterest"><i class="fab fa-pinterest"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
 
-				<div class="menu_copyright menu_mm">Bookify All rights reserved</div>
-			</div>
+            <!-- Footer Column - Menu -->
+            <div class="footer-column">
+                <h3 class="footer-column-title">@Localizer["lbCategories"]</h3>
+                <ul class="footer-links">
+                    <li><a asp-controller="Home" asp-action="Index">@Localizer["lbHome"]</a></li>
+                    <li><a asp-area="Admin" asp-controller="Accounts" asp-action="Login">@Localizer["lbAdminLogin"]</a></li>
+                    <li><a asp-area="Admin" asp-controller="Categories" asp-action="Categories">@Localizer["lbCategories"]</a></li>
+                    <li><a asp-area="Admin" asp-controller="Authors" asp-action="Authors">@Localizer["lbAuthors"]</a></li>
+                    <li><a href="/hangfire" target="_blank" rel="noopener">@Localizer["lbHangfire"]</a></li>
+                    <li><a href="/swagger" target="_blank" rel="noopener">@Localizer["lbSwagger"]</a></li>
+                    <li><a href="/health">@Localizer["lbHealth"]</a></li>
+                </ul>
+            </div>
 
-		</div>
+            <!-- Footer Column - Reports -->
+            <div class="footer-column">
+                <h3 class="footer-column-title">@Localizer["lbReports"]</h3>
+                <ul class="footer-links">
+                    <li><a asp-area="Admin" asp-controller="Reports" asp-action="OverdueBooks">@Localizer["lbViewOverdueBooks"]</a></li>
+                    <li><a asp-area="Admin" asp-controller="Reports" asp-action="PopularBooks">@Localizer["lbViewPopularBooks"]</a></li>
+                    <li><a asp-area="Admin" asp-controller="Reports" asp-action="ActiveSubscribers">@Localizer["lbViewActiveSubscribers"]</a></li>
+                    <li><a asp-area="Admin" asp-controller="Reports" asp-action="ExpiringSubscriptions">@Localizer["lbViewExpiringSubscriptions"]</a></li>
+                    <li><a asp-area="Admin" asp-controller="Reports" asp-action="RentalHistory">@Localizer["lbViewRentalHistory"]</a></li>
+                    <li><a asp-area="Admin" asp-controller="Reports" asp-action="BooksByCategory">@Localizer["lbViewBooksByCategory"]</a></li>
+                    <li><a asp-area="Admin" asp-controller="Reports" asp-action="BooksByAuthor">@Localizer["lbViewBooksByAuthor"]</a></li>
+                </ul>
+            </div>
 
-	</div>
-	
-	<!-- Home -->
+            <!-- Footer Column - Contact -->
+            <div class="footer-column">
+                <h3 class="footer-column-title">@Localizer["lbContactUs"]</h3>
+                <ul class="footer-contact">
+                    <li class="footer-contact-item">
+                        <span class="footer-contact-icon"><i class="fas fa-map-marker-alt"></i></span>
+                        <span>Blvd Libertad, 34 m05200 ArÃ©valo</span>
+                    </li>
+                    <li class="footer-contact-item">
+                        <span class="footer-contact-icon"><i class="fas fa-phone"></i></span>
+                        <span>+43 4566 7788 2457</span>
+                    </li>
+                    <li class="footer-contact-item">
+                        <span class="footer-contact-icon"><i class="fas fa-envelope"></i></span>
+                        <span>hello@bookify.local</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
 
-	<div class="home">
-
-		<!-- Hero Slider -->
-		<div class="hero_slider_container">
-			<div class="hero_slider owl-carousel">
-				
-				<!-- Hero Slide -->
-				<div class="hero_slide">
-					<div class="hero_slide_background" style="background-image:url(web/images/slider_background.jpg)"></div>
-					<div class="hero_slide_container d-flex flex-column align-items-center justify-content-center">
-						<div class="hero_slide_content text-center">
-							<h1 data-animation-in="fadeInUp" data-animation-out="animate-out fadeOut">@Localizer["lbWelcome"] <span>@Localizer["lbWelcomeDesc"]</span>!</h1>
-						</div>
-					</div>
-				</div>
-				
-				<!-- Hero Slide -->
-				<div class="hero_slide">
-					<div class="hero_slide_background" style="background-image:url(web/images/slider_background.jpg)"></div>
-					<div class="hero_slide_container d-flex flex-column align-items-center justify-content-center">
-						<div class="hero_slide_content text-center">
-							<h1 data-animation-in="fadeInUp" data-animation-out="animate-out fadeOut">@Localizer["lbWelcome"] <span>@Localizer["lbWelcomeDesc"]</span>!</h1>
-						</div>
-					</div>
-				</div>
-				
-				<!-- Hero Slide -->
-				<div class="hero_slide">
-					<div class="hero_slide_background" style="background-image:url(web/images/slider_background.jpg)"></div>
-					<div class="hero_slide_container d-flex flex-column align-items-center justify-content-center">
-						<div class="hero_slide_content text-center">
-							<h1 data-animation-in="fadeInUp" data-animation-out="animate-out fadeOut">@Localizer["lbWelcome"] <span>@Localizer["lbWelcomeDesc"]</span>!</h1>
-						</div>
-					</div>
-				</div>
-
-			</div>
-
-			<div class="hero_slider_left hero_slider_nav trans_200"><span class="trans_200">prev</span></div>
-			<div class="hero_slider_right hero_slider_nav trans_200"><span class="trans_200">next</span></div>
-		</div>
-
-	</div>
-
-	<div class="hero_boxes">
-		<div class="hero_boxes_inner">
-			<div class="container">
-				<div class="row">
-
-					<div class="col-lg-4 hero_box_col">
-						<div class="hero_box d-flex flex-row align-items-center justify-content-start">
-							<img src="~/web/images/earth-globe.svg" class="svg" alt="">
-							<div class="hero_box_content">
-								<h2 class="hero_box_title">@Localizer["lbCategories"]</h2>
-								<a asp-area="Admin" asp-controller="Categories" asp-action="Categories" class="hero_box_link">@Localizer["lbViewReport"]</a>
-							</div>
-						</div>
-					</div>
-
-					<div class="col-lg-4 hero_box_col">
-						<div class="hero_box d-flex flex-row align-items-center justify-content-start">
-							<img src="~/web/images/books.svg" class="svg" alt="">
-							<div class="hero_box_content">
-								<h2 class="hero_box_title">@Localizer["lbManageBook"]</h2>
-								<a href="#" class="hero_box_link text-muted" title="@Localizer["lbComingSoon"]">@Localizer["lbViewReport"] <span class="badge bg-warning">@Localizer["lbComingSoon"]</span></a>
-							</div>
-						</div>
-					</div>
-
-					<div class="col-lg-4 hero_box_col">
-						<div class="hero_box d-flex flex-row align-items-center justify-content-start">
-							<img src="~/web/images/professor.svg" class="svg" alt="">
-							<div class="hero_box_content">
-								<h2 class="hero_box_title">@Localizer["lbAuthors"]</h2>
-								<a asp-area="Admin" asp-controller="Authors" asp-action="Authors" class="hero_box_link">@Localizer["lbViewReport"]</a>
-							</div>
-						</div>
-					</div>
-
-				</div>
-			</div>
-		</div>
-	</div>
-
-     <div class="container-fluid">
-		 @RenderBody()
-	 </div>
-
-	<!-- Footer -->
-
-	<footer class="footer">
-		<div class="container">
-			
-			<!-- Newsletter -->
-
-			<div class="newsletter">
-				<div class="row">
-					<div class="col">
-						<div class="section_title text-center">
-							<h1>@Localizer["lbHomePage"]</h1>
-						</div>
-					</div>
-				</div>
-
-				<div class="row">
-					<div class="col text-center">
-						<div class="newsletter_form_container mx-auto">
-							<form action="post">
-								<div class="newsletter_form d-flex flex-md-row flex-column flex-xs-column align-items-center justify-content-center">
-									<input id="newsletter_email" class="newsletter_email" type="email" placeholder="@Localizer["lbEmailUser"]" required="required" data-error="Valid email is required.">
-									<button id="newsletter_submit" type="submit" class="newsletter_submit_btn trans_300" value="Submit">@Localizer["lbBtnSave"]</button>
-								</div>
-							</form>
-						</div>
-					</div>
-				</div>
-
-			</div>
-
-			<!-- Footer Content -->
-
-			<div class="footer_content">
-				<div class="row">
-
-					<!-- Footer Column - About -->
-					<div class="col-lg-3 footer_col">
-
-						<!-- Logo -->
-						<div class="logo_container">
-							<div class="logo">
-								<img src="~/web/images/logo.png" alt="">
-								<span>Bookify</span>
-							</div>
-						</div>
-
-						<p class="footer_about_text">@Localizer["lbWelcomeDesc"]</p>
-
-					</div>
-
-					<!-- Footer Column - Menu -->
-
-					<div class="col-lg-3 footer_col">
-						<div class="footer_column_title">@Localizer["lbCategories"]</div>
-						<div class="footer_column_content">
-							<ul>
-								<li class="footer_list_item"><a asp-controller="Home" asp-action="Index">@Localizer["lbHome"]</a></li>
-								<li class="footer_list_item"><a asp-area="Admin" asp-controller="Accounts" asp-action="Login">@Localizer["lbAdminLogin"]</a></li>
-								<li class="footer_list_item"><a asp-area="Admin" asp-controller="Categories" asp-action="Categories">@Localizer["lbCategories"]</a></li>
-								<li class="footer_list_item"><a asp-area="Admin" asp-controller="Authors" asp-action="Authors">@Localizer["lbAuthors"]</a></li>
-								<li class="footer_list_item"><a href="/hangfire" target="_blank">@Localizer["lbHangfire"]</a></li>
-								<li class="footer_list_item"><a href="/swagger" target="_blank">@Localizer["lbSwagger"]</a></li>
-								<li class="footer_list_item"><a href="/health">@Localizer["lbHealth"]</a></li>
-							</ul>
-						</div>
-					</div>
-
-					<!-- Footer Column - Usefull Links -->
-
-					<div class="col-lg-3 footer_col">
-						<div class="footer_column_title">@Localizer["lbReports"]</div>
-						<div class="footer_column_content">
-							<ul>
-								<li class="footer_list_item"><a asp-area="Admin" asp-controller="Reports" asp-action="OverdueBooks">@Localizer["lbViewOverdueBooks"]</a></li>
-								<li class="footer_list_item"><a asp-area="Admin" asp-controller="Reports" asp-action="PopularBooks">@Localizer["lbViewPopularBooks"]</a></li>
-								<li class="footer_list_item"><a asp-area="Admin" asp-controller="Reports" asp-action="ActiveSubscribers">@Localizer["lbViewActiveSubscribers"]</a></li>
-								<li class="footer_list_item"><a asp-area="Admin" asp-controller="Reports" asp-action="ExpiringSubscriptions">@Localizer["lbViewExpiringSubscriptions"]</a></li>
-								<li class="footer_list_item"><a asp-area="Admin" asp-controller="Reports" asp-action="RentalHistory">@Localizer["lbViewRentalHistory"]</a></li>
-								<li class="footer_list_item"><a asp-area="Admin" asp-controller="Reports" asp-action="BooksByCategory">@Localizer["lbViewBooksByCategory"]</a></li>
-								<li class="footer_list_item"><a asp-area="Admin" asp-controller="Reports" asp-action="BooksByAuthor">@Localizer["lbViewBooksByAuthor"]</a></li>
-							</ul>
-						</div>
-					</div>
-
-					<!-- Footer Column - Contact -->
-
-					<div class="col-lg-3 footer_col">
-						<div class="footer_column_title">@Localizer["lbAdminLogin"]</div>
-						<div class="footer_column_content">
-							<ul>
-								<li class="footer_contact_item">
-									<div class="footer_contact_icon">
-										<img src="~/web/images/placeholder.svg" alt="">
-									</div>
-									Blvd Libertad, 34 m05200 Arévalo
-								</li>
-								<li class="footer_contact_item">
-									<div class="footer_contact_icon">
-										<img src="~/web/images/smartphone.svg" alt="">
-									</div>
-									0034 37483 2445 322
-								</li>
-								<li class="footer_contact_item">
-									<div class="footer_contact_icon">
-										<img src="~/web/images/envelope.svg" alt="">
-									</div>hello@company.com
-								</li>
-							</ul>
-						</div>
-					</div>
-
-				</div>
-			</div>
-
-			<!-- Footer Copyright -->
-
-			<div class="footer_bar d-flex flex-column flex-sm-row align-items-center">
-				<div class="footer_copyright">
-					<span><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
-<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></span>
-				</div>
-				<div class="footer_social ml-sm-auto">
-					<ul class="menu_social">
-						<li class="menu_social_item"><a href="#"><i class="fab fa-pinterest"></i></a></li>
-						<li class="menu_social_item"><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
-						<li class="menu_social_item"><a href="#"><i class="fab fa-instagram"></i></a></li>
-						<li class="menu_social_item"><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-						<li class="menu_social_item"><a href="#"><i class="fab fa-twitter"></i></a></li>
-					</ul>
-				</div>
-			</div>
-
-		</div>
-	</footer>
+        <!-- Footer Bottom -->
+        <div class="footer-bottom container-custom">
+            <div class="footer-legal">
+                <span>&copy; <span data-year>@DateTime.Now.Year</span> @Localizer["lbFooter"]</span>
+            </div>
+            <div class="footer-social">
+                <a href="#" aria-label="Pinterest"><i class="fab fa-pinterest"></i></a>
+                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            </div>
+        </div>
+    </footer>
 
 </div>
 
 <script src="~/web/js/jquery-3.2.1.min.js"></script>
 <script src="~/web/styles/bootstrap4/popper.js"></script>
 <script src="~/web/styles/bootstrap4/bootstrap.min.js"></script>
-<script src="~/web/plugins/greensock/TweenMax.min.js"></script>
-<script src="~/web/plugins/greensock/TimelineMax.min.js"></script>
-<script src="~/web/plugins/scrollmagic/ScrollMagic.min.js"></script>
-<script src="~/web/plugins/greensock/animation.gsap.min.js"></script>
-<script src="~/web/plugins/greensock/ScrollToPlugin.min.js"></script>
-<script src="~/web/plugins/OwlCarousel2-2.2.1/owl.carousel.js"></script>
-<script src="~/web/plugins/scrollTo/jquery.scrollTo.min.js"></script>
-<script src="~/web/plugins/easing/easing.js"></script>
-<script src="~/web/js/custom.js"></script>
+<script>
+    document.querySelectorAll('[data-year]').forEach(function (el) {
+        el.textContent = new Date().getFullYear();
+    });
+</script>
+
+@await RenderSectionAsync("Scripts", required: false)
 
 </body>
 </html>
+
+

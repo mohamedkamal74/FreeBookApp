@@ -520,7 +520,7 @@
     <value>Bookify</value>
   </data>
   <data name="lbFooter" xml:space="preserve">
-    <value>Copyright © 2026 Bookify. All rights reserved.</value>
+    <value>Bookify. All rights reserved.</value>
   </data>
   <data name="lbVersion" xml:space="preserve">
     <value>Version</value>
@@ -566,5 +566,62 @@
   </data>
   <data name="lbRegisterNewMembership" xml:space="preserve">
     <value>Register a new membership</value>
+  </data>
+  <data name="lbFeatures" xml:space="preserve">
+    <value>Features</value>
+  </data>
+  <data name="lbFeaturesDesc" xml:space="preserve">
+    <value>Discover what makes Bookify different</value>
+  </data>
+  <data name="lbCategoriesDesc" xml:space="preserve">
+    <value>Organize your books in searchable categories</value>
+  </data>
+  <data name="lbManageBookDesc" xml:space="preserve">
+    <value>Comprehensive book, copy, and edition management</value>
+  </data>
+  <data name="lbAuthorsDesc" xml:space="preserve">
+    <value>Track authors and publishers with details</value>
+  </data>
+  <data name="lbBookCopiesDesc" xml:space="preserve">
+    <value>Track every book copy with availability status</value>
+  </data>
+  <data name="lbSubscribersDesc" xml:space="preserve">
+    <value>Manage subscribers and subscriptions easily</value>
+  </data>
+  <data name="lbReportsDesc" xml:space="preserve">
+    <value>Detailed reports on rentals and penalties</value>
+  </data>
+  <data name="lbReadyToStart" xml:space="preserve">
+    <value>Ready to Get Started?</value>
+  </data>
+  <data name="lbReadyToStartDesc" xml:space="preserve">
+    <value>Join thousands of libraries that trust Bookify</value>
+  </data>
+  <data name="lbGoToDashboard" xml:space="preserve">
+    <value>Go to Dashboard</value>
+  </data>
+  <data name="lbToggleMenu" xml:space="preserve">
+    <value>Toggle Menu</value>
+  </data>
+  <data name="lbCloseMenu" xml:space="preserve">
+    <value>Close Menu</value>
+  </data>
+  <data name="lbMobileMenu" xml:space="preserve">
+    <value>Mobile Menu</value>
+  </data>
+  <data name="lbMobileNavigation" xml:space="preserve">
+    <value>Mobile Navigation</value>
+  </data>
+  <data name="lbMainNavigation" xml:space="preserve">
+    <value>Main Navigation</value>
+  </data>
+  <data name="lbContactUs" xml:space="preserve">
+    <value>Contact Us</value>
+  </data>
+  <data name="lbSkipToContent" xml:space="preserve">
+    <value>Skip to main content</value>
+  </data>
+  <data name="lbHeroSubtitle" xml:space="preserve">
+    <value>Manage categories, books, authors, book copies, subscribers and reports — all in one modern library platform.</value>
   </data>
 </root>
