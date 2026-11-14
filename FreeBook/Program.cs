@@ -231,10 +231,11 @@ try
         {
             var recurringJobManager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
 
-            recurringJobManager.AddOrUpdate<FineCalculationJob>("daily-fines", x => x.CalculateDailyFinesAsync(), Cron.Daily(2, 0), TimeZoneInfo.Local, "fines");
-            recurringJobManager.AddOrUpdate<ExpiryCheckJob>("expiry-check", x => x.CheckExpiringSubscriptionsAsync(), Cron.Daily(8, 0), TimeZoneInfo.Local, "notifications");
-            recurringJobManager.AddOrUpdate<OverdueNotificationJob>("overdue-notifications", x => x.SendOverdueNotificationsAsync(), Cron.Daily(9, 0), TimeZoneInfo.Local, "notifications");
-            recurringJobManager.AddOrUpdate<CleanupJob>("cleanup-old-jobs", x => x.CleanupAsync(), Cron.Weekly(DayOfWeek.Sunday, 3, 0), TimeZoneInfo.Local, "default");
+            var options = new RecurringJobOptions { TimeZone = TimeZoneInfo.Local };
+            recurringJobManager.AddOrUpdate<FineCalculationJob>("fines", "daily-fines", x => x.CalculateDailyFinesAsync(), Cron.Daily(2, 0), options);
+            recurringJobManager.AddOrUpdate<ExpiryCheckJob>("notifications", "expiry-check", x => x.CheckExpiringSubscriptionsAsync(), Cron.Daily(8, 0), options);
+            recurringJobManager.AddOrUpdate<OverdueNotificationJob>("notifications", "overdue-notifications", x => x.SendOverdueNotificationsAsync(), Cron.Daily(9, 0), options);
+            recurringJobManager.AddOrUpdate<CleanupJob>("default", "cleanup-old-jobs", x => x.CleanupAsync(), Cron.Weekly(DayOfWeek.Sunday, 3, 0), options);
         }
     }
 
