@@ -183,6 +183,33 @@
   <data name="lmTextMsgDelete" xml:space="preserve">
     <value>لن تتمكن من التراجع!</value>
   </data>
+  <data name="lbPrivacy" xml:space="preserve">
+    <value>الخصوصية</value>
+  </data>
+  <data name="lbPrivacyTitle" xml:space="preserve">
+    <value>سياسة الخصوصية</value>
+  </data>
+  <data name="lbPrivacyIntro" xml:space="preserve">
+    <value>Bookify تطبيق تجريبي لإدارة المكتبات. توضح هذه الصفحة البيانات التي يحفظها الموقع والغرض منها.</value>
+  </data>
+  <data name="lbPrivacyDataTitle" xml:space="preserve">
+    <value>البيانات التي نحفظها</value>
+  </data>
+  <data name="lbPrivacyDataBody" xml:space="preserve">
+    <value>عند التسجيل يحفظ الموقع اسمك وبريدك الإلكتروني، وصورة الملف الشخصي إن رفعتها. تُستخدم بيانات حسابك لتسجيل الدخول وإدارة الاستعارات الخاصة بحسابك فقط.</value>
+  </data>
+  <data name="lbPrivacyCookiesTitle" xml:space="preserve">
+    <value>ملفات تعريف الارتباط</value>
+  </data>
+  <data name="lbPrivacyCookiesBody" xml:space="preserve">
+    <value>يستخدم تسجيل الدخول ملف تعريف ارتباط للمصادقة، ويُحفظ اختيار اللغة في ملف تعريف ارتباط للثقافة. لا يستخدم الموقع ملفات تعريف ارتباط للتحليلات أو الإعلانات.</value>
+  </data>
+  <data name="lbPrivacyContactTitle" xml:space="preserve">
+    <value>خياراتك</value>
+  </data>
+  <data name="lbPrivacyContactBody" xml:space="preserve">
+    <value>تواصل مع مسؤول الموقع إذا رغبت في حذف حسابك أو بياناتك.</value>
+  </data>
   <data name="lbLanguage" xml:space="preserve">
     <value>اللغة</value>
   </data>

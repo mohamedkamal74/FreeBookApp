@@ -1248,7 +1248,75 @@ img {
 }
 
 /* ============================================================
-   19) PRINT
+   19) CONTENT PAGES (privacy, etc.)
+   ============================================================ */
+.page-section {
+  padding: var(--bk-space-16) 0;
+  background: var(--bk-bg);
+}
+
+.page-header {
+  max-width: 46rem;
+  margin: 0 auto var(--bk-space-10);
+  text-align: center;
+}
+
+.page-header h1 {
+  margin-bottom: var(--bk-space-3);
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--bk-text);
+}
+
+.page-lead {
+  margin: 0;
+  font-size: 1.125rem;
+  color: var(--bk-text-muted);
+}
+
+.page-body {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: var(--bk-space-8);
+  background: var(--bk-bg-card);
+  border: 1px solid var(--bk-border);
+  border-radius: var(--bk-radius-lg);
+  box-shadow: var(--bk-shadow-sm);
+}
+
+.page-body h2 {
+  margin: var(--bk-space-6) 0 var(--bk-space-2);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--bk-text);
+}
+
+.page-body h2:first-child {
+  margin-top: 0;
+}
+
+.page-body p {
+  margin: 0 0 var(--bk-space-3);
+  line-height: 1.75;
+  color: var(--bk-text-muted);
+}
+
+.page-body p:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 575.98px) {
+  .page-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .page-body {
+    padding: var(--bk-space-5);
+  }
+}
+
+/* ============================================================
+   20) PRINT
    ============================================================ */
 @media print {
   .header,

@@ -180,6 +180,33 @@
   <data name="lmTextMsgDelete" xml:space="preserve">
     <value>You will not be able to undo this!</value>
   </data>
+  <data name="lbPrivacy" xml:space="preserve">
+    <value>Privacy</value>
+  </data>
+  <data name="lbPrivacyTitle" xml:space="preserve">
+    <value>Privacy Policy</value>
+  </data>
+  <data name="lbPrivacyIntro" xml:space="preserve">
+    <value>Bookify is a library management demo. This page explains which data the site stores and why.</value>
+  </data>
+  <data name="lbPrivacyDataTitle" xml:space="preserve">
+    <value>Data we store</value>
+  </data>
+  <data name="lbPrivacyDataBody" xml:space="preserve">
+    <value>When you register, the site stores your name, email address and, if you upload one, a profile image. Your account details are used only to sign you in and to manage rentals for your account.</value>
+  </data>
+  <data name="lbPrivacyCookiesTitle" xml:space="preserve">
+    <value>Cookies</value>
+  </data>
+  <data name="lbPrivacyCookiesBody" xml:space="preserve">
+    <value>Signing in uses an authentication cookie and your language choice is kept in a culture cookie. The site does not use analytics or advertising cookies.</value>
+  </data>
+  <data name="lbPrivacyContactTitle" xml:space="preserve">
+    <value>Your choices</value>
+  </data>
+  <data name="lbPrivacyContactBody" xml:space="preserve">
+    <value>Ask a site administrator if you want your account or your data removed.</value>
+  </data>
   <data name="lbLanguage" xml:space="preserve">
     <value>Language</value>
   </data>

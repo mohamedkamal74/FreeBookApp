@@ -1,6 +1,24 @@
-﻿@{
-    ViewData["Title"] = "Privacy Policy";
+﻿@inject IStringLocalizer<ResourceWeb> Localizer
+@{
+    ViewData["Title"] = Localizer["lbPrivacyTitle"];
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<section class="page-section" aria-labelledby="privacy-title">
+    <div class="container-custom">
+        <header class="page-header">
+            <h1 id="privacy-title">@Localizer["lbPrivacyTitle"]</h1>
+            <p class="page-lead">@Localizer["lbPrivacyIntro"]</p>
+        </header>
+
+        <div class="page-body">
+            <h2>@Localizer["lbPrivacyDataTitle"]</h2>
+            <p>@Localizer["lbPrivacyDataBody"]</p>
+
+            <h2>@Localizer["lbPrivacyCookiesTitle"]</h2>
+            <p>@Localizer["lbPrivacyCookiesBody"]</p>
+
+            <h2>@Localizer["lbPrivacyContactTitle"]</h2>
+            <p>@Localizer["lbPrivacyContactBody"]</p>
+        </div>
+    </div>
+</section>
