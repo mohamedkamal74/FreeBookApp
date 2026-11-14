@@ -81,7 +81,7 @@
         </div>
     </header>
 
-    <main id="main-content">
+    <main id="main-content" tabindex="-1">
         @RenderBody()
     </main>
 
@@ -143,11 +143,11 @@
                     </li>
                     <li class="footer-contact-item">
                         <span class="footer-contact-icon"><i class="fas fa-phone"></i></span>
-                        <span>+43 4566 7788 2457</span>
+                        <a href="tel:+43456677882457">+43 4566 7788 2457</a>
                     </li>
                     <li class="footer-contact-item">
                         <span class="footer-contact-icon"><i class="fas fa-envelope"></i></span>
-                        <span>hello@bookify.local</span>
+                        <a href="mailto:hello@bookify.local">hello@bookify.local</a>
                     </li>
                 </ul>
             </div>
@@ -158,13 +158,6 @@
             <div class="footer-legal">
                 <span>&copy; <span data-year>@DateTime.Now.Year</span> @Localizer["lbFooter"]</span>
                 <a asp-controller="Home" asp-action="Privacy">@Localizer["lbPrivacy"]</a>
-            </div>
-            <div class="footer-social">
-                <a href="#" aria-label="Pinterest"><i class="fab fa-pinterest"></i></a>
-                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
             </div>
         </div>
     </footer>
