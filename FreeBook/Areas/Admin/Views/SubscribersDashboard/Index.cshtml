@@ -1,0 +1,448 @@
+@inject IStringLocalizer<ResourceWeb> Localizer
+@{
+    ViewData["Title"] = Localizer["lbSubscribersDashboard"].Value;
+}
+
+<style>
+    .small-box-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .small-box-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .small-box-link:hover .small-box {
+        transform: none;
+        box-shadow: none;
+    }
+
+    .chart-box {
+        position: relative;
+        height: 260px;
+    }
+
+    .dashboard-filter-card .card-body {
+        padding-bottom: 0.75rem;
+    }
+
+    .dashboard-filter-card .form-group {
+        margin-bottom: 0.75rem;
+    }
+
+    .dashboard-filter-card label {
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--bk-text-muted);
+        margin-bottom: 0.375rem;
+    }
+
+    .dashboard-filter-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+</style>
+
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">@Localizer["lbSubscribersDashboard"]</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @{
+        var dashboard = (FreeBook.Models.SubscribersDashboardViewModel)ViewBag.Dashboard;
+        var filter = (FreeBook.Models.SubscribersDashboardFilterViewModel)ViewBag.Filter;
+    }
+
+    <!-- Filters: the rental and subscription charts below are scoped by this form -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card card-outline card-primary dashboard-filter-card">
+                <div class="card-header">
+                    <h3 class="card-title">@Localizer["lbFilter"]</h3>
+                    <div class="card-tools">
+                        <span class="badge badge-light">
+                            @filter.From.ToString("d MMM yyyy") – @filter.To.ToString("d MMM yyyy")
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="get" asp-area="Admin" asp-controller="SubscribersDashboard" asp-action="Index">
+                        <div class="form-row align-items-end">
+                            <div class="form-group col-lg-3 col-md-6">
+                                <label for="filterFrom">@Localizer["lbFrom"]</label>
+                                <input type="date" class="form-control" id="filterFrom" name="from"
+                                       value="@filter.From.ToString("yyyy-MM-dd")" />
+                            </div>
+                            <div class="form-group col-lg-3 col-md-6">
+                                <label for="filterTo">@Localizer["lbTo"]</label>
+                                <input type="date" class="form-control" id="filterTo" name="to"
+                                       value="@filter.To.ToString("yyyy-MM-dd")" />
+                            </div>
+                            <div class="form-group col-lg-3 col-md-6">
+                                <label for="filterGovernorate">@Localizer["lbGovernorate"]</label>
+                                <select class="form-control" id="filterGovernorate" name="governorateId">
+                                    <option value="">@Localizer["lbAll"]</option>
+                                    @foreach (var governorate in filter.Governorates)
+                                    {
+                                        <option value="@governorate.Id" selected="@(filter.GovernorateId == governorate.Id ? "selected" : null)">@governorate.Name</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group col-lg-3 col-md-6">
+                                <div class="dashboard-filter-actions">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-filter" aria-hidden="true"></i>
+                                        @Localizer["lbApplyFilter"]
+                                    </button>
+                                    <a asp-area="Admin" asp-controller="SubscribersDashboard" asp-action="Index" class="btn btn-outline-secondary">
+                                        @Localizer["lbResetFilter"]
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-3 col-6">
+            <a asp-area="Admin" asp-controller="Subscribers" asp-action="Subscribers" class="small-box-link">
+                <div class="small-box bg-info">
+                    <div class="inner">
+                        <h3>@dashboard.TotalSubscribers</h3>
+                        <p>@Localizer["lbTotalSubscribers"]</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-lg-3 col-6">
+            <a asp-area="Admin" asp-controller="Subscriptions" asp-action="Subscriptions" class="small-box-link">
+                <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3>@dashboard.ActiveSubscriptions</h3>
+                        <p>@Localizer["lbActiveSubscriptions"]</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-id-card"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-lg-3 col-6">
+            <a asp-area="Admin" asp-controller="Subscriptions" asp-action="Subscriptions" asp-route-filter="expiring" class="small-box-link">
+                <div class="small-box bg-warning">
+                    <div class="inner">
+                        <h3>@dashboard.ExpiringSoon</h3>
+                        <p>@Localizer["lbExpiringSubscriptions"]</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-lg-3 col-6">
+            <a asp-area="Admin" asp-controller="Subscribers" asp-action="Subscribers" asp-route-filter="blacklisted" class="small-box-link">
+                <div class="small-box bg-secondary">
+                    <div class="inner">
+                        <h3>@dashboard.Blacklisted</h3>
+                        <p>@Localizer["lbBlacklistedSubscribers"]</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-user-slash"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-primary">
+                <div class="inner">
+                    <h3>@dashboard.WhatsAppEnabled</h3>
+                    <p>@Localizer["lbWhatsAppEnabled"]</p>
+                </div>
+                <div class="icon">
+                    <i class="fab fa-whatsapp"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics: geography and demographics -->
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">@Localizer["lbSubscribersByGovernorate"]</h3>
+                </div>
+                <div class="card-body">
+                    <div class="chart-box">
+                        <canvas id="chartByGovernorate"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">@Localizer["lbAgeDistribution"]</h3>
+                </div>
+                <div class="card-body">
+                    <div class="chart-box">
+                        <canvas id="chartAgeGroups"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics: subscriptions over time and status -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">@Localizer["lbSubscriptionsPerMonth"]</h3>
+                </div>
+                <div class="card-body">
+                    <div class="chart-box">
+                        <canvas id="chartSubscriptionsPerMonth"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">@Localizer["lbActiveVsExpiredSubs"]</h3>
+                </div>
+                <div class="card-body">
+                    <div class="chart-box">
+                        <canvas id="chartSubscriptionStatus"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics: most active borrowers -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">@Localizer["lbTopRentingSubscribers"]</h3>
+                </div>
+                <div class="card-body">
+                    <div class="chart-box">
+                        <canvas id="chartTopRenters"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+        @{
+            var chartJson = System.Text.Json.JsonSerializer.Serialize(dashboard, new System.Text.Json.JsonSerializerOptions
+            {
+                PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+            });
+            var noDataText = Localizer["lbNoData"].Value;
+        }
+        <script>
+            (function () {
+                var data = @Html.Raw(chartJson);
+                var NO_DATA = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(noDataText));
+                var palette = ['#5F62EF', '#8B5CF6', '#10B981', '#F59E0B', '#06B6D4', '#EF4444', '#EC4899', '#64748B'];
+
+                function emptyState(canvas) {
+                    var note = document.createElement('div');
+                    note.className = 'd-flex align-items-center justify-content-center h-100 text-muted';
+                    note.textContent = NO_DATA;
+                    canvas.parentNode.appendChild(note);
+                    canvas.remove();
+                }
+
+                function colorsFor(rows) {
+                    return rows.map(function (_, i) { return palette[i % palette.length]; });
+                }
+
+                function hasValues(rows) {
+                    return !!rows && rows.some(function (row) { return row.count > 0; });
+                }
+
+                var tooltips = {
+                    backgroundColor: 'rgba(30, 41, 59, 0.95)',
+                    cornerRadius: 6,
+                    xPadding: 10,
+                    yPadding: 8
+                };
+
+                // 1) Subscribers by governorate
+                var govCanvas = document.getElementById('chartByGovernorate');
+                if (govCanvas) {
+                    if (!hasValues(data.byGovernorate)) {
+                        emptyState(govCanvas);
+                    } else {
+                        new Chart(govCanvas, {
+                            type: 'horizontalBar',
+                            data: {
+                                labels: data.byGovernorate.map(function (r) { return r.name; }),
+                                datasets: [{
+                                    data: data.byGovernorate.map(function (r) { return r.count; }),
+                                    backgroundColor: colorsFor(data.byGovernorate),
+                                    hoverBackgroundColor: '#4F46E5',
+                                    maxBarThickness: 26
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                legend: { display: false },
+                                tooltips: tooltips,
+                                scales: {
+                                    xAxes: [{ ticks: { beginAtZero: true, precision: 0, stepSize: 1 } }],
+                                    yAxes: [{ gridLines: { display: false } }]
+                                }
+                            }
+                        });
+                    }
+                }
+
+                // 2) Age distribution
+                var ageCanvas = document.getElementById('chartAgeGroups');
+                if (ageCanvas) {
+                    if (!hasValues(data.ageGroups)) {
+                        emptyState(ageCanvas);
+                    } else {
+                        new Chart(ageCanvas, {
+                            type: 'bar',
+                            data: {
+                                labels: data.ageGroups.map(function (r) { return r.name; }),
+                                datasets: [{
+                                    data: data.ageGroups.map(function (r) { return r.count; }),
+                                    backgroundColor: '#8B5CF6',
+                                    hoverBackgroundColor: '#5F62EF',
+                                    maxBarThickness: 48
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                legend: { display: false },
+                                tooltips: tooltips,
+                                scales: {
+                                    yAxes: [{ ticks: { beginAtZero: true, precision: 0, stepSize: 1 } }],
+                                    xAxes: [{ gridLines: { display: false } }]
+                                }
+                            }
+                        });
+                    }
+                }
+
+                // 3) Subscriptions started per month
+                var monthCanvas = document.getElementById('chartSubscriptionsPerMonth');
+                if (monthCanvas) {
+                    if (!hasValues(data.subscriptionsPerMonth)) {
+                        emptyState(monthCanvas);
+                    } else {
+                        new Chart(monthCanvas, {
+                            type: 'bar',
+                            data: {
+                                labels: data.subscriptionsPerMonth.map(function (r) { return r.name; }),
+                                datasets: [{
+                                    data: data.subscriptionsPerMonth.map(function (r) { return r.count; }),
+                                    backgroundColor: '#5F62EF',
+                                    hoverBackgroundColor: '#4F46E5',
+                                    maxBarThickness: 48
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                legend: { display: false },
+                                tooltips: tooltips,
+                                scales: {
+                                    yAxes: [{ ticks: { beginAtZero: true, precision: 0, stepSize: 1 } }],
+                                    xAxes: [{ gridLines: { display: false } }]
+                                }
+                            }
+                        });
+                    }
+                }
+
+                // 4) Active / expired subscriptions
+                var statusCanvas = document.getElementById('chartSubscriptionStatus');
+                if (statusCanvas) {
+                    if (!hasValues(data.subscriptionStatus)) {
+                        emptyState(statusCanvas);
+                    } else {
+                        new Chart(statusCanvas, {
+                            type: 'doughnut',
+                            data: {
+                                labels: data.subscriptionStatus.map(function (r) { return r.name; }),
+                                datasets: [{
+                                    data: data.subscriptionStatus.map(function (r) { return r.count; }),
+                                    backgroundColor: ['#10B981', '#F59E0B'],
+                                    borderWidth: 0
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                cutoutPercentage: 68,
+                                legend: { position: 'bottom', labels: { boxWidth: 10, padding: 12 } },
+                                tooltips: tooltips
+                            }
+                        });
+                    }
+                }
+
+                // 5) Most active borrowers
+                var topCanvas = document.getElementById('chartTopRenters');
+                if (topCanvas) {
+                    if (!hasValues(data.topRenters)) {
+                        emptyState(topCanvas);
+                    } else {
+                        new Chart(topCanvas, {
+                            type: 'horizontalBar',
+                            data: {
+                                labels: data.topRenters.map(function (r) { return r.name; }),
+                                datasets: [{
+                                    data: data.topRenters.map(function (r) { return r.count; }),
+                                    backgroundColor: colorsFor(data.topRenters),
+                                    hoverBackgroundColor: '#4F46E5',
+                                    maxBarThickness: 22
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                legend: { display: false },
+                                tooltips: tooltips,
+                                scales: {
+                                    xAxes: [{ ticks: { beginAtZero: true, precision: 0, stepSize: 1 } }],
+                                    yAxes: [{ gridLines: { display: false } }]
+                                }
+                            }
+                        });
+                    }
+                }
+            })();
+        </script>
+}

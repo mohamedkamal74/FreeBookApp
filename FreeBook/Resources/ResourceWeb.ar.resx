@@ -249,6 +249,48 @@
   <data name="lbResetFilter" xml:space="preserve">
     <value>إعادة تعيين</value>
   </data>
+  <data name="lbSubscribersDashboard" xml:space="preserve">
+    <value>لوحة تحكم المشتركين</value>
+  </data>
+  <data name="lbDashboardGeneral" xml:space="preserve">
+    <value>عام</value>
+  </data>
+  <data name="lbSubscribersByGovernorate" xml:space="preserve">
+    <value>المشتركون حسب المحافظة</value>
+  </data>
+  <data name="lbAgeDistribution" xml:space="preserve">
+    <value>توزيع الأعمار</value>
+  </data>
+  <data name="lbAgeUnder18" xml:space="preserve">
+    <value>أقل من 18</value>
+  </data>
+  <data name="lbAge18to25" xml:space="preserve">
+    <value>18–25</value>
+  </data>
+  <data name="lbAge26to35" xml:space="preserve">
+    <value>26–35</value>
+  </data>
+  <data name="lbAge36to50" xml:space="preserve">
+    <value>36–50</value>
+  </data>
+  <data name="lbAgeOver50" xml:space="preserve">
+    <value>أكثر من 50</value>
+  </data>
+  <data name="lbSubscriptionsPerMonth" xml:space="preserve">
+    <value>الاشتراكات شهرياً</value>
+  </data>
+  <data name="lbActiveVsExpiredSubs" xml:space="preserve">
+    <value>النشطة مقابل المنتهية</value>
+  </data>
+  <data name="lbExpired" xml:space="preserve">
+    <value>منتهية</value>
+  </data>
+  <data name="lbTopRentingSubscribers" xml:space="preserve">
+    <value>أكثر المشتركين استعارة</value>
+  </data>
+  <data name="lbWhatsAppEnabled" xml:space="preserve">
+    <value>متاح على واتساب</value>
+  </data>
   <data name="lbLanguage" xml:space="preserve">
     <value>اللغة</value>
   </data>

@@ -246,6 +246,48 @@
   <data name="lbResetFilter" xml:space="preserve">
     <value>Reset</value>
   </data>
+  <data name="lbSubscribersDashboard" xml:space="preserve">
+    <value>Subscribers dashboard</value>
+  </data>
+  <data name="lbDashboardGeneral" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="lbSubscribersByGovernorate" xml:space="preserve">
+    <value>Subscribers by governorate</value>
+  </data>
+  <data name="lbAgeDistribution" xml:space="preserve">
+    <value>Age distribution</value>
+  </data>
+  <data name="lbAgeUnder18" xml:space="preserve">
+    <value>Under 18</value>
+  </data>
+  <data name="lbAge18to25" xml:space="preserve">
+    <value>18–25</value>
+  </data>
+  <data name="lbAge26to35" xml:space="preserve">
+    <value>26–35</value>
+  </data>
+  <data name="lbAge36to50" xml:space="preserve">
+    <value>36–50</value>
+  </data>
+  <data name="lbAgeOver50" xml:space="preserve">
+    <value>Over 50</value>
+  </data>
+  <data name="lbSubscriptionsPerMonth" xml:space="preserve">
+    <value>Subscriptions per month</value>
+  </data>
+  <data name="lbActiveVsExpiredSubs" xml:space="preserve">
+    <value>Active vs expired</value>
+  </data>
+  <data name="lbExpired" xml:space="preserve">
+    <value>Expired</value>
+  </data>
+  <data name="lbTopRentingSubscribers" xml:space="preserve">
+    <value>Most active borrowers</value>
+  </data>
+  <data name="lbWhatsAppEnabled" xml:space="preserve">
+    <value>WhatsApp enabled</value>
+  </data>
   <data name="lbLanguage" xml:space="preserve">
     <value>Language</value>
   </data>

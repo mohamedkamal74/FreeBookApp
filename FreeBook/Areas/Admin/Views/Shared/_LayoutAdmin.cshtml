@@ -107,11 +107,28 @@
                 <nav class="mt-2 mr-6">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="true">
                         <!-- Dashboard -->
-                        <li class="nav-item">
-                            <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="nav-link">
+                        <li class="nav-item has-treeview">
+                            <a href="#" class="nav-link">
                                 <i class="nav-icon fas fa-tachometer-alt"></i>
-                                <p>@Localizer["lbDashboard"]</p>
+                                <p>
+                                    @Localizer["lbDashboard"]
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
                             </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>@Localizer["lbDashboardGeneral"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-area="Admin" asp-controller="SubscribersDashboard" asp-action="Index" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>@Localizer["lbSubscribersDashboard"]</p>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
 
                         <!-- Management Group -->
@@ -298,6 +315,12 @@
             // Also handle Dashboard root
             if (path === '/admin' || path === '/admin/dashboard' || path === '/admin/dashboard/index') {
                 $('.nav-sidebar a[href="/Admin/Dashboard/Index"], .nav-sidebar a[href="/admin/dashboard/index"]').addClass('active');
+            }
+            // Keep the parent treeview open when one of its children is the current page
+            var $activeChild = $('.nav-sidebar .nav-treeview .nav-link.active').first();
+            if ($activeChild.length) {
+                $activeChild.closest('.nav-treeview').parent().addClass('menu-open');
+                $activeChild.closest('.nav-treeview').prev('.nav-link').addClass('active');
             }
         })();
     </script>
