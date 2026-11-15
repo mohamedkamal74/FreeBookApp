@@ -207,6 +207,30 @@
   <data name="lbPrivacyContactBody" xml:space="preserve">
     <value>Ask a site administrator if you want your account or your data removed.</value>
   </data>
+  <data name="lbLast6Months" xml:space="preserve">
+    <value>Last 6 months</value>
+  </data>
+  <data name="lbRentalsPerMonth" xml:space="preserve">
+    <value>Rentals per month</value>
+  </data>
+  <data name="lbTopRentedBooks" xml:space="preserve">
+    <value>Top rented books</value>
+  </data>
+  <data name="lbTopRenters" xml:space="preserve">
+    <value>Most active renters</value>
+  </data>
+  <data name="lbCopyAvailability" xml:space="preserve">
+    <value>Copy availability</value>
+  </data>
+  <data name="lbAvailable" xml:space="preserve">
+    <value>Available</value>
+  </data>
+  <data name="lbRented" xml:space="preserve">
+    <value>Rented</value>
+  </data>
+  <data name="lbNoData" xml:space="preserve">
+    <value>No data for this period</value>
+  </data>
   <data name="lbLanguage" xml:space="preserve">
     <value>Language</value>
   </data>

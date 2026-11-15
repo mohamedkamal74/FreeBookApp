@@ -1,4 +1,5 @@
 using Domin.Entity;
+using FreeBook.Models;
 using Infrastructure.Common;
 using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
@@ -66,7 +67,77 @@ namespace FreeBook.Areas.Admin.Controllers
             ViewBag.OverdueList = overdueRentals.Take(10).ToList();
             ViewBag.ExpiringSubs = expiringSubscriptions.Take(10).ToList();
 
+            ViewBag.Charts = BuildCharts(rentals, books, copies, now);
+
             return View();
+        }
+
+        private static DashboardChartsViewModel BuildCharts(
+            List<Rental> rentals,
+            List<Book> books,
+            List<BookCopy> copies,
+            DateTime now)
+        {
+            // Charts look at the last six calendar months by default.
+            var firstMonth = new DateTime(now.Year, now.Month, 1).AddMonths(-5);
+            var windowRentals = rentals
+                .Where(r => r.StartDate >= firstMonth && r.StartDate <= now)
+                .ToList();
+
+            var charts = new DashboardChartsViewModel
+            {
+                AvailableCopies = copies.Count(c => c.IsAvailableForRental),
+                RentedCopies = copies.Count(c => !c.IsAvailableForRental)
+            };
+
+            charts.TopRentedBooks = windowRentals
+                .SelectMany(r => r.RentalCopies)
+                .Where(rc => rc.BookCopy != null)
+                .GroupBy(rc => rc.BookCopy!.BookId)
+                .Select(g => new NamedCount
+                {
+                    Name = g.First().BookCopy!.Book?.Name ?? string.Empty,
+                    Count = g.Count()
+                })
+                .Where(x => !string.IsNullOrWhiteSpace(x.Name))
+                .OrderByDescending(x => x.Count)
+                .ThenBy(x => x.Name)
+                .Take(5)
+                .ToList();
+
+            charts.TopRenters = windowRentals
+                .GroupBy(r => r.SubscriberId)
+                .Select(g => new NamedCount
+                {
+                    Name = g.First().Subscriber?.FullName ?? string.Empty,
+                    Count = g.Count()
+                })
+                .Where(x => !string.IsNullOrWhiteSpace(x.Name))
+                .OrderByDescending(x => x.Count)
+                .ThenBy(x => x.Name)
+                .Take(5)
+                .ToList();
+
+            charts.BooksByCategory = books
+                .GroupBy(b => b.Category?.Name ?? "—")
+                .Select(g => new NamedCount { Name = g.Key, Count = g.Count() })
+                .OrderByDescending(x => x.Count)
+                .ThenBy(x => x.Name)
+                .ToList();
+
+            charts.RentalsPerMonth = Enumerable.Range(0, 6)
+                .Select(i =>
+                {
+                    var month = firstMonth.AddMonths(i);
+                    return new NamedCount
+                    {
+                        Name = month.ToString("MMM yyyy"),
+                        Count = windowRentals.Count(r => r.StartDate.Year == month.Year && r.StartDate.Month == month.Month)
+                    };
+                })
+                .ToList();
+
+            return charts;
         }
     }
 }

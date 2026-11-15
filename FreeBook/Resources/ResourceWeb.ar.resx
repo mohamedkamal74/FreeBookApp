@@ -210,6 +210,30 @@
   <data name="lbPrivacyContactBody" xml:space="preserve">
     <value>تواصل مع مسؤول الموقع إذا رغبت في حذف حسابك أو بياناتك.</value>
   </data>
+  <data name="lbLast6Months" xml:space="preserve">
+    <value>آخر 6 أشهر</value>
+  </data>
+  <data name="lbRentalsPerMonth" xml:space="preserve">
+    <value>الإيجارات شهرياً</value>
+  </data>
+  <data name="lbTopRentedBooks" xml:space="preserve">
+    <value>أكثر الكتب استعارة</value>
+  </data>
+  <data name="lbTopRenters" xml:space="preserve">
+    <value>أكثر المستأجرين نشاطاً</value>
+  </data>
+  <data name="lbCopyAvailability" xml:space="preserve">
+    <value>توفر النسخ</value>
+  </data>
+  <data name="lbAvailable" xml:space="preserve">
+    <value>متاح</value>
+  </data>
+  <data name="lbRented" xml:space="preserve">
+    <value>مستعار</value>
+  </data>
+  <data name="lbNoData" xml:space="preserve">
+    <value>لا توجد بيانات لهذه الفترة</value>
+  </data>
   <data name="lbLanguage" xml:space="preserve">
     <value>اللغة</value>
   </data>

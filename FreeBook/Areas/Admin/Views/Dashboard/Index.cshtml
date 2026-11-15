@@ -18,6 +18,69 @@
         transform: none;
         box-shadow: none;
     }
+
+    .chart-box {
+        position: relative;
+        height: 260px;
+    }
+
+    .top-renter-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.875rem;
+    }
+
+    .top-renter-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 0.375rem;
+        font-size: 0.9375rem;
+    }
+
+    .top-renter-name {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--bk-text);
+        font-weight: 500;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .top-renter-rank {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 1.5rem;
+        width: 1.5rem;
+        height: 1.5rem;
+        border-radius: 50%;
+        background: var(--bk-primary-light);
+        color: var(--bk-primary);
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .top-renter-bar {
+        height: 6px;
+        border-radius: 999px;
+        background: var(--bk-border);
+        overflow: hidden;
+    }
+
+    .top-renter-bar span {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--bk-primary), var(--bk-violet));
+    }
 </style>
 
 <div class="content-wrapper">
@@ -135,6 +198,104 @@
                     </div>
                 </div>
             </a>
+        </div>
+    </div>
+
+    <!-- Analytics: rentals per month, books by category, copy availability -->
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">@Localizer["lbRentalsPerMonth"]</h3>
+                    <div class="card-tools">
+                        <span class="badge badge-light">@Localizer["lbLast6Months"]</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-box">
+                        <canvas id="chartRentalsPerMonth"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">@Localizer["lbBooksByCategory"]</h3>
+                </div>
+                <div class="card-body">
+                    <div class="chart-box">
+                        <canvas id="chartBooksByCategory"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">@Localizer["lbCopyAvailability"]</h3>
+                </div>
+                <div class="card-body">
+                    <div class="chart-box">
+                        <canvas id="chartCopyAvailability"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics: top rented books and most active renters -->
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">@Localizer["lbTopRentedBooks"]</h3>
+                </div>
+                <div class="card-body">
+                    <div class="chart-box">
+                        <canvas id="chartTopRentedBooks"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">@Localizer["lbTopRenters"]</h3>
+                </div>
+                <div class="card-body">
+                    @{
+                        var topRenters = ((FreeBook.Models.DashboardChartsViewModel)ViewBag.Charts).TopRenters;
+                        var maxRentals = topRenters.Count > 0 ? topRenters.Max(x => x.Count) : 0;
+                        var rank = 1;
+                    }
+                    @if (topRenters.Count == 0)
+                    {
+                        <p class="text-muted mb-0">@Localizer["lbNoData"]</p>
+                    }
+                    else
+                    {
+                        <ul class="top-renter-list">
+                            @foreach (var renter in topRenters)
+                            {
+                                <li>
+                                    <div class="top-renter-header">
+                                        <span class="top-renter-name">
+                                            <span class="top-renter-rank">@rank</span>
+                                            @renter.Name
+                                        </span>
+                                        <span class="badge badge-primary">@renter.Count</span>
+                                    </div>
+                                    <div class="top-renter-bar">
+                                        <span style="width: @(maxRentals > 0 ? (renter.Count * 100 / maxRentals) : 0)%"></span>
+                                    </div>
+                                </li>
+                                rank++;
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
         </div>
     </div>
 
@@ -263,3 +424,163 @@
             </div>
         </div>
     </div>
+
+    @section Scripts {
+        @{
+            var chartData = (FreeBook.Models.DashboardChartsViewModel)ViewBag.Charts;
+            var chartJson = System.Text.Json.JsonSerializer.Serialize(chartData, new System.Text.Json.JsonSerializerOptions
+            {
+                PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+            });
+            var noDataText = Localizer["lbNoData"].Value;
+            var availableText = Localizer["lbAvailable"].Value;
+            var rentedText = Localizer["lbRented"].Value;
+        }
+        <script>
+            (function () {
+                var data = @Html.Raw(chartJson);
+                var NO_DATA = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(noDataText));
+                var palette = ['#5F62EF', '#8B5CF6', '#10B981', '#F59E0B', '#06B6D4', '#EF4444', '#EC4899', '#64748B'];
+
+                function emptyState(canvas) {
+                    var note = document.createElement('div');
+                    note.className = 'd-flex align-items-center justify-content-center h-100 text-muted';
+                    note.textContent = NO_DATA;
+                    canvas.parentNode.appendChild(note);
+                    canvas.remove();
+                }
+
+                function colorsFor(rows) {
+                    return rows.map(function (_, i) { return palette[i % palette.length]; });
+                }
+
+                var tooltips = {
+                    backgroundColor: 'rgba(30, 41, 59, 0.95)',
+                    cornerRadius: 6,
+                    xPadding: 10,
+                    yPadding: 8
+                };
+
+                // 1) Rentals per month
+                var monthlyCanvas = document.getElementById('chartRentalsPerMonth');
+                if (monthlyCanvas) {
+                    if (!data.rentalsPerMonth || data.rentalsPerMonth.length === 0) {
+                        emptyState(monthlyCanvas);
+                    } else {
+                        new Chart(monthlyCanvas, {
+                            type: 'bar',
+                            data: {
+                                labels: data.rentalsPerMonth.map(function (r) { return r.name; }),
+                                datasets: [{
+                                    data: data.rentalsPerMonth.map(function (r) { return r.count; }),
+                                    backgroundColor: '#5F62EF',
+                                    hoverBackgroundColor: '#4F46E5',
+                                    maxBarThickness: 48
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                legend: { display: false },
+                                tooltips: tooltips,
+                                scales: {
+                                    yAxes: [{ ticks: { beginAtZero: true, precision: 0, stepSize: 1 } }],
+                                    xAxes: [{ gridLines: { display: false } }]
+                                }
+                            }
+                        });
+                    }
+                }
+
+                // 2) Books by category
+                var categoryCanvas = document.getElementById('chartBooksByCategory');
+                if (categoryCanvas) {
+                    if (!data.booksByCategory || data.booksByCategory.length === 0) {
+                        emptyState(categoryCanvas);
+                    } else {
+                        new Chart(categoryCanvas, {
+                            type: 'doughnut',
+                            data: {
+                                labels: data.booksByCategory.map(function (r) { return r.name; }),
+                                datasets: [{
+                                    data: data.booksByCategory.map(function (r) { return r.count; }),
+                                    backgroundColor: colorsFor(data.booksByCategory),
+                                    borderWidth: 0
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                cutoutPercentage: 62,
+                                legend: { position: 'bottom', labels: { boxWidth: 10, padding: 12 } },
+                                tooltips: tooltips
+                            }
+                        });
+                    }
+                }
+
+                // 3) Copy availability
+                var availabilityCanvas = document.getElementById('chartCopyAvailability');
+                if (availabilityCanvas) {
+                    var available = data.availableCopies || 0;
+                    var rented = data.rentedCopies || 0;
+                    if (available === 0 && rented === 0) {
+                        emptyState(availabilityCanvas);
+                    } else {
+                        new Chart(availabilityCanvas, {
+                            type: 'doughnut',
+                            data: {
+                                labels: [
+                                    @Html.Raw(System.Text.Json.JsonSerializer.Serialize(availableText)),
+                                    @Html.Raw(System.Text.Json.JsonSerializer.Serialize(rentedText))
+                                ],
+                                datasets: [{
+                                    data: [available, rented],
+                                    backgroundColor: ['#10B981', '#F59E0B'],
+                                    borderWidth: 0
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                cutoutPercentage: 68,
+                                legend: { position: 'bottom', labels: { boxWidth: 10, padding: 12 } },
+                                tooltips: tooltips
+                            }
+                        });
+                    }
+                }
+
+                // 4) Top rented books
+                var topBooksCanvas = document.getElementById('chartTopRentedBooks');
+                if (topBooksCanvas) {
+                    if (!data.topRentedBooks || data.topRentedBooks.length === 0) {
+                        emptyState(topBooksCanvas);
+                    } else {
+                        new Chart(topBooksCanvas, {
+                            type: 'horizontalBar',
+                            data: {
+                                labels: data.topRentedBooks.map(function (r) { return r.name; }),
+                                datasets: [{
+                                    data: data.topRentedBooks.map(function (r) { return r.count; }),
+                                    backgroundColor: colorsFor(data.topRentedBooks),
+                                    hoverBackgroundColor: '#4F46E5',
+                                    maxBarThickness: 32
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                legend: { display: false },
+                                tooltips: tooltips,
+                                scales: {
+                                    xAxes: [{ ticks: { beginAtZero: true, precision: 0, stepSize: 1 } }],
+                                    yAxes: [{ gridLines: { display: false } }]
+                                }
+                            }
+                        });
+                    }
+                }
+            })();
+        </script>
+    }
