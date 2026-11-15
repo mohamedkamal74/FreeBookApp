@@ -93,7 +93,12 @@ namespace FreeBook.Areas.Admin.Controllers
             ViewBag.BlacklistedSubscribers = subscribers.Count(s => s.IsBlackListed);
 
             ViewBag.RecentRentals = rentals.OrderByDescending(r => r.StartDate).Take(5).ToList();
-            ViewBag.RecentSubscribers = subscribers.OrderByDescending(s => s.Id).Take(5).ToList();
+            ViewBag.RecentSubscribers = subscribers
+                .OrderByDescending(s => s.CreatedOn)
+                .ThenBy(s => s.FirstName)
+                .ThenBy(s => s.LastName)
+                .Take(5)
+                .ToList();
             ViewBag.OverdueList = overdueRentals.Take(10).ToList();
             ViewBag.ExpiringSubs = expiringSubscriptions.Take(10).ToList();
 

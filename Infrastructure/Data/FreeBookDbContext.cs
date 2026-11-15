@@ -117,6 +117,11 @@ namespace Infrastructure.Data
                 .HasForeignKey(s => s.GovernorateId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // Existing rows predate the column, so let SQL Server stamp them on migration.
+            builder.Entity<Subscriber>()
+                .Property(s => s.CreatedOn)
+                .HasDefaultValueSql("GETUTCDATE()");
+
             builder.Entity<Subscription>()
                 .HasOne(s => s.Subscriber)
                 .WithMany(s => s.Subscriptions)

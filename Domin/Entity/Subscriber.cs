@@ -56,6 +56,8 @@ namespace Domin.Entity
 
         public bool IsBlackListed { get; set; } = false;
 
+        public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
+
         public ICollection<Subscription> Subscriptions { get; set; } = new List<Subscription>();
 
         public ICollection<Rental> Rentals { get; set; } = new List<Rental>();
