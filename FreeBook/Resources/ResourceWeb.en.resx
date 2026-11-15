@@ -207,9 +207,6 @@
   <data name="lbPrivacyContactBody" xml:space="preserve">
     <value>Ask a site administrator if you want your account or your data removed.</value>
   </data>
-  <data name="lbLast6Months" xml:space="preserve">
-    <value>Last 6 months</value>
-  </data>
   <data name="lbRentalsPerMonth" xml:space="preserve">
     <value>Rentals per month</value>
   </data>
@@ -230,6 +227,24 @@
   </data>
   <data name="lbNoData" xml:space="preserve">
     <value>No data for this period</value>
+  </data>
+  <data name="lbFilter" xml:space="preserve">
+    <value>Filter</value>
+  </data>
+  <data name="lbFrom" xml:space="preserve">
+    <value>From</value>
+  </data>
+  <data name="lbTo" xml:space="preserve">
+    <value>To</value>
+  </data>
+  <data name="lbAll" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="lbApplyFilter" xml:space="preserve">
+    <value>Apply filter</value>
+  </data>
+  <data name="lbResetFilter" xml:space="preserve">
+    <value>Reset</value>
   </data>
   <data name="lbLanguage" xml:space="preserve">
     <value>Language</value>
