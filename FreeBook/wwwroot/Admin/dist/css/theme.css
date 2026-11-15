@@ -187,11 +187,24 @@ a, button, .btn, .card, .form-control, .badge, .dropdown-item,
   margin-top: 0;
 }
 
-/* Treeview sub-items */
+/* Treeview sub-items: same metrics as the top-level links so the submenu reads
+   as part of the same list. The circle icon and active tint still mark the
+   hierarchy, but the indent no longer shifts icons and text out of column. */
+.sidebar .nav-treeview > .nav-item {
+  margin-left: 0;
+  margin-right: 0;
+}
+
 .sidebar .nav-treeview .nav-link {
-  padding-left: 2.5rem !important;
-  font-size: 0.875rem;
+  padding: 0.75rem 1rem !important;
+  font-size: inherit;
   font-weight: 400;
+}
+
+/* adminlte widens treeview icons to 1.6rem, which would push the label 2px
+   past the top-level text column. */
+.sidebar .nav-sidebar .nav-treeview > .nav-item > .nav-link > .nav-icon {
+  width: 1.5rem;
 }
 
 .sidebar .nav-treeview .nav-link.active {
@@ -817,7 +830,7 @@ a, button, .btn, .card, .form-control, .badge, .dropdown-item,
 }
 
 [dir="rtl"] .sidebar .nav-treeview .nav-link {
-  padding-right: 3rem !important;
+  padding-right: 1.5rem !important;
   padding-left: 1rem !important;
 }
 
