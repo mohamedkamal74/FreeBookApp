@@ -825,6 +825,28 @@ a, button, .btn, .card, .form-control, .badge, .dropdown-item,
   transform: translateX(-2px);
 }
 
+/* iCheck bootstrap hard-codes a left-hand box (padding-left, margin-left and a
+   left-anchored checkmark), which leaves the Arabic label sitting on top of the
+   square. Mirror the three pieces so the box leads the text on the right. */
+[dir="rtl"] [class*="icheck-"] > label {
+  padding-right: 29px !important;
+  padding-left: 0 !important;
+}
+
+[dir="rtl"] [class*="icheck-"] > input:first-child + label::before,
+[dir="rtl"] [class*="icheck-"] > input:first-child + input[type="hidden"] + label::before {
+  margin-left: 0;
+  margin-right: -29px;
+}
+
+[dir="rtl"] [class*="icheck-"] > input:first-child:checked + label::after,
+[dir="rtl"] [class*="icheck-"] > input:first-child:checked + input[type="hidden"] + label::after {
+  right: 0;
+  left: auto;
+  transform: translate(-7.75px, 4.5px) rotate(45deg);
+  -ms-transform: translate(-7.75px, 4.5px) rotate(45deg);
+}
+
 [dir="rtl"] .input-group .form-control {
   border-left: 1px solid var(--bk-border) !important;
   border-right: none !important;
