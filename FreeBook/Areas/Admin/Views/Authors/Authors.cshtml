@@ -58,30 +58,18 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="authorModalTitle">@Localizer["lbBtnSaveNewAuthor"]</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Localizer["lbClose"]"></button>
-                </div>
-                <div class="modal-body">
-                    <form asp-action="Save" asp-controller="Authors" method="post">
-                        <div class="form-group">
-                            <input type="text" asp-for="NewAuthor.AuthorId" hidden class="form-control" id="authorId"/>
-                            <label class="control-label" asp-for="NewAuthor.Name">@Localizer["lbAuthorName"]</label>
-                            <input type="text" asp-for="NewAuthor.Name" class="form-control" id="authorName"/>
-                            <span asp-validation-for="NewAuthor.Name" class="text-danger"></span>
-                        </div>
-                        <input type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="authorModalBtnSave"/>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["lbClose"]</button>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                </div>
+    <modal id="exampleModal" title-id="authorModalTitle" title="@Localizer["lbBtnSaveNewAuthor"]">
+        <form asp-action="Save" asp-controller="Authors" method="post">
+            <div class="form-group">
+                <input type="text" asp-for="NewAuthor.AuthorId" hidden class="form-control" id="authorId"/>
+                <label class="control-label" asp-for="NewAuthor.Name">@Localizer["lbAuthorName"]</label>
+                <input type="text" asp-for="NewAuthor.Name" class="form-control" id="authorName"/>
+                <span asp-validation-for="NewAuthor.Name" class="text-danger"></span>
             </div>
-        </div>
-    </div>
+            <input type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="authorModalBtnSave"/>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["lbClose"]</button>
+        </form>
+    </modal>
 
     <form id="deleteForm" method="post" class="d-none">
         @Html.AntiForgeryToken()

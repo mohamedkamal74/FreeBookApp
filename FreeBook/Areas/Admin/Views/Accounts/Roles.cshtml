@@ -82,34 +82,20 @@
 
 
 <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="roleModalTitle">@Localizer["lbBtnSaveNewRole"]</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Localizer["lbClose"]"></button>
-      </div>
-      <div class="modal-body">
-
-       <form asp-action="Roles" asp-controller="Accounts" method="post">
-            <div class="form-group">
-           <input type="text" asp-for="NewRole.RoleId" hidden class="form-control" id="roleId"/>
+<modal id="exampleModal" title-id="roleModalTitle" title="@Localizer["lbBtnSaveNewRole"]">
+    <form asp-action="Roles" asp-controller="Accounts" method="post">
+         <div class="form-group">
+        <input type="text" asp-for="NewRole.RoleId" hidden class="form-control" id="roleId"/>
 
 <label class="control-label" asp-for="NewRole.RoleName">@Localizer["lbNameRole"]</label>
 <input type="text" asp-for="NewRole.RoleName" class="form-control" id="roleName"/>
 <span asp-validation-for="NewRole.RoleName" class="text-danger"></span>
 </div>
 <input  type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="roleModalBtnSave"/>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["lbClose"]</button>
+         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["lbClose"]</button>
 
-       </form>
-      </div>
-      <div class="modal-footer">
-
-      </div>
-    </div>
-  </div>
-</div>
+    </form>
+</modal>
 
 <form id="deleteForm" method="post" class="d-none">
     @Html.AntiForgeryToken()

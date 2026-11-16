@@ -71,99 +71,87 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="subscriberModalTitle">@Localizer["lbBtnSaveNewSubscriber"]</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Localizer["lbClose"]"></button>
+    <modal id="exampleModal" size="lg" title-id="subscriberModalTitle" title="@Localizer["lbBtnSaveNewSubscriber"]">
+        <form asp-action="Save" asp-controller="Subscribers" method="post">
+            <div class="form-group">
+                <input type="text" asp-for="NewSubscriber.SubscriberId" hidden class="form-control" id="subscriberId"/>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="control-label" asp-for="NewSubscriber.FirstName">@Localizer["lbFirstName"]</label>
+                        <input type="text" asp-for="NewSubscriber.FirstName" class="form-control" id="firstName"/>
+                        <span asp-validation-for="NewSubscriber.FirstName" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="control-label" asp-for="NewSubscriber.LastName">@Localizer["lbLastName"]</label>
+                        <input type="text" asp-for="NewSubscriber.LastName" class="form-control" id="lastName"/>
+                        <span asp-validation-for="NewSubscriber.LastName" class="text-danger"></span>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    <form asp-action="Save" asp-controller="Subscribers" method="post">
-                        <div class="form-group">
-                            <input type="text" asp-for="NewSubscriber.SubscriberId" hidden class="form-control" id="subscriberId"/>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <label class="control-label" asp-for="NewSubscriber.FirstName">@Localizer["lbFirstName"]</label>
-                                    <input type="text" asp-for="NewSubscriber.FirstName" class="form-control" id="firstName"/>
-                                    <span asp-validation-for="NewSubscriber.FirstName" class="text-danger"></span>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="control-label" asp-for="NewSubscriber.LastName">@Localizer["lbLastName"]</label>
-                                    <input type="text" asp-for="NewSubscriber.LastName" class="form-control" id="lastName"/>
-                                    <span asp-validation-for="NewSubscriber.LastName" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <label class="control-label" asp-for="NewSubscriber.DateOfBirth">@Localizer["lbDateOfBirth"]</label>
-                                    <input type="date" asp-for="NewSubscriber.DateOfBirth" class="form-control" id="dateOfBirth"/>
-                                    <span asp-validation-for="NewSubscriber.DateOfBirth" class="text-danger"></span>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="control-label" asp-for="NewSubscriber.NationalId">@Localizer["lbNationalId"]</label>
-                                    <input type="text" asp-for="NewSubscriber.NationalId" class="form-control" id="nationalId"/>
-                                    <span asp-validation-for="NewSubscriber.NationalId" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <label class="control-label" asp-for="NewSubscriber.MobileNumber">@Localizer["lbMobileNumber"]</label>
-                                    <input type="text" asp-for="NewSubscriber.MobileNumber" class="form-control" id="mobileNumber"/>
-                                    <span asp-validation-for="NewSubscriber.MobileNumber" class="text-danger"></span>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-check mt-4">
-                                        <input type="checkbox" asp-for="NewSubscriber.HasWhatsApp" class="form-check-input" id="hasWhatsApp"/>
-                                        <label class="form-check-label" for="hasWhatsApp">@Localizer["lbHasWhatsApp"]</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <label class="control-label" asp-for="NewSubscriber.Email">@Localizer["lbEmail"]</label>
-                                    <input type="email" asp-for="NewSubscriber.Email" class="form-control" id="email"/>
-                                    <span asp-validation-for="NewSubscriber.Email" class="text-danger"></span>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="control-label" asp-for="NewSubscriber.AreaId">@Localizer["lbArea"]</label>
-                                    <select asp-for="NewSubscriber.AreaId" class="form-control" id="areaId"
-                                            asp-items="@(new SelectList(Model.Areas,"Id","Name"))">
-                                        <option value="">@Localizer["lbSelectUserRole"]</option>
-                                    </select>
-                                    <span asp-validation-for="NewSubscriber.AreaId" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <label class="control-label" asp-for="NewSubscriber.GovernorateId">@Localizer["lbGovernorate"]</label>
-                                    <select asp-for="NewSubscriber.GovernorateId" class="form-control" id="governorateId"
-                                            asp-items="@(new SelectList(Model.Governorates,"Id","Name"))">
-                                        <option value="">@Localizer["lbSelectUserRole"]</option>
-                                    </select>
-                                    <span asp-validation-for="NewSubscriber.GovernorateId" class="text-danger"></span>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="control-label" asp-for="NewSubscriber.IsBlackListed">@Localizer["lbIsBlackListed"]</label>
-                                    <div class="form-check mt-4">
-                                        <input type="checkbox" asp-for="NewSubscriber.IsBlackListed" class="form-check-input" id="isBlackListed"/>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label" asp-for="NewSubscriber.Address">@Localizer["lbAddress"]</label>
-                                <textarea asp-for="NewSubscriber.Address" class="form-control" id="address" rows="3"></textarea>
-                                <span asp-validation-for="NewSubscriber.Address" class="text-danger"></span>
-                            </div>
-                            <input type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="subscriberModalBtnSave"/>
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["lbClose"]</button>
-                    </form>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="control-label" asp-for="NewSubscriber.DateOfBirth">@Localizer["lbDateOfBirth"]</label>
+                        <input type="date" asp-for="NewSubscriber.DateOfBirth" class="form-control" id="dateOfBirth"/>
+                        <span asp-validation-for="NewSubscriber.DateOfBirth" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="control-label" asp-for="NewSubscriber.NationalId">@Localizer["lbNationalId"]</label>
+                        <input type="text" asp-for="NewSubscriber.NationalId" class="form-control" id="nationalId"/>
+                        <span asp-validation-for="NewSubscriber.NationalId" class="text-danger"></span>
+                    </div>
                 </div>
-                <div class="modal-footer">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="control-label" asp-for="NewSubscriber.MobileNumber">@Localizer["lbMobileNumber"]</label>
+                        <input type="text" asp-for="NewSubscriber.MobileNumber" class="form-control" id="mobileNumber"/>
+                        <span asp-validation-for="NewSubscriber.MobileNumber" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check mt-4">
+                            <input type="checkbox" asp-for="NewSubscriber.HasWhatsApp" class="form-check-input" id="hasWhatsApp"/>
+                            <label class="form-check-label" for="hasWhatsApp">@Localizer["lbHasWhatsApp"]</label>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="control-label" asp-for="NewSubscriber.Email">@Localizer["lbEmail"]</label>
+                        <input type="email" asp-for="NewSubscriber.Email" class="form-control" id="email"/>
+                        <span asp-validation-for="NewSubscriber.Email" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="control-label" asp-for="NewSubscriber.AreaId">@Localizer["lbArea"]</label>
+                        <select asp-for="NewSubscriber.AreaId" class="form-control" id="areaId"
+                                asp-items="@(new SelectList(Model.Areas,"Id","Name"))">
+                            <option value="">@Localizer["lbSelectUserRole"]</option>
+                        </select>
+                        <span asp-validation-for="NewSubscriber.AreaId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="control-label" asp-for="NewSubscriber.GovernorateId">@Localizer["lbGovernorate"]</label>
+                        <select asp-for="NewSubscriber.GovernorateId" class="form-control" id="governorateId"
+                                asp-items="@(new SelectList(Model.Governorates,"Id","Name"))">
+                            <option value="">@Localizer["lbSelectUserRole"]</option>
+                        </select>
+                        <span asp-validation-for="NewSubscriber.GovernorateId" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="control-label" asp-for="NewSubscriber.IsBlackListed">@Localizer["lbIsBlackListed"]</label>
+                        <div class="form-check mt-4">
+                            <input type="checkbox" asp-for="NewSubscriber.IsBlackListed" class="form-check-input" id="isBlackListed"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" asp-for="NewSubscriber.Address">@Localizer["lbAddress"]</label>
+                    <textarea asp-for="NewSubscriber.Address" class="form-control" id="address" rows="3"></textarea>
+                    <span asp-validation-for="NewSubscriber.Address" class="text-danger"></span>
+                </div>
+                <input type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="subscriberModalBtnSave"/>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["lbClose"]</button>
+        </form>
+    </modal>
 
     <form id="deleteForm" method="post" class="d-none">
         @Html.AntiForgeryToken()

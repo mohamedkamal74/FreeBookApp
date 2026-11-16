@@ -56,30 +56,18 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="governorateModalTitle">@Localizer["lbBtnSaveNewGovernorate"]</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Localizer["lbClose"]"></button>
-                </div>
-                <div class="modal-body">
-                    <form asp-action="Save" asp-controller="Governorates" method="post">
-                        <div class="form-group">
-                            <input type="text" asp-for="NewGovernorate.GovernorateId" hidden class="form-control" id="governorateId"/>
-                            <label class="control-label" asp-for="NewGovernorate.Name">@Localizer["lbGovernorateName"]</label>
-                            <input type="text" asp-for="NewGovernorate.Name" class="form-control" id="governorateName"/>
-                            <span asp-validation-for="NewGovernorate.Name" class="text-danger"></span>
-                        </div>
-                        <input type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="governorateModalBtnSave"/>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["lbClose"]</button>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                </div>
+    <modal id="exampleModal" title-id="governorateModalTitle" title="@Localizer["lbBtnSaveNewGovernorate"]">
+        <form asp-action="Save" asp-controller="Governorates" method="post">
+            <div class="form-group">
+                <input type="text" asp-for="NewGovernorate.GovernorateId" hidden class="form-control" id="governorateId"/>
+                <label class="control-label" asp-for="NewGovernorate.Name">@Localizer["lbGovernorateName"]</label>
+                <input type="text" asp-for="NewGovernorate.Name" class="form-control" id="governorateName"/>
+                <span asp-validation-for="NewGovernorate.Name" class="text-danger"></span>
             </div>
-        </div>
-    </div>
+            <input type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="governorateModalBtnSave"/>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["lbClose"]</button>
+        </form>
+    </modal>
 
     <form id="deleteForm" method="post" class="d-none">
         @Html.AntiForgeryToken()

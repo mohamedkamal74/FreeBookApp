@@ -175,40 +175,29 @@
 
 
      <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="categoryModalTitle">@Localizer["lbBtnSaveNewCategory"]</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Localizer["lbClose"]"></button>
-                </div>
-                <div class="modal-body">
+    <modal id="exampleModal" title-id="categoryModalTitle" title="@Localizer["lbBtnSaveNewCategory"]">
 
-                    <form asp-action="Save" asp-controller="Categories" method="post">
-                        <input type="text" asp-for="NewCategory.Id" hidden class="form-control" id="categoryId" />
+        <form asp-action="Save" asp-controller="Categories" method="post">
+            <input type="text" asp-for="NewCategory.Id" hidden class="form-control" id="categoryId" />
 
 <div class="form-group">
-    <label class="control-label" asp-for="NewCategory.Name">@Localizer["lbNameCategory"]</label>
-    <input type="text" asp-for="NewCategory.Name" class="form-control" id="categoryName" />
+<label class="control-label" asp-for="NewCategory.Name">@Localizer["lbNameCategory"]</label>
+<input type="text" asp-for="NewCategory.Name" class="form-control" id="categoryName" />
 </div>
 
 <div class="form-group">
-    <label class="control-label" asp-for="NewCategory.Description">@Localizer["lbDescription"]</label>
-    <input type="text" asp-for="NewCategory.Description" class="form-control" id="description" />
-    <span asp-validation-for="NewCategory.Description" class="text-danger"></span>
+<label class="control-label" asp-for="NewCategory.Description">@Localizer["lbDescription"]</label>
+<input type="text" asp-for="NewCategory.Description" class="form-control" id="description" />
+<span asp-validation-for="NewCategory.Description" class="text-danger"></span>
 </div>
 
 <div class="modal-footer-rtl" style="padding:0 15px 15px 0">
-    <input type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="categoryModalBtnSave" />
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["lbClose"]</button>
+<input type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="categoryModalBtnSave" />
+<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["lbClose"]</button>
 </div>
 
-                    </form>
-                </div>
-
-            </div>
-        </div>
-    </div>
+        </form>
+    </modal>
 </div>
 
 <form id="deleteForm" method="post" class="d-none">

@@ -101,112 +101,84 @@
 
 
 <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="userModalTitle">@Localizer["lbBtnSaveNewUser"]</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Localizer["lbClose"]"></button>
-      </div>
-      <div class="modal-body">
+<modal id="exampleModal" title-id="userModalTitle" title="@Localizer["lbBtnSaveNewUser"]">
+    <form asp-action="Register" asp-controller="Accounts" method="post" enctype="multipart/form-data">
+         <div class="form-group">
+        <input type="text" asp-for="NewRegister.Id" hidden class="form-control" id="userId"/>
+        <input type="text" asp-for="NewRegister.ImageUser" hidden class="form-control" id="imagehidden"/>
 
-       <form asp-action="Register" asp-controller="Accounts" method="post" enctype="multipart/form-data">
-            <div class="form-group">
-           <input type="text" asp-for="NewRegister.Id" hidden class="form-control" id="userId"/>
-           <input type="text" asp-for="NewRegister.ImageUser" hidden class="form-control" id="imagehidden"/>
-
-            <label class="control-label" asp-for="NewRegister.Name">@Localizer["lbNameUser"]</label>
-            <input type="text" asp-for="NewRegister.Name" class="form-control" id="userName"/>
-            <span asp-validation-for="NewRegister.Name" class="text-danger"></span>
-            </div>
-             <div class="form-group">
-            <label class="control-label" asp-for="NewRegister.Email">@Localizer["lbEmailUser"]</label>
-            <input type="text" asp-for="NewRegister.Email" class="form-control" id="userEmail"/>
-            <span asp-validation-for="NewRegister.Email" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <!-- src is set by Register.js (Edit); no request is made when it is empty. -->
-                <img class="img-circle" style="width:35px;height:35px" hidden id="image" alt="" />
-            </div>
-             <div class="form-group">
-            <label class="control-label" asp-for="NewRegister.ImageUser">@Localizer["lbImageUser"]</label>
-            <input type="file" asp-for="NewRegister.ImageUser" class="form-control" id="userImage"/>
-            <span asp-validation-for="NewRegister.ImageUser" class="text-danger"></span>
-            </div>
-             <div class="form-group">
+         <label class="control-label" asp-for="NewRegister.Name">@Localizer["lbNameUser"]</label>
+         <input type="text" asp-for="NewRegister.Name" class="form-control" id="userName"/>
+         <span asp-validation-for="NewRegister.Name" class="text-danger"></span>
+         </div>
+          <div class="form-group">
+         <label class="control-label" asp-for="NewRegister.Email">@Localizer["lbEmailUser"]</label>
+         <input type="text" asp-for="NewRegister.Email" class="form-control" id="userEmail"/>
+         <span asp-validation-for="NewRegister.Email" class="text-danger"></span>
+         </div>
+         <div class="form-group">
+             <!-- src is set by Register.js (Edit); no request is made when it is empty. -->
+             <img class="img-circle" style="width:35px;height:35px" hidden id="image" alt="" />
+         </div>
+          <div class="form-group">
+         <label class="control-label" asp-for="NewRegister.ImageUser">@Localizer["lbImageUser"]</label>
+         <input type="file" asp-for="NewRegister.ImageUser" class="form-control" id="userImage"/>
+         <span asp-validation-for="NewRegister.ImageUser" class="text-danger"></span>
+         </div>
+          <div class="form-group">
 <label class="control-label" asp-for="NewRegister.RoleName">@Localizer["lbNameRole"]</label>
 <select asp-for="NewRegister.RoleName" class="form-control" id="ddluserRole"
 asp-items="@(new SelectList(Model.Roles,"Name","Name"))">
-    <option value="">@Localizer["lbSelectUserRole"]</option>
+ <option value="">@Localizer["lbSelectUserRole"]</option>
 </select>
-            <span asp-validation-for="NewRegister.RoleName" class="text-danger"></span>
-            </div>
-             <div class="form-group">
-            <label class="control-label" asp-for="NewRegister.ActiveUser">@Localizer["lbActiveUser"]</label>
-            <input type="checkbox"  asp-for="NewRegister.ActiveUser" style="height:30px;width:30px" id="userActive"/>
+         <span asp-validation-for="NewRegister.RoleName" class="text-danger"></span>
+         </div>
+          <div class="form-group">
+         <label class="control-label" asp-for="NewRegister.ActiveUser">@Localizer["lbActiveUser"]</label>
+         <input type="checkbox"  asp-for="NewRegister.ActiveUser" style="height:30px;width:30px" id="userActive"/>
 
 
-            </div>
-              <div class="form-group" id="grPassword">
-            <label class="control-label" asp-for="NewRegister.Password">@Localizer["lbPassword"]</label>
-            <input type="password" asp-for="NewRegister.Password" class="form-control" id="userPassword"/>
-            <span asp-validation-for="NewRegister.Password" class="text-danger"></span>
-            </div>
+         </div>
+           <div class="form-group" id="grPassword">
+         <label class="control-label" asp-for="NewRegister.Password">@Localizer["lbPassword"]</label>
+         <input type="password" asp-for="NewRegister.Password" class="form-control" id="userPassword"/>
+         <span asp-validation-for="NewRegister.Password" class="text-danger"></span>
+         </div>
 <div class="form-group" id="confPassword">
-             <label class="control-label" asp-for="NewRegister.ConfirmPassword">@Localizer["lbConfirmpassword"]</label>
-             <input type="password" asp-for="NewRegister.ConfirmPassword" class="form-control" id="userConfirm"/>
-             <span asp-validation-for="NewRegister.ConfirmPassword" class="text-danger"></span>
-             </div>
-              <input  type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="userModalBtnSave"/>
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["lbClose"]</button>
+          <label class="control-label" asp-for="NewRegister.ConfirmPassword">@Localizer["lbConfirmpassword"]</label>
+          <input type="password" asp-for="NewRegister.ConfirmPassword" class="form-control" id="userConfirm"/>
+          <span asp-validation-for="NewRegister.ConfirmPassword" class="text-danger"></span>
+          </div>
+           <input  type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="userModalBtnSave"/>
+           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["lbClose"]</button>
 
-        </form>
-      </div>
-      <div class="modal-footer">
-
-      </div>
-    </div>
-  </div>
-</div>
+     </form>
+</modal>
 
 
 <!--Modal Change Password-->
 
-<div class="modal fade" id="ChangePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="changePasswordModalTitle">@Localizer["lbbtnChangePassword"]</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Localizer["lbClose"]"></button>
-      </div>
-      <div class="modal-body">
+<modal id="ChangePasswordModal" title-id="changePasswordModalTitle" title="@Localizer["lbbtnChangePassword"]">
+    <form asp-action="ChangePassword" asp-controller="Accounts" method="post" enctype="multipart/form-data">
+         <div class="form-group">
+        <input type="text" asp-for="changePassword.Id" hidden class="form-control" id="userPassId"/>
 
-       <form asp-action="ChangePassword" asp-controller="Accounts" method="post" enctype="multipart/form-data">
-            <div class="form-group">
-           <input type="text" asp-for="changePassword.Id" hidden class="form-control" id="userPassId"/>
-
-            <label class="control-label" asp-for="changePassword.NewPassword">@Localizer["lbPassword"]</label>
-            <input type="password" asp-for="changePassword.NewPassword" class="form-control" />
-            <span asp-validation-for="changePassword.NewPassword" class="text-danger"></span>
-            </div>
+         <label class="control-label" asp-for="changePassword.NewPassword">@Localizer["lbPassword"]</label>
+         <input type="password" asp-for="changePassword.NewPassword" class="form-control" />
+         <span asp-validation-for="changePassword.NewPassword" class="text-danger"></span>
+         </div>
 <div class="form-group">
-             <label class="control-label" asp-for="changePassword.ConfirmPassword">@Localizer["lbConfirmpassword"]</label>
-             <input type="password" asp-for="changePassword.ConfirmPassword" class="form-control" />
-             <span asp-validation-for="changePassword.ConfirmPassword" class="text-danger"></span>
-             </div>
+          <label class="control-label" asp-for="changePassword.ConfirmPassword">@Localizer["lbConfirmpassword"]</label>
+          <input type="password" asp-for="changePassword.ConfirmPassword" class="form-control" />
+          <span asp-validation-for="changePassword.ConfirmPassword" class="text-danger"></span>
+          </div>
 
-              
-              <input  type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="changePasswordModalBtnSave"/>
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["lbClose"]</button>
 
-        </form>
-      </div>
-      <div class="modal-footer">
+           <input  type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="changePasswordModalBtnSave"/>
+           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["lbClose"]</button>
 
-      </div>
-    </div>
-  </div>
-</div>
+     </form>
+</modal>
 </div>
 
 <form id="deleteForm" method="post" class="d-none">

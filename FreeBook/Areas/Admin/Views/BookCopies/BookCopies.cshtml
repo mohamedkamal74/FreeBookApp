@@ -62,48 +62,36 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="bookCopyModalTitle">@Localizer["lbBtnSaveNewBookCopy"]</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Localizer["lbClose"]"></button>
+    <modal id="exampleModal" title-id="bookCopyModalTitle" title="@Localizer["lbBtnSaveNewBookCopy"]">
+        <form asp-action="Save" asp-controller="BookCopies" method="post">
+            <div class="form-group">
+                <input type="text" asp-for="NewBookCopy.BookCopyId" hidden class="form-control" id="bookCopyId"/>
+                <div class="form-group">
+                    <label class="control-label" asp-for="NewBookCopy.BookId">@Localizer["lbBookName"]</label>
+                    <select asp-for="NewBookCopy.BookId" class="form-control" id="bookId"
+                            asp-items="@(new SelectList(Model.Books,"Id","Name"))">
+                        <option value="">@Localizer["lbSelectUserRole"]</option>
+                    </select>
+                    <span asp-validation-for="NewBookCopy.BookId" class="text-danger"></span>
                 </div>
-                <div class="modal-body">
-                    <form asp-action="Save" asp-controller="BookCopies" method="post">
-                        <div class="form-group">
-                            <input type="text" asp-for="NewBookCopy.BookCopyId" hidden class="form-control" id="bookCopyId"/>
-                            <div class="form-group">
-                                <label class="control-label" asp-for="NewBookCopy.BookId">@Localizer["lbBookName"]</label>
-                                <select asp-for="NewBookCopy.BookId" class="form-control" id="bookId"
-                                        asp-items="@(new SelectList(Model.Books,"Id","Name"))">
-                                    <option value="">@Localizer["lbSelectUserRole"]</option>
-                                </select>
-                                <span asp-validation-for="NewBookCopy.BookId" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label" asp-for="NewBookCopy.EditionNumber">@Localizer["lbEditionNumber"]</label>
-                                <input type="number" asp-for="NewBookCopy.EditionNumber" class="form-control" id="editionNumber" min="1"/>
-                                <span asp-validation-for="NewBookCopy.EditionNumber" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label" asp-for="NewBookCopy.SerialNumber">@Localizer["lbSerialNumber"]</label>
-                                <input type="number" asp-for="NewBookCopy.SerialNumber" class="form-control" id="serialNumber" min="1"/>
-                                <span asp-validation-for="NewBookCopy.SerialNumber" class="text-danger"></span>
-                            </div>
-                            <div class="form-check mt-2">
-                                <input type="checkbox" asp-for="NewBookCopy.IsAvailableForRental" class="form-check-input" id="isAvailable"/>
-                                <label class="form-check-label" for="isAvailable">@Localizer["lbActiveUser"]</label>
-                            </div>
-                            <input type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="bookCopyModalBtnSave"/>
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["lbClose"]</button>
-                    </form>
+                <div class="form-group">
+                    <label class="control-label" asp-for="NewBookCopy.EditionNumber">@Localizer["lbEditionNumber"]</label>
+                    <input type="number" asp-for="NewBookCopy.EditionNumber" class="form-control" id="editionNumber" min="1"/>
+                    <span asp-validation-for="NewBookCopy.EditionNumber" class="text-danger"></span>
                 </div>
-                <div class="modal-footer">
+                <div class="form-group">
+                    <label class="control-label" asp-for="NewBookCopy.SerialNumber">@Localizer["lbSerialNumber"]</label>
+                    <input type="number" asp-for="NewBookCopy.SerialNumber" class="form-control" id="serialNumber" min="1"/>
+                    <span asp-validation-for="NewBookCopy.SerialNumber" class="text-danger"></span>
                 </div>
-            </div>
-        </div>
-    </div>
+                <div class="form-check mt-2">
+                    <input type="checkbox" asp-for="NewBookCopy.IsAvailableForRental" class="form-check-input" id="isAvailable"/>
+                    <label class="form-check-label" for="isAvailable">@Localizer["lbActiveUser"]</label>
+                </div>
+                <input type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="bookCopyModalBtnSave"/>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["lbClose"]</button>
+        </form>
+    </modal>
 
     <form id="deleteForm" method="post" class="d-none">
         @Html.AntiForgeryToken()

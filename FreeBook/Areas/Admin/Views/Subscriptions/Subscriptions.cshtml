@@ -58,44 +58,32 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="subscriptionModalTitle">@Localizer["lbBtnSaveNewSubscription"]</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Localizer["lbClose"]"></button>
+    <modal id="exampleModal" title-id="subscriptionModalTitle" title="@Localizer["lbBtnSaveNewSubscription"]">
+        <form asp-action="Save" asp-controller="Subscriptions" method="post">
+            <div class="form-group">
+                <input type="text" asp-for="NewSubscription.SubscriptionId" hidden class="form-control" id="subscriptionId"/>
+                <div class="form-group">
+                    <label class="control-label" asp-for="NewSubscription.SubscriberId">@Localizer["lbSubscriber"]</label>
+                    <select asp-for="NewSubscription.SubscriberId" class="form-control" id="subscriberId"
+                            asp-items="@(new SelectList(Model.Subscribers,"Id","FullName"))">
+                        <option value="">@Localizer["lbSelectUserRole"]</option>
+                    </select>
+                    <span asp-validation-for="NewSubscription.SubscriberId" class="text-danger"></span>
                 </div>
-                <div class="modal-body">
-                    <form asp-action="Save" asp-controller="Subscriptions" method="post">
-                        <div class="form-group">
-                            <input type="text" asp-for="NewSubscription.SubscriptionId" hidden class="form-control" id="subscriptionId"/>
-                            <div class="form-group">
-                                <label class="control-label" asp-for="NewSubscription.SubscriberId">@Localizer["lbSubscriber"]</label>
-                                <select asp-for="NewSubscription.SubscriberId" class="form-control" id="subscriberId"
-                                        asp-items="@(new SelectList(Model.Subscribers,"Id","FullName"))">
-                                    <option value="">@Localizer["lbSelectUserRole"]</option>
-                                </select>
-                                <span asp-validation-for="NewSubscription.SubscriberId" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label" asp-for="NewSubscription.StartDate">@Localizer["lbStartDate"]</label>
-                                <input type="date" asp-for="NewSubscription.StartDate" class="form-control" id="startDate"/>
-                                <span asp-validation-for="NewSubscription.StartDate" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label" asp-for="NewSubscription.EndDate">@Localizer["lbEndDate"]</label>
-                                <input type="date" asp-for="NewSubscription.EndDate" class="form-control" id="endDate"/>
-                                <span asp-validation-for="NewSubscription.EndDate" class="text-danger"></span>
-                            </div>
-                            <input type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="subscriptionModalBtnSave"/>
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["lbClose"]</button>
-                    </form>
+                <div class="form-group">
+                    <label class="control-label" asp-for="NewSubscription.StartDate">@Localizer["lbStartDate"]</label>
+                    <input type="date" asp-for="NewSubscription.StartDate" class="form-control" id="startDate"/>
+                    <span asp-validation-for="NewSubscription.StartDate" class="text-danger"></span>
                 </div>
-                <div class="modal-footer">
+                <div class="form-group">
+                    <label class="control-label" asp-for="NewSubscription.EndDate">@Localizer["lbEndDate"]</label>
+                    <input type="date" asp-for="NewSubscription.EndDate" class="form-control" id="endDate"/>
+                    <span asp-validation-for="NewSubscription.EndDate" class="text-danger"></span>
                 </div>
-            </div>
-        </div>
-    </div>
+                <input type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="subscriptionModalBtnSave"/>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["lbClose"]</button>
+        </form>
+    </modal>
 
     <form id="deleteForm" method="post" class="d-none">
         @Html.AntiForgeryToken()
