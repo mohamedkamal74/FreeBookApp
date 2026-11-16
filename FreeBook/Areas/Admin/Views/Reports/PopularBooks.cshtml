@@ -57,12 +57,7 @@
     @section Script{
         <script>
             $(function () {
-                $("#tablePopular").DataTable({
-                    "responsive": true,
-                    "lengthChange": false,
-                    "autoWidth": false,
-                    "buttons": ["copy", "csv", "excel", "pdf", "print"]
-                }).buttons().container().appendTo('#tablePopular_wrapper .col-md-6:eq(0)');
+                initReportTable('#tablePopular');
             });
         </script>
     }

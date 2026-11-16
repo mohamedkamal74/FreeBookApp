@@ -83,12 +83,7 @@
     @section Script{
         <script>
             $(function () {
-                $("#tableRentalHistory").DataTable({
-                    "responsive": true,
-                    "lengthChange": false,
-                    "autoWidth": false,
-                    "buttons": ["copy", "csv", "excel", "pdf", "print"]
-                }).buttons().container().appendTo('#tableRentalHistory_wrapper .col-md-6:eq(0)');
+                initReportTable('#tableRentalHistory');
             });
         </script>
     }

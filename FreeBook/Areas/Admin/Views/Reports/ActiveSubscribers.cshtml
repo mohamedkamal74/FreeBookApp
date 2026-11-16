@@ -58,12 +58,7 @@
     @section Script{
         <script>
             $(function () {
-                $("#tableActiveSubs").DataTable({
-                    "responsive": true,
-                    "lengthChange": false,
-                    "autoWidth": false,
-                    "buttons": ["copy", "csv", "excel", "pdf", "print"]
-                }).buttons().container().appendTo('#tableActiveSubs_wrapper .col-md-6:eq(0)');
+                initReportTable('#tableActiveSubs');
             });
         </script>
     }
