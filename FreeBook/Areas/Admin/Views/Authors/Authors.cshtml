@@ -63,7 +63,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="authorModalTitle">@Localizer["lbBtnSaveNewAuthor"]</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Localizer["lbClose"]"></button>
                 </div>
                 <div class="modal-body">
                     <form asp-action="Save" asp-controller="Authors" method="post">
@@ -74,7 +74,7 @@
                             <span asp-validation-for="NewAuthor.Name" class="text-danger"></span>
                         </div>
                         <input type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="authorModalBtnSave"/>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["lbClose"]</button>
                     </form>
                 </div>
                 <div class="modal-footer">

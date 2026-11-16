@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -150,6 +150,9 @@
   <data name="RegisterName" xml:space="preserve">
     <value>يجب ادحال اسم المستخدم</value>
   </data>
+  <data name="SubscriberId" xml:space="preserve">
+<value>يجب اختيار المشترك</value>
+  </data>
   <data name="RoleName" xml:space="preserve">
     <value>يجب ادحال اسم المجموعة</value>
   </data>
@@ -197,9 +200,6 @@
   </data>
   <data name="PenaltyPaid" xml:space="preserve">
     <value>الغرامة مدفوعة</value>
-  </data>
-  <data name="SubscriberId" xml:space="preserve">
-    <value>معرف المشترك</value>
   </data>
   <data name="StartDate" xml:space="preserve">
     <value>تاريخ البداية</value>

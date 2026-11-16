@@ -67,7 +67,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="bookCopyModalTitle">@Localizer["lbBtnSaveNewBookCopy"]</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Localizer["lbClose"]"></button>
                 </div>
                 <div class="modal-body">
                     <form asp-action="Save" asp-controller="BookCopies" method="post">
@@ -96,7 +96,7 @@
                                 <label class="form-check-label" for="isAvailable">@Localizer["lbActiveUser"]</label>
                             </div>
                             <input type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="bookCopyModalBtnSave"/>
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["lbClose"]</button>
                     </form>
                 </div>
                 <div class="modal-footer">

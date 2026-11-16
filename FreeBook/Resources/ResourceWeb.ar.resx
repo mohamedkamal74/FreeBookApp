@@ -735,4 +735,7 @@
   <data name="lbHeroSubtitle" xml:space="preserve">
     <value>أدر الفئات والكتب والمؤلفين والنسخ والمشتركين والتقارير — كل ذلك في منصة مكتبات حديثة واحدة.</value>
   </data>
+  <data name="lbClose" xml:space="preserve">
+    <value>إغلاق</value>
+  </data>
 </root>

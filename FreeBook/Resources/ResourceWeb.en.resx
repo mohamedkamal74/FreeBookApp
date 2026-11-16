@@ -735,4 +735,7 @@
   <data name="lbHeroSubtitle" xml:space="preserve">
     <value>Manage categories, books, authors, book copies, subscribers and reports — all in one modern library platform.</value>
   </data>
+  <data name="lbClose" xml:space="preserve">
+    <value>Close</value>
+  </data>
 </root>
