@@ -26,7 +26,7 @@
         </div>
         <div class="card-tools">
             <button type="button" class="btn btn-outline-primary rounded-pill mr-5 mt-2" data-bs-toggle="modal" data-bs-target="#createRentalModal">
-                @Localizer["lbBtnSaveNewCategory"]
+                @Localizer["lbCreateRental"]
             </button>
         </div>
         <div class="card-body">
@@ -180,6 +180,8 @@
             }
             Context.Session.SetString("msgType","");
         }
+
+        <script src="~/Models/Rentals.js"></script>
 
         <script>
             let lbTitleDeleteMsg='@Html.Raw(Localizer["lbTitleDeleteMsg"])';
