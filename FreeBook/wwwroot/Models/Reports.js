@@ -11,6 +11,9 @@
 //         shaping and order) and offers "Save as PDF".
 //
 // Excel (.xlsx) writes UTF-8 XML and is already safe.
+//
+// Copy is not offered: it exports the same data as CSV but to the clipboard
+// only, which made it redundant next to four real file exports.
 
 function reportPrintStyle(dir) {
     return [
@@ -42,7 +45,6 @@ function initReportTable(selector, options) {
         lengthChange: false,
         autoWidth: false,
         buttons: [
-            'copy',
             { extend: 'csv', bom: true },
             'excel',
             {
@@ -58,7 +60,7 @@ function initReportTable(selector, options) {
     }, options || {}));
 
     // btn-group glues the buttons together and strips their corner radius.
-    // Dropping it lets custom.css space them evenly in both directions.
+    // Dropping it lets theme.css space them evenly in both directions.
     table.buttons().container()
         .removeClass('btn-group')
         .addClass('dt-buttons-spaced')
