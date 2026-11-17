@@ -2,11 +2,11 @@
 $(document).ready(function () {
     $('#tableCategories').DataTable({
         "autoWidth": false,
-       " responsive": true
+        "responsive": true
     });
     $('#tableLogCategories').DataTable({
         "autoWidth": false,
-        " responsive": true
+        "responsive": true
     });
 });
 
