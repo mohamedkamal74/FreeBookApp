@@ -33,7 +33,7 @@ Edit = (id, name, governorateId) => {
 Rest = () => {
     clearValidation(document.getElementById('exampleModal'));
     document.getElementById('areaModalTitle').innerHTML = lbBtnSaveNewArea;
-    document.getElementById('areaModalBtnSave').value = lbSave;
+    document.getElementById('areaModalBtnSave').value = lbBtnSave;
     document.getElementById('areaId').value = "";
     document.getElementById('areaName').value = "";
     document.getElementById('governorateId').value = "";

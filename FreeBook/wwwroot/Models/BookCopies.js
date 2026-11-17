@@ -35,7 +35,7 @@ Edit = (id, bookId, editionNumber, serialNumber, isAvailable) => {
 Rest = () => {
     clearValidation(document.getElementById('exampleModal'));
     document.getElementById('bookCopyModalTitle').innerHTML = lbBtnSaveNewBookCopy;
-    document.getElementById('bookCopyModalBtnSave').value = lbSave;
+    document.getElementById('bookCopyModalBtnSave').value = lbBtnSave;
     document.getElementById('bookCopyId').value = "";
     document.getElementById('bookId').value = "";
     document.getElementById('editionNumber').value = "";

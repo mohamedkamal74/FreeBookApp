@@ -46,6 +46,7 @@ Edit = (id, name, description) => {
 Rest = () => {
     clearValidation(document.getElementById('exampleModal'));
     document.getElementById('categoryModalTitle').innerHTML = lbBtnSaveNewCategory;
+    document.getElementById('categoryModalBtnSave').value = lbBtnSave;
     document.getElementById('categoryId').value = "";
     document.getElementById('categoryName').value ="" ;
     document.getElementById('description').value = "";

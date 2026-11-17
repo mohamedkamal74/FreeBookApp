@@ -32,7 +32,7 @@ Edit = (id, name) => {
 Rest = () => {
     clearValidation(document.getElementById('exampleModal'));
     document.getElementById('governorateModalTitle').innerHTML = lbBtnSaveNewGovernorate;
-    document.getElementById('governorateModalBtnSave').value = lbSave;
+    document.getElementById('governorateModalBtnSave').value = lbBtnSave;
     document.getElementById('governorateId').value = "";
     document.getElementById('governorateName').value = "";
 }

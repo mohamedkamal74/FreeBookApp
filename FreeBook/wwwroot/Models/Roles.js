@@ -25,7 +25,7 @@ Edit = (id, name) => {
 Rest = () => {
     clearValidation(document.getElementById('exampleModal'));
     document.getElementById('roleModalTitle').innerHTML = lbEditNewRole;
-    document.getElementById('roleModalBtnSave').value = lbSave;
+    document.getElementById('roleModalBtnSave').value = lbBtnSave;
     document.getElementById('roleId').value = "";
     document.getElementById('roleName').value = "";
 }

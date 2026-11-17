@@ -32,7 +32,7 @@ Edit = (id, name) => {
 Rest = () => {
     clearValidation(document.getElementById('exampleModal'));
     document.getElementById('authorModalTitle').innerHTML = lbBtnSaveNewAuthor;
-    document.getElementById('authorModalBtnSave').value = lbSave;
+    document.getElementById('authorModalBtnSave').value = lbBtnSave;
     document.getElementById('authorId').value = "";
     document.getElementById('authorName').value = "";
 }
