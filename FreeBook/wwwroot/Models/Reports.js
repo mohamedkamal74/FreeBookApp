@@ -6,9 +6,9 @@
 //         Arabic word into mojibake. `bom: true` adds EF BB BF.
 //   PDF - the bundled pdfmake only ships Roboto, which has no Arabic glyphs,
 //         and pdfmake does no bidi or letter shaping, so Arabic can never
-//         render correctly there. The PDF button is replaced by the print
-//         button: the browser print dialog uses system fonts (correct shaping
-//         and order) and offers "Save as PDF".
+//         render correctly there. The PDF button reuses the print view
+//         instead: the browser print dialog uses system fonts (correct
+//         shaping and order) and offers "Save as PDF".
 //
 // Excel (.xlsx) writes UTF-8 XML and is already safe.
 
@@ -45,10 +45,24 @@ function initReportTable(selector, options) {
             'copy',
             { extend: 'csv', bom: true },
             'excel',
+            {
+                // Same print view as the print button, labelled the way users
+                // look for it: their browser saves the dialog as a PDF.
+                extend: 'print',
+                text: '<i class="fas fa-file-pdf"></i> PDF',
+                className: 'buttons-print buttons-pdf',
+                customize: customizeReportPrint
+            },
             { extend: 'print', customize: customizeReportPrint }
         ]
     }, options || {}));
 
-    table.buttons().container().appendTo(selector + '_wrapper .col-md-6:eq(0)');
+    // btn-group glues the buttons together and strips their corner radius.
+    // Dropping it lets custom.css space them evenly in both directions.
+    table.buttons().container()
+        .removeClass('btn-group')
+        .addClass('dt-buttons-spaced')
+        .appendTo(selector + '_wrapper .col-md-6:eq(0)');
+
     return table;
 }
