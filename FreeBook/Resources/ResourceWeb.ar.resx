@@ -738,4 +738,43 @@
   <data name="lbClose" xml:space="preserve">
     <value>إغلاق</value>
   </data>
+  <data name="dtSearch" xml:space="preserve">
+    <value>بحث:</value>
+  </data>
+  <data name="dtLengthMenu" xml:space="preserve">
+    <value>إظهار _MENU_ سجلات</value>
+  </data>
+  <data name="dtInfo" xml:space="preserve">
+    <value>إظهار _START_ إلى _END_ من _TOTAL_ سجل</value>
+  </data>
+  <data name="dtInfoEmpty" xml:space="preserve">
+    <value>إظهار 0 إلى 0 من 0 سجل</value>
+  </data>
+  <data name="dtInfoFiltered" xml:space="preserve">
+    <value>(تمت التصفية من _MAX_ سجل إجمالي)</value>
+  </data>
+  <data name="dtZeroRecords" xml:space="preserve">
+    <value>لا توجد سجلات مطابقة</value>
+  </data>
+  <data name="dtEmptyTable" xml:space="preserve">
+    <value>لا توجد بيانات في الجدول</value>
+  </data>
+  <data name="dtLoadingRecords" xml:space="preserve">
+    <value>جارٍ التحميل...</value>
+  </data>
+  <data name="dtProcessing" xml:space="preserve">
+    <value>جارٍ المعالجة...</value>
+  </data>
+  <data name="dtPaginateFirst" xml:space="preserve">
+    <value>الأول</value>
+  </data>
+  <data name="dtPaginatePrevious" xml:space="preserve">
+    <value>السابق</value>
+  </data>
+  <data name="dtPaginateNext" xml:space="preserve">
+    <value>التالي</value>
+  </data>
+  <data name="dtPaginateLast" xml:space="preserve">
+    <value>الأخير</value>
+  </data>
 </root>

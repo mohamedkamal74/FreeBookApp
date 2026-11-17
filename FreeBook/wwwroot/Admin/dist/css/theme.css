@@ -466,6 +466,28 @@ a, button, .btn, .card, .form-control, .badge, .dropdown-item,
   white-space: nowrap;
 }
 
+/* DataTables toolbar: keep "Show _MENU_ entries" and "Search:" on one line.
+   The theme's .form-control forces width: 100%, which breaks the inline layout. */
+.dataTables_wrapper .dt-length select,
+.dataTables_wrapper .dt-search input {
+  width: auto !important;
+  min-width: 0;
+  display: inline-block;
+  vertical-align: middle;
+}
+.dataTables_wrapper .dt-length label,
+.dataTables_wrapper .dt-search label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  margin-bottom: 0;
+}
+[dataTables_paginate] .paginate_button {
+  display: inline-block;
+  margin: 0 0.125rem;
+}
+
 /* PDF reuses the print view (the only export that shapes Arabic), but reads
    as the "official" save-as-PDF action. */
 .dt-buttons-spaced .btn.buttons-pdf {
