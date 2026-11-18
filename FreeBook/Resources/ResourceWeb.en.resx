@@ -777,4 +777,55 @@
   <data name="dtPaginateLast" xml:space="preserve">
     <value>Last</value>
   </data>
+  <data name="msgRentalSelectSubscriber" xml:space="preserve">
+    <value>Please select a subscriber</value>
+  </data>
+  <data name="msgRentalSelectCopy" xml:space="preserve">
+    <value>Please select at least one book copy</value>
+  </data>
+  <data name="msgRentalMaxCopies" xml:space="preserve">
+    <value>Maximum {0} copies allowed per rental</value>
+  </data>
+  <data name="msgRentalSubscriberUnavailable" xml:space="preserve">
+    <value>Subscriber not found or blacklisted</value>
+  </data>
+  <data name="msgRentalNoActiveSubscription" xml:space="preserve">
+    <value>Subscriber does not have an active subscription</value>
+  </data>
+  <data name="msgRentalCopiesLoadFailed" xml:space="preserve">
+    <value>Failed to load book copies</value>
+  </data>
+  <data name="msgRentalCopyUnavailable" xml:space="preserve">
+    <value>One or more selected copies are not available</value>
+  </data>
+  <data name="msgRentalCreated" xml:space="preserve">
+    <value>Rental created successfully</value>
+  </data>
+  <data name="msgRentalCreateFailed" xml:space="preserve">
+    <value>Failed to create rental</value>
+  </data>
+  <data name="msgRentalInvalidCopy" xml:space="preserve">
+    <value>Invalid rental or copy</value>
+  </data>
+  <data name="msgRentalNotFound" xml:space="preserve">
+    <value>Rental not found</value>
+  </data>
+  <data name="msgRentalCopyAlreadyReturned" xml:space="preserve">
+    <value>Copy already returned or not found</value>
+  </data>
+  <data name="msgRentalReturned" xml:space="preserve">
+    <value>Book returned successfully</value>
+  </data>
+  <data name="msgRentalExtended" xml:space="preserve">
+    <value>Rental extended successfully</value>
+  </data>
+  <data name="msgRentalPenaltyPaid" xml:space="preserve">
+    <value>Penalty paid</value>
+  </data>
+  <data name="msgAreaHasSubscribers" xml:space="preserve">
+    <value>Cannot delete area with associated subscribers</value>
+  </data>
+  <data name="msgGovernorateInUse" xml:space="preserve">
+    <value>Cannot delete governorate with associated areas or subscribers</value>
+  </data>
 </root>

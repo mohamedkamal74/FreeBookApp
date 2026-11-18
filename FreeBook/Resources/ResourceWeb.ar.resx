@@ -777,4 +777,55 @@
   <data name="dtPaginateLast" xml:space="preserve">
     <value>الأخير</value>
   </data>
+  <data name="msgRentalSelectSubscriber" xml:space="preserve">
+    <value>يرجى اختيار المشترك</value>
+  </data>
+  <data name="msgRentalSelectCopy" xml:space="preserve">
+    <value>يرجى اختيار نسخة كتاب واحدة على الأقل</value>
+  </data>
+  <data name="msgRentalMaxCopies" xml:space="preserve">
+    <value>الحد الأقصى {0} نسخ لكل استعارة</value>
+  </data>
+  <data name="msgRentalSubscriberUnavailable" xml:space="preserve">
+    <value>المشترك غير موجود أو مدرج في القائمة السوداء</value>
+  </data>
+  <data name="msgRentalNoActiveSubscription" xml:space="preserve">
+    <value>لا يوجد اشتراك ساري للمشترك</value>
+  </data>
+  <data name="msgRentalCopiesLoadFailed" xml:space="preserve">
+    <value>تعذر تحميل نسخ الكتب</value>
+  </data>
+  <data name="msgRentalCopyUnavailable" xml:space="preserve">
+    <value>نسخة واحدة أو أكثر من المحددة غير متاحة</value>
+  </data>
+  <data name="msgRentalCreated" xml:space="preserve">
+    <value>تم إنشاء الاستعارة بنجاح</value>
+  </data>
+  <data name="msgRentalCreateFailed" xml:space="preserve">
+    <value>تعذر إنشاء الاستعارة</value>
+  </data>
+  <data name="msgRentalInvalidCopy" xml:space="preserve">
+    <value>استعارة أو نسخة غير صالحة</value>
+  </data>
+  <data name="msgRentalNotFound" xml:space="preserve">
+    <value>الاستعارة غير موجودة</value>
+  </data>
+  <data name="msgRentalCopyAlreadyReturned" xml:space="preserve">
+    <value>النسخة مُرجعة مسبقًا أو غير موجودة</value>
+  </data>
+  <data name="msgRentalReturned" xml:space="preserve">
+    <value>تم إرجاع الكتاب بنجاح</value>
+  </data>
+  <data name="msgRentalExtended" xml:space="preserve">
+    <value>تم تمديد الاستعارة بنجاح</value>
+  </data>
+  <data name="msgRentalPenaltyPaid" xml:space="preserve">
+    <value>تم دفع الغرامة</value>
+  </data>
+  <data name="msgAreaHasSubscribers" xml:space="preserve">
+    <value>لا يمكن حذف منطقة مرتبطة بمشتركين</value>
+  </data>
+  <data name="msgGovernorateInUse" xml:space="preserve">
+    <value>لا يمكن حذف محافظة مرتبطة بمناطق أو مشتركين</value>
+  </data>
 </root>

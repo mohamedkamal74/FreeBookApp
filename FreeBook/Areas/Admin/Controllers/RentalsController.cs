@@ -1,4 +1,5 @@
 using Domin.Entity;
+using FreeBook.Resources;
 using Infrastructure.Common;
 using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 
 namespace FreeBook.Areas.Admin.Controllers
 {
@@ -17,17 +19,20 @@ namespace FreeBook.Areas.Admin.Controllers
         private readonly IServiceRepository<Subscriber> _serviceSubscriber;
         private readonly IServiceRepository<BookCopy> _serviceBookCopy;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IStringLocalizer<ResourceWeb> _localizer;
 
         public RentalsController(
             IServiceRepository<Rental> serviceRental,
             IServiceRepository<Subscriber> serviceSubscriber,
             IServiceRepository<BookCopy> serviceBookCopy,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager,
+            IStringLocalizer<ResourceWeb> localizer)
         {
             _serviceRental = serviceRental;
             _serviceSubscriber = serviceSubscriber;
             _serviceBookCopy = serviceBookCopy;
             _userManager = userManager;
+            _localizer = localizer;
         }
 
         public async Task<IActionResult> Rentals(RentalViewModel model)
@@ -64,26 +69,26 @@ namespace FreeBook.Areas.Admin.Controllers
 
             if (model.NewRental.SubscriberId == Guid.Empty)
             {
-                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, "Please select a subscriber");
+                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, _localizer["msgRentalSelectSubscriber"]);
                 return RedirectToAction(nameof(Rentals));
             }
 
             if (model.SelectedCopyIds == null || model.SelectedCopyIds.Length == 0)
             {
-                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, "Please select at least one book copy");
+                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, _localizer["msgRentalSelectCopy"]);
                 return RedirectToAction(nameof(Rentals));
             }
 
             if (model.SelectedCopyIds.Length > (int)RentalsConfigurations.MaxAllowedCopies)
             {
-                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, $"Maximum {(int)RentalsConfigurations.MaxAllowedCopies} copies allowed per rental");
+                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, string.Format(_localizer["msgRentalMaxCopies"], (int)RentalsConfigurations.MaxAllowedCopies));
                 return RedirectToAction(nameof(Rentals));
             }
 
             var subscriberResult = await _serviceSubscriber.FindByIdAsync(model.NewRental.SubscriberId);
             if (!subscriberResult.IsSuccess || subscriberResult.Value is null || subscriberResult.Value.IsBlackListed)
             {
-                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, "Subscriber not found or blacklisted");
+                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, _localizer["msgRentalSubscriberUnavailable"]);
                 return RedirectToAction(nameof(Rentals));
             }
 
@@ -94,7 +99,7 @@ namespace FreeBook.Areas.Admin.Controllers
             var hasActiveSubscription = subscriber.Subscriptions?.Any(s => s.StartDate <= now && s.EndDate >= now) ?? false;
             if (!hasActiveSubscription)
             {
-                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, "Subscriber does not have an active subscription");
+                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, _localizer["msgRentalNoActiveSubscription"]);
                 return RedirectToAction(nameof(Rentals));
             }
 
@@ -102,7 +107,7 @@ namespace FreeBook.Areas.Admin.Controllers
             var copiesResult = await _serviceBookCopy.GetAllAsync();
             if (!copiesResult.IsSuccess)
             {
-                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, "Failed to load book copies");
+                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, _localizer["msgRentalCopiesLoadFailed"]);
                 return RedirectToAction(nameof(Rentals));
             }
 
@@ -110,7 +115,7 @@ namespace FreeBook.Areas.Admin.Controllers
             var selectedCopies = availableCopies.Where(c => model.SelectedCopyIds.Contains(c.Id) && c.IsAvailableForRental).ToList();
             if (selectedCopies.Count != model.SelectedCopyIds.Length)
             {
-                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, "One or more selected copies are not available");
+                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, _localizer["msgRentalCopyUnavailable"]);
                 return RedirectToAction(nameof(Rentals));
             }
 
@@ -138,9 +143,9 @@ namespace FreeBook.Areas.Admin.Controllers
 
             var saveResult = await _serviceRental.SaveAsync(rental);
             if (saveResult.IsSuccess)
-                SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, "Rental created successfully");
+                SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, _localizer["msgRentalCreated"]);
             else
-                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, "Failed to create rental");
+                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, _localizer["msgRentalCreateFailed"]);
 
             return RedirectToAction(nameof(Rentals));
         }
@@ -151,14 +156,14 @@ namespace FreeBook.Areas.Admin.Controllers
         {
             if (model.RentalId == Guid.Empty || model.RentalCopyId == Guid.Empty)
             {
-                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, "Invalid rental or copy");
+                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, _localizer["msgRentalInvalidCopy"]);
                 return RedirectToAction(nameof(Rentals));
             }
 
             var rentalResult = await _serviceRental.FindByIdAsync(model.RentalId);
             if (!rentalResult.IsSuccess || rentalResult.Value is null)
             {
-                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, "Rental not found");
+                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, _localizer["msgRentalNotFound"]);
                 return RedirectToAction(nameof(Rentals));
             }
 
@@ -167,7 +172,7 @@ namespace FreeBook.Areas.Admin.Controllers
             var rentalCopy = rental.RentalCopies.FirstOrDefault(rc => rc.BookCopyId == model.RentalCopyId);
             if (rentalCopy is null || rentalCopy.ReturnDate != null)
             {
-                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, "Copy already returned or not found");
+                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, _localizer["msgRentalCopyAlreadyReturned"]);
                 return RedirectToAction(nameof(Rentals));
             }
 
@@ -180,7 +185,7 @@ namespace FreeBook.Areas.Admin.Controllers
             }
 
             await _serviceRental.SaveAsync(rental);
-            SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, "Book returned successfully");
+            SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, _localizer["msgRentalReturned"]);
             return RedirectToAction(nameof(Rentals));
         }
 
@@ -190,14 +195,14 @@ namespace FreeBook.Areas.Admin.Controllers
         {
             if (model.RentalId == Guid.Empty || model.RentalCopyId == Guid.Empty)
             {
-                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, "Invalid rental or copy");
+                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, _localizer["msgRentalInvalidCopy"]);
                 return RedirectToAction(nameof(Rentals));
             }
 
             var rentalResult = await _serviceRental.FindByIdAsync(model.RentalId);
             if (!rentalResult.IsSuccess || rentalResult.Value is null)
             {
-                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, "Rental not found");
+                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, _localizer["msgRentalNotFound"]);
                 return RedirectToAction(nameof(Rentals));
             }
 
@@ -206,7 +211,7 @@ namespace FreeBook.Areas.Admin.Controllers
             var rentalCopy = rental.RentalCopies.FirstOrDefault(rc => rc.BookCopyId == model.RentalCopyId);
             if (rentalCopy is null || rentalCopy.ReturnDate != null)
             {
-                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, "Copy already returned or not found");
+                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, _localizer["msgRentalCopyAlreadyReturned"]);
                 return RedirectToAction(nameof(Rentals));
             }
 
@@ -220,7 +225,7 @@ namespace FreeBook.Areas.Admin.Controllers
             rentalCopy.ExtendedOn = DateTime.UtcNow;
 
             await _serviceRental.SaveAsync(rental);
-            SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, "Rental extended successfully");
+            SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, _localizer["msgRentalExtended"]);
             return RedirectToAction(nameof(Rentals));
         }
 
@@ -233,7 +238,7 @@ namespace FreeBook.Areas.Admin.Controllers
             {
                 rentalResult.Value.PenaltyPaid = true;
                 await _serviceRental.SaveAsync(rentalResult.Value);
-                SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, "Penalty paid");
+                SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, _localizer["msgRentalPenaltyPaid"]);
             }
             return RedirectToAction(nameof(Rentals));
         }

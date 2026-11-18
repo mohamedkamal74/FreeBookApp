@@ -1,9 +1,11 @@
 using Domin.Entity;
+using FreeBook.Resources;
 using Infrastructure.Common;
 using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace FreeBook.Areas.Admin.Controllers
 {
@@ -13,13 +15,16 @@ namespace FreeBook.Areas.Admin.Controllers
     {
         private readonly IServiceRepository<Area> _serviceArea;
         private readonly IServiceRepository<Governorate> _serviceGovernorate;
+        private readonly IStringLocalizer<ResourceWeb> _localizer;
 
         public AreasController(
             IServiceRepository<Area> serviceArea,
-            IServiceRepository<Governorate> serviceGovernorate)
+            IServiceRepository<Governorate> serviceGovernorate,
+            IStringLocalizer<ResourceWeb> localizer)
         {
             _serviceArea = serviceArea;
             _serviceGovernorate = serviceGovernorate;
+            _localizer = localizer;
         }
 
         public async Task<IActionResult> Areas(AreaViewModel model)
@@ -41,7 +46,7 @@ namespace FreeBook.Areas.Admin.Controllers
             var result = await _serviceArea.DeleteAsync(Id);
             if (result.IsSuccess)
                 return RedirectToAction(nameof(Areas));
-            SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, result.Error?.Message ?? "Cannot delete area with associated subscribers");
+            SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, result.Error?.Message ?? _localizer["msgAreaHasSubscribers"]);
             return RedirectToAction(nameof(Areas));
         }
 

@@ -1,9 +1,11 @@
 using Domin.Entity;
+using FreeBook.Resources;
 using Infrastructure.Common;
 using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace FreeBook.Areas.Admin.Controllers
 {
@@ -12,10 +14,14 @@ namespace FreeBook.Areas.Admin.Controllers
     public class GovernoratesController : Controller
     {
         private readonly IServiceRepository<Governorate> _serviceGovernorate;
+        private readonly IStringLocalizer<ResourceWeb> _localizer;
 
-        public GovernoratesController(IServiceRepository<Governorate> serviceGovernorate)
+        public GovernoratesController(
+            IServiceRepository<Governorate> serviceGovernorate,
+            IStringLocalizer<ResourceWeb> localizer)
         {
             _serviceGovernorate = serviceGovernorate;
+            _localizer = localizer;
         }
 
         public async Task<IActionResult> Governorates(GovernorateViewModel model)
@@ -35,7 +41,7 @@ namespace FreeBook.Areas.Admin.Controllers
             var result = await _serviceGovernorate.DeleteAsync(Id);
             if (result.IsSuccess)
                 return RedirectToAction(nameof(Governorates));
-            SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, result.Error?.Message ?? "Cannot delete governorate with associated areas or subscribers");
+            SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, result.Error?.Message ?? _localizer["msgGovernorateInUse"]);
             return RedirectToAction(nameof(Governorates));
         }
 
