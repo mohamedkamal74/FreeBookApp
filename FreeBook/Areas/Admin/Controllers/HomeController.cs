@@ -9,7 +9,7 @@ namespace FreeBook.Areas.Admin.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+            return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
         }
 
         [AllowAnonymous]
