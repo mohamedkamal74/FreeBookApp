@@ -182,7 +182,10 @@ try
         app.UseSwaggerUI();
     }
 
-    app.UseHttpsRedirection();
+    if (app.Configuration.GetValue("Https:Redirect", true))
+    {
+        app.UseHttpsRedirection();
+    }
     app.UseStaticFiles();
     app.UseRequestLocalization();
     app.UseRouting();

@@ -87,6 +87,13 @@ docker compose up --build
 - SQL Server password: override `MSSQL_SA_PASSWORD` (defaults are for local use only)
 - See `.env.example` for the available settings.
 
+**Important notes:**
+
+- `.env` is **git-ignored** (added in `.gitignore`). Copy `.env.example` to `.env` and change the admin password before first run.
+- `MSSQL_SA_PASSWORD` is **frozen on first container start** — it's baked into the `sqlserver-data` volume. Changing it later causes login failures; run `docker compose down -v` to reset the database volume.
+- App logs appear in `./logs/log-YYYYMMDD.txt` (bind-mounted from the container).
+- Port overrides: `MSSQL_PORT` (default 1433) and `APP_PORT` (default 8080) via `.env` or environment variables if you have a local SQL Server on 1433.
+
 The startup hooks are opt-in via configuration: `Startup:MigrateOnStartup` and
 `Startup:SeedAdmin` (plus `Seed:AdminEmail` / `Seed:AdminPassword`).
 

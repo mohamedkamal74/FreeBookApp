@@ -10,3 +10,13 @@
 *.db
 *.db-shm
 *.db-wal
+.env
+logs/
+*.log
+*.err
+TestData.sql
+TestApp*.ps1
+RunTestData.ps1
+ReportModels.cs
+README.md
+.opencode/

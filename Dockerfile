@@ -1,6 +1,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
+COPY Directory.Build.props ./
 COPY FreeBook/FreeBook.csproj FreeBook/
 COPY Infrastructure/Infrastructure.csproj Infrastructure/
 COPY Domin/Domin.csproj Domin/
@@ -15,4 +16,5 @@ ENV ASPNETCORE_URLS=http://+:8080
 ENV ASPNETCORE_ENVIRONMENT=Production
 EXPOSE 8080
 COPY --from=build /app/publish .
+RUN mkdir -p /app/logs
 ENTRYPOINT ["dotnet", "FreeBook.dll"]
