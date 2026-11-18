@@ -167,6 +167,15 @@ try
 
     var app = builder.Build();
 
+    // Apply migrations before Hangfire resolves its SQL storage. The dashboard
+    // middleware and recurring-job registration install Hangfire's schema on first
+    // use, which fails with SQL 4060 on a fresh database volume if BookDb is missing.
+    if (app.Configuration.GetValue<bool>("Startup:MigrateOnStartup")
+        || app.Configuration.GetValue<bool>("Startup:SeedAdmin"))
+    {
+        await DatabaseInitializer.InitializeAsync(app.Services, app.Configuration, app.Logger);
+    }
+
     app.UseMiddleware<SecurityHeadersMiddleware>();
 
     // Configure the HTTP request pipeline.
@@ -221,12 +230,6 @@ try
     app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}");
-
-    if (app.Configuration.GetValue<bool>("Startup:MigrateOnStartup")
-        || app.Configuration.GetValue<bool>("Startup:SeedAdmin"))
-    {
-        await DatabaseInitializer.InitializeAsync(app.Services, app.Configuration, app.Logger);
-    }
 
     // Schedule recurring jobs
     if (hangfireEnabled)
