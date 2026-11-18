@@ -95,7 +95,17 @@ docker compose up --build
 - Port overrides: `MSSQL_PORT` (default 1433) and `APP_PORT` (default 8080) via `.env` or environment variables if you have a local SQL Server on 1433.
 
 The startup hooks are opt-in via configuration: `Startup:MigrateOnStartup` and
-`Startup:SeedAdmin` (plus `Seed:AdminEmail` / `Seed:AdminPassword`).
+`Startup:SeedAdmin` (plus `Seed:AdminEmail` / `Seed:AdminPassword`). Only the admin
+account is seeded automatically. To load demo data (categories, books, copies,
+subscribers, subscriptions and rentals), run:
+
+```powershell
+scripts\seed-demo.ps1
+```
+
+This copies `TestData.sql` into the SQL container and runs it. **It deletes and
+recreates all library rows**, so use it only for demos — run it again after
+`docker compose down -v` to restore the sample data.
 
 ## Development commands
 
