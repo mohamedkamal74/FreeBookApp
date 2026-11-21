@@ -311,6 +311,17 @@ INSERT INTO RentalCopies (RentalId, BookCopyId, RentalDate, EndDate, ReturnDate,
 (@Rental15, @Copy7_2, DATEADD(day, -20, @Now), DATEADD(day, 0, @Now), DATEADD(day, -2, @Now), NULL);
 
 -- ============================================
+-- STEP 11b: DEMO NOTIFICATIONS (sample Hangfire alerts)
+-- ============================================
+-- Only the demo:* rows are replaced; alerts produced by the real jobs are kept.
+DELETE FROM Notifications WHERE DedupeKey LIKE 'demo:%';
+
+INSERT INTO Notifications (Id, Type, DedupeKey, SubscriberName, BookTitle, Days, Amount, CreatedOn, IsRead, TargetUrl) VALUES
+(NEWID(), 1, N'demo:sub:1', N'Ahmed Ali', NULL, 3, NULL, GETUTCDATE(), 0, N'/Admin/Subscriptions/Subscriptions'),
+(NEWID(), 2, N'demo:overdue:1', N'Ahmed Ali', N'Clean Code', 4, NULL, GETUTCDATE(), 0, N'/Admin/Rentals/Rentals'),
+(NEWID(), 3, N'demo:fine:1', N'Ahmed Ali', N'Clean Code', 4, 7.50, GETUTCDATE(), 0, N'/Admin/Rentals/Rentals');
+
+-- ============================================
 -- STEP 12: VERIFICATION
 -- ============================================
 SELECT 'Governorates' as TableName, COUNT(*) as Count FROM Governorates
@@ -322,7 +333,8 @@ UNION ALL SELECT 'BookCopies', COUNT(*) FROM BookCopies
 UNION ALL SELECT 'Subscribers', COUNT(*) FROM Subscribers
 UNION ALL SELECT 'Subscriptions', COUNT(*) FROM Subscriptions
 UNION ALL SELECT 'Rentals', COUNT(*) FROM Rentals
-UNION ALL SELECT 'RentalCopies', COUNT(*) FROM RentalCopies;
+UNION ALL SELECT 'RentalCopies', COUNT(*) FROM RentalCopies
+UNION ALL SELECT 'Notifications', COUNT(*) FROM Notifications;
 
 -- Dashboard stat verification
 SELECT 

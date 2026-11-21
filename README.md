@@ -105,7 +105,10 @@ scripts\seed-demo.ps1
 
 This copies `TestData.sql` into the SQL container and runs it. **It deletes and
 recreates all library rows**, so use it only for demos — run it again after
-`docker compose down -v` to restore the sample data.
+`docker compose down -v` to restore the sample data. Users and roles are never
+deleted. The script also loads three sample alerts with `demo:` dedupe keys so
+the admin notification center has content; rerunning it replaces only those demo
+alerts and leaves real job-generated alerts untouched.
 
 ## Development commands
 
@@ -134,6 +137,11 @@ Convenience scripts live in `scripts/` (`build.ps1`, `run.ps1`, `migrate.ps1`).
   per minute per client, and passwords require 8+ characters with upper, lower, digit, and
   symbol.
 - Destructive admin actions are POST-only and protected by antiforgery tokens.
+- The admin-only notification center at `/Admin/Notifications/Index` shows alerts from
+  the Hangfire expiry, overdue and fine jobs. A navbar bell shows the unread count;
+  admins can mark individual/all alerts as read and clear read ones. Jobs upsert by
+  `DedupeKey`, so repeated daily runs never duplicate an alert. Messages are localized
+  at render time (background jobs have no UI culture), with `en` and `ar` strings.
 
 ## Tests
 
