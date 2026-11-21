@@ -14,7 +14,7 @@ namespace Infrastructure.Services
 {
     public class CloudinaryImageService : IImageService
     {
-        private readonly Cloudinary _cloudinary;
+        private readonly Cloudinary? _cloudinary;
         private readonly CloudinarySettings _settings;
         private readonly ILogger<CloudinaryImageService> _logger;
 
@@ -22,6 +22,14 @@ namespace Infrastructure.Services
         {
             _settings = settings.Value;
             _logger = logger;
+
+            if (string.IsNullOrWhiteSpace(_settings.CloudName) ||
+                string.IsNullOrWhiteSpace(_settings.ApiKey) ||
+                string.IsNullOrWhiteSpace(_settings.ApiSecret))
+            {
+                _logger.LogWarning("Cloudinary credentials are not configured. Image uploads are disabled.");
+                return;
+            }
 
             var account = new Account(_settings.CloudName, _settings.ApiKey, _settings.ApiSecret);
             _cloudinary = new Cloudinary(account);
@@ -40,6 +48,9 @@ namespace Infrastructure.Services
             var maxSizeBytes = 10 * 1024 * 1024; // 10 MB
             if (file.Length > maxSizeBytes)
                 return new Infrastructure.Common.Interfaces.ImageUploadResult { Success = false, Error = "File too large. Max 10 MB" };
+
+            if (_cloudinary is null)
+                return new Infrastructure.Common.Interfaces.ImageUploadResult { Success = false, Error = "Cloudinary is not configured" };
 
             try
             {
@@ -83,6 +94,9 @@ namespace Infrastructure.Services
             if (!allowedExtensions.Contains(ext))
                 return new Infrastructure.Common.Interfaces.ImageUploadResult { Success = false, Error = "Invalid file type" };
 
+            if (_cloudinary is null)
+                return new Infrastructure.Common.Interfaces.ImageUploadResult { Success = false, Error = "Cloudinary is not configured" };
+
             try
             {
                 var uploadParams = new ImageUploadParams
@@ -116,7 +130,7 @@ namespace Infrastructure.Services
 
         public async Task DeleteAsync(string publicId)
         {
-            if (string.IsNullOrEmpty(publicId))
+            if (_cloudinary is null || string.IsNullOrEmpty(publicId))
                 return;
 
             try
@@ -131,7 +145,7 @@ namespace Infrastructure.Services
 
         public string GetImageUrl(string publicId, int? width = null, int? height = null)
         {
-            if (string.IsNullOrEmpty(publicId))
+            if (_cloudinary is null || string.IsNullOrEmpty(publicId))
                 return string.Empty;
 
             var transformation = new Transformation();

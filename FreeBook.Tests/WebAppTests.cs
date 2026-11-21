@@ -160,8 +160,11 @@ public class WebAppTests : IClassFixture<CustomWebApplicationFactory>
 
         Assert.Contains("id=\"tableBooks\"", html);
         Assert.Contains("id=\"bookModalBtnSave\"", html);
+        Assert.Contains("id=\"coverImage\"", html);
+        Assert.Contains("enctype=\"multipart/form-data\"", html);
         Assert.Contains("id=\"deleteForm\"", html);
         Assert.Contains("Add New Book", html);
+        Assert.Contains("Cover Image", html);
         Assert.Contains("/Admin/Books/Save", html);
         Assert.Single(Regex.Matches(html, "window\\.bookify"));
     }

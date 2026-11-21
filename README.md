@@ -140,7 +140,12 @@ Convenience scripts live in `scripts/` (`build.ps1`, `run.ps1`, `migrate.ps1`).
 - The admin-only Books page at `/Admin/Books/Books` manages book metadata (name, author,
   publisher, publishing date, category/subcategory, hall, rental availability, cover image
   URLs and description). Deletes are soft deletes, so copies and rental history are preserved.
-  Cover image upload is not part of this page; the existing image URL fields are editable.
+  A cover image can be uploaded from the same form (JPG, JPEG, PNG, GIF or WEBP, up to 5 MB).
+  The upload replaces the Cloudinary asset only after the book is saved successfully; if the
+  new image is shared by another book, the old asset is kept. The manual image URL fields
+  remain editable for externally hosted covers. Configure Docker with `CLOUDINARY_CLOUD_NAME`,
+  `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` and optional `CLOUDINARY_FOLDER` (see
+  `.env.example`).
 - The admin-only notification center at `/Admin/Notifications/Index` shows alerts from
   the Hangfire expiry, overdue and fine jobs. A navbar bell shows the unread count;
   admins can mark individual/all alerts as read and clear read ones. Jobs upsert by

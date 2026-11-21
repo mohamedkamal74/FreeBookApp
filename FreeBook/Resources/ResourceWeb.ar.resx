@@ -558,6 +558,18 @@
   <data name="lbHall" xml:space="preserve">
     <value>القاعة</value>
   </data>
+  <data name="lbCoverImage" xml:space="preserve">
+    <value>صورة الغلاف</value>
+  </data>
+  <data name="lbCoverImageHelp" xml:space="preserve">
+    <value>ارفع صورة JPG أو JPEG أو PNG أو GIF أو WEBP بحجم لا يتجاوز 5 ميغابايت. اترك الحقل فارغاً للاحتفاظ بالغلاف الحالي.</value>
+  </data>
+  <data name="msgCoverImageInvalid" xml:space="preserve">
+    <value>يُسمح فقط بصور JPG أو JPEG أو PNG أو GIF أو WEBP بحجم لا يتجاوز 5 ميغابايت.</value>
+  </data>
+  <data name="msgCoverImageUploadFailed" xml:space="preserve">
+    <value>تعذر رفع صورة الغلاف. يرجى المحاولة مرة أخرى.</value>
+  </data>
   <data name="lbImageUrl" xml:space="preserve">
     <value>رابط صورة الغلاف</value>
   </data>

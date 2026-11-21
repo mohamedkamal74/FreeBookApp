@@ -561,6 +561,18 @@
   <data name="lbHall" xml:space="preserve">
     <value>Hall</value>
   </data>
+  <data name="lbCoverImage" xml:space="preserve">
+    <value>Cover Image</value>
+  </data>
+  <data name="lbCoverImageHelp" xml:space="preserve">
+    <value>Upload a JPG, JPEG, PNG, GIF, or WEBP image up to 5 MB. Leave empty to keep the current cover.</value>
+  </data>
+  <data name="msgCoverImageInvalid" xml:space="preserve">
+    <value>Only JPG, JPEG, PNG, GIF, or WEBP images up to 5 MB are allowed.</value>
+  </data>
+  <data name="msgCoverImageUploadFailed" xml:space="preserve">
+    <value>The cover image could not be uploaded. Please try again.</value>
+  </data>
   <data name="lbImageUrl" xml:space="preserve">
     <value>Cover Image URL</value>
   </data>

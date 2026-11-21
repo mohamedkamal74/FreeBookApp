@@ -78,7 +78,7 @@
 
     <!-- Modal -->
     <modal id="exampleModal" title-id="bookModalTitle" title="@Localizer["lbBtnSaveNewBook"]">
-        <form asp-action="Save" asp-controller="Books" method="post">
+        <form asp-action="Save" asp-controller="Books" method="post" enctype="multipart/form-data">
             <input type="hidden" asp-for="NewBook.BookId" id="bookId" />
 
             <div class="form-group">
@@ -138,6 +138,16 @@
             <div class="form-check mt-2">
                 <input type="checkbox" asp-for="NewBook.IsAvailableForRental" class="form-check-input" id="isAvailableForRental" />
                 <label class="form-check-label" for="isAvailableForRental">@Localizer["lbAvailableForRental"]</label>
+            </div>
+
+            <div class="form-group mt-3">
+                <label class="control-label" for="coverImage">@Localizer["lbCoverImage"]</label>
+                <input type="file" asp-for="NewBook.CoverImage" class="form-control" id="coverImage"
+                       accept=".jpg,.jpeg,.png,.gif,.webp,image/jpeg,image/png,image/gif,image/webp"
+                       aria-describedby="coverImageHelp" />
+                <small id="coverImageHelp" class="form-text text-muted">@Localizer["lbCoverImageHelp"]</small>
+                <img id="coverImagePreview" class="img-thumbnail mt-2 d-none" alt="@Localizer["lbCoverImage"]" style="max-width:160px;max-height:160px" />
+                <span asp-validation-for="NewBook.CoverImage" class="text-danger"></span>
             </div>
 
             <div class="form-group mt-3">

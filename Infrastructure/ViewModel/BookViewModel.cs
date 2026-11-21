@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using Domin.Entity;
 using Domin.Resources;
+using Microsoft.AspNetCore.Http;
 
 namespace Infrastructure.ViewModel
 {
@@ -31,6 +32,9 @@ namespace Infrastructure.ViewModel
 
         [DataType(DataType.Date)]
         public DateTime? PublishingDate { get; set; }
+
+        [DataType(DataType.Upload)]
+        public IFormFile? CoverImage { get; set; }
 
         [MaxLength(500)]
         public string? ImageUrl { get; set; }

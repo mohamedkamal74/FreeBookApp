@@ -28,6 +28,10 @@ services:
       ConnectionStrings__BookConnection: "Server=db,1433;Database=BookDb;User Id=sa;Password=${MSSQL_SA_PASSWORD:-Bookify!Passw0rd};TrustServerCertificate=True;MultipleActiveResultSets=True;"
       Startup__MigrateOnStartup: "true"
       Startup__SeedAdmin: "true"
+      Cloudinary__CloudName: "${CLOUDINARY_CLOUD_NAME:-}"
+      Cloudinary__ApiKey: "${CLOUDINARY_API_KEY:-}"
+      Cloudinary__ApiSecret: "${CLOUDINARY_API_SECRET:-}"
+      Cloudinary__Folder: "${CLOUDINARY_FOLDER:-bookify}"
       Seed__AdminEmail: "${SEED_ADMIN_EMAIL:-admin@bookify.local}"
       Seed__AdminPassword: "${SEED_ADMIN_PASSWORD:-Admin@12345}"
     ports:
