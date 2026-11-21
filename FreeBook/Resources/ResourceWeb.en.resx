@@ -792,6 +792,57 @@
   <data name="lbErrorRequestId" xml:space="preserve">
     <value>Request ID</value>
   </data>
+  <data name="msgNotificationLoadError" xml:space="preserve">
+    <value>Notifications could not be loaded. Please try again later.</value>
+  </data>
+  <data name="lbNotifications" xml:space="preserve">
+    <value>Notifications</value>
+  </data>
+  <data name="lbNotificationType" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="lbNotificationTypeExpiring" xml:space="preserve">
+    <value>Subscription</value>
+  </data>
+  <data name="lbNotificationTypeOverdue" xml:space="preserve">
+    <value>Overdue</value>
+  </data>
+  <data name="lbNotificationTypeFine" xml:space="preserve">
+    <value>Fine</value>
+  </data>
+  <data name="lbNotificationSubscriptionExpiring" xml:space="preserve">
+    <value>{0}'s subscription expires in {1} days</value>
+  </data>
+  <data name="lbNotificationRentalOverdue" xml:space="preserve">
+    <value>{0} has an overdue book: {1} ({2} days overdue)</value>
+  </data>
+  <data name="lbNotificationFineApplied" xml:space="preserve">
+    <value>Fine of {3} applied to {0} for {1} ({2} days overdue)</value>
+  </data>
+  <data name="lbNotificationEmpty" xml:space="preserve">
+    <value>No notifications yet</value>
+  </data>
+  <data name="lbNotificationEmptyHint" xml:space="preserve">
+    <value>Alerts from subscription, rental and fine jobs will appear here.</value>
+  </data>
+  <data name="lbNotificationUnread" xml:space="preserve">
+    <value>Unread</value>
+  </data>
+  <data name="lbNotificationDate" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="lbNotificationDetails" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="lbMarkAllRead" xml:space="preserve">
+    <value>Mark all as read</value>
+  </data>
+  <data name="lbClearRead" xml:space="preserve">
+    <value>Clear read</value>
+  </data>
+  <data name="lbMarkRead" xml:space="preserve">
+    <value>Mark as read</value>
+  </data>
   <data name="msgRentalSelectSubscriber" xml:space="preserve">
     <value>Please select a subscriber</value>
   </data>

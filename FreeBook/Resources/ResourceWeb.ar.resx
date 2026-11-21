@@ -792,6 +792,57 @@
   <data name="lbErrorRequestId" xml:space="preserve">
     <value>معرّف الطلب</value>
   </data>
+  <data name="msgNotificationLoadError" xml:space="preserve">
+    <value>تعذر تحميل الإشعارات. يُرجى المحاولة مرة أخرى لاحقًا.</value>
+  </data>
+  <data name="lbNotifications" xml:space="preserve">
+    <value>الإشعارات</value>
+  </data>
+  <data name="lbNotificationType" xml:space="preserve">
+    <value>النوع</value>
+  </data>
+  <data name="lbNotificationTypeExpiring" xml:space="preserve">
+    <value>اشتراك</value>
+  </data>
+  <data name="lbNotificationTypeOverdue" xml:space="preserve">
+    <value>تأخر إرجاع</value>
+  </data>
+  <data name="lbNotificationTypeFine" xml:space="preserve">
+    <value>غرامة</value>
+  </data>
+  <data name="lbNotificationSubscriptionExpiring" xml:space="preserve">
+    <value>ينتهي اشتراك {0} خلال {1} يومًا</value>
+  </data>
+  <data name="lbNotificationRentalOverdue" xml:space="preserve">
+    <value>كتاب متأخر لدى {0}: {1} (تأخر {2} يومًا)</value>
+  </data>
+  <data name="lbNotificationFineApplied" xml:space="preserve">
+    <value>تم فرض غرامة بقيمة {3} على {0} عن كتاب {1} (تأخر {2} يومًا)</value>
+  </data>
+  <data name="lbNotificationEmpty" xml:space="preserve">
+    <value>لا توجد إشعارات بعد</value>
+  </data>
+  <data name="lbNotificationEmptyHint" xml:space="preserve">
+    <value>ستظهر هنا تنبيهات الاشتراكات والإيجارات والغرامات.</value>
+  </data>
+  <data name="lbNotificationUnread" xml:space="preserve">
+    <value>غير مقروء</value>
+  </data>
+  <data name="lbNotificationDate" xml:space="preserve">
+    <value>التاريخ</value>
+  </data>
+  <data name="lbNotificationDetails" xml:space="preserve">
+    <value>التفاصيل</value>
+  </data>
+  <data name="lbMarkAllRead" xml:space="preserve">
+    <value>تعليم الكل كمقروء</value>
+  </data>
+  <data name="lbClearRead" xml:space="preserve">
+    <value>حذف المقروء</value>
+  </data>
+  <data name="lbMarkRead" xml:space="preserve">
+    <value>تعليم كمقروء</value>
+  </data>
   <data name="msgRentalSelectSubscriber" xml:space="preserve">
     <value>يرجى اختيار المشترك</value>
   </data>

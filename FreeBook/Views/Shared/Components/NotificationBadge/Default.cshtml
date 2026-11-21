@@ -1,0 +1,11 @@
+@inject IStringLocalizer<ResourceWeb> Localizer
+@model int
+
+<a asp-area="Admin" asp-controller="Notifications" asp-action="Index" class="nav-link"
+   aria-label="@Localizer["lbNotifications"]" title="@Localizer["lbNotifications"]">
+    <i class="fas fa-bell" aria-hidden="true"></i>
+    @if (Model > 0)
+    {
+        <span class="badge badge-danger navbar-badge">@Model</span>
+    }
+</a>

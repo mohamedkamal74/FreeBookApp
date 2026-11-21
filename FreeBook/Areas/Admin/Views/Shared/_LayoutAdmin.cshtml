@@ -61,6 +61,12 @@
 
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
+                @if (User.IsInRole("Admin"))
+                {
+                    <li class="nav-item">
+                        @await Component.InvokeAsync("NotificationBadge")
+                    </li>
+                }
                 <li class="nav-item">
                     @await Html.PartialAsync("_LanguageSwitcher")
                 </li>
@@ -208,6 +214,15 @@
                                 <p>@Localizer["lbReports"]</p>
                             </a>
                         </li>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a asp-area="Admin" asp-controller="Notifications" asp-action="Index" class="nav-link">
+                                    <i class="nav-icon fas fa-bell"></i>
+                                    <p>@Localizer["lbNotifications"]</p>
+                                </a>
+                            </li>
+                        }
                     </ul>
                 </nav>
                 <!-- /.sidebar-menu -->
