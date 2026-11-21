@@ -23,6 +23,10 @@ function initDataTablesLanguage() {
             previous: (typeof dtPaginatePrevious !== 'undefined') ? dtPaginatePrevious : 'Previous',
             next:     (typeof dtPaginateNext     !== 'undefined') ? dtPaginateNext     : 'Next',
             last:     (typeof dtPaginateLast     !== 'undefined') ? dtPaginateLast     : 'Last'
+        },
+        aria: {
+            sortAscending:  (typeof dtAriaSortAscending  !== 'undefined') ? dtAriaSortAscending  : ': activate to sort column ascending',
+            sortDescending: (typeof dtAriaSortDescending !== 'undefined') ? dtAriaSortDescending : ': activate to sort column descending'
         }
     };
     jQuery.extend(true, jQuery.fn.dataTable.defaults, { language: dt });

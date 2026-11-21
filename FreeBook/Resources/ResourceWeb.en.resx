@@ -777,6 +777,12 @@
   <data name="dtPaginateLast" xml:space="preserve">
     <value>Last</value>
   </data>
+  <data name="dtAriaSortAscending" xml:space="preserve">
+    <value>: activate to sort column ascending</value>
+  </data>
+  <data name="dtAriaSortDescending" xml:space="preserve">
+    <value>: activate to sort column descending</value>
+  </data>
   <data name="msgRentalSelectSubscriber" xml:space="preserve">
     <value>Please select a subscriber</value>
   </data>
