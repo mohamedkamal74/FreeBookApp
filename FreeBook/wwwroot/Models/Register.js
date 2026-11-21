@@ -57,7 +57,7 @@ Rest = () => {
     clearValidation(modal);
 
     document.getElementById('userModalTitle').innerHTML = lbBtnSaveNewUser
-    document.getElementById('userModalBtnSave').value = lbBtnSave;
+    document.getElementById('userModalBtnSave').value = bookify.ui.save;
     document.getElementById('userId').value = "";
     document.getElementById('userName').value ="" ;
     document.getElementById('userEmail').value = "";

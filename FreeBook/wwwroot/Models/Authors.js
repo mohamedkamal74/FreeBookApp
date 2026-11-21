@@ -24,7 +24,7 @@ function DeleteAuthor(id) {
 Edit = (id, name) => {
     clearValidation(document.getElementById('exampleModal'));
     document.getElementById('authorModalTitle').innerHTML = lbTitleEditAuthor;
-    document.getElementById('authorModalBtnSave').value = lbEdit;
+    document.getElementById('authorModalBtnSave').value = bookify.ui.edit;
     document.getElementById('authorId').value = id;
     document.getElementById('authorName').value = name;
 }
@@ -32,7 +32,7 @@ Edit = (id, name) => {
 Rest = () => {
     clearValidation(document.getElementById('exampleModal'));
     document.getElementById('authorModalTitle').innerHTML = lbBtnSaveNewAuthor;
-    document.getElementById('authorModalBtnSave').value = lbBtnSave;
+    document.getElementById('authorModalBtnSave').value = bookify.ui.save;
     document.getElementById('authorId').value = "";
     document.getElementById('authorName').value = "";
 }

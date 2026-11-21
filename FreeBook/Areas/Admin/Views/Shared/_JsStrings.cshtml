@@ -1,0 +1,43 @@
+@inject IStringLocalizer<ResourceWeb> Localizer
+@{
+    // Single source of truth for the localized strings used by shared admin
+    // JavaScript. Rendered once by _LayoutAdmin before Common.js, so no view
+    // needs to redeclare these values.
+    var dt = new
+    {
+        search = Localizer["dtSearch"].Value,
+        lengthMenu = Localizer["dtLengthMenu"].Value,
+        info = Localizer["dtInfo"].Value,
+        infoEmpty = Localizer["dtInfoEmpty"].Value,
+        infoFiltered = Localizer["dtInfoFiltered"].Value,
+        zeroRecords = Localizer["dtZeroRecords"].Value,
+        emptyTable = Localizer["dtEmptyTable"].Value,
+        loadingRecords = Localizer["dtLoadingRecords"].Value,
+        processing = Localizer["dtProcessing"].Value,
+        paginate = new
+        {
+            first = Localizer["dtPaginateFirst"].Value,
+            previous = Localizer["dtPaginatePrevious"].Value,
+            next = Localizer["dtPaginateNext"].Value,
+            last = Localizer["dtPaginateLast"].Value
+        },
+        aria = new
+        {
+            sortAscending = Localizer["dtAriaSortAscending"].Value,
+            sortDescending = Localizer["dtAriaSortDescending"].Value
+        }
+    };
+
+    var ui = new
+    {
+        edit = Localizer["lbEdit"].Value,
+        save = Localizer["lbBtnSave"].Value,
+        deleteTitle = Localizer["lbTitleDeleteMsg"].Value,
+        deleteText = Localizer["lmTextMsgDelete"].Value,
+        deleteConfirm = Localizer["lbconfirmButtonText"].Value,
+        deleteCancel = Localizer["lbCancelButtonText"].Value
+    };
+}
+<script>
+    window.bookify = @Json.Serialize(new { dt, ui });
+</script>

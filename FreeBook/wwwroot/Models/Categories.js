@@ -1,4 +1,4 @@
-﻿
+
 $(document).ready(function () {
     $('#tableCategories').DataTable({
         "autoWidth": false,
@@ -37,7 +37,7 @@ function DeleteLog(id) {
 Edit = (id, name, description) => {
     clearValidation(document.getElementById('exampleModal'));
     document.getElementById('categoryModalTitle').innerHTML = lbTitleEditCategory;
-    document.getElementById('categoryModalBtnSave').value = lbEdit;
+    document.getElementById('categoryModalBtnSave').value = bookify.ui.edit;
     document.getElementById('categoryId').value = id;
     document.getElementById('categoryName').value = name;
     document.getElementById('description').value = description;   
@@ -46,7 +46,7 @@ Edit = (id, name, description) => {
 Rest = () => {
     clearValidation(document.getElementById('exampleModal'));
     document.getElementById('categoryModalTitle').innerHTML = lbBtnSaveNewCategory;
-    document.getElementById('categoryModalBtnSave').value = lbBtnSave;
+    document.getElementById('categoryModalBtnSave').value = bookify.ui.save;
     document.getElementById('categoryId').value = "";
     document.getElementById('categoryName').value ="" ;
     document.getElementById('description').value = "";

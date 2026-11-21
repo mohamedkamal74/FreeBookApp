@@ -39,7 +39,7 @@ function ToggleBlacklist(id) {
 Edit = (id, firstName, lastName, nationalId, mobileNumber, hasWhatsApp, email, areaId, governorateId, address, isBlackListed, dateOfBirth) => {
     clearValidation(document.getElementById('exampleModal'));
     document.getElementById('subscriberModalTitle').innerHTML = lbTitleEditSubscriber;
-    document.getElementById('subscriberModalBtnSave').value = lbEdit;
+    document.getElementById('subscriberModalBtnSave').value = bookify.ui.edit;
     document.getElementById('subscriberId').value = id;
     document.getElementById('firstName').value = firstName;
     document.getElementById('lastName').value = lastName;
@@ -57,7 +57,7 @@ Edit = (id, firstName, lastName, nationalId, mobileNumber, hasWhatsApp, email, a
 Rest = () => {
     clearValidation(document.getElementById('exampleModal'));
     document.getElementById('subscriberModalTitle').innerHTML = lbBtnSaveNewSubscriber;
-    document.getElementById('subscriberModalBtnSave').value = lbBtnSave;
+    document.getElementById('subscriberModalBtnSave').value = bookify.ui.save;
     document.getElementById('subscriberId').value = "";
     document.getElementById('firstName').value = "";
     document.getElementById('lastName').value = "";

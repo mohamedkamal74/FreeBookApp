@@ -24,7 +24,7 @@ function DeleteSubscription(id) {
 Rest = () => {
     clearValidation(document.getElementById('exampleModal'));
     document.getElementById('subscriptionModalTitle').innerHTML = lbBtnSaveNewSubscription;
-    document.getElementById('subscriptionModalBtnSave').value = lbBtnSave;
+    document.getElementById('subscriptionModalBtnSave').value = bookify.ui.save;
     document.getElementById('subscriptionId').value = "";
     document.getElementById('subscriberId').value = "";
     document.getElementById('startDate').value = "";

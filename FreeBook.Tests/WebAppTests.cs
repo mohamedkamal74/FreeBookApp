@@ -116,6 +116,34 @@ public class WebAppTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.OK, registerPage.StatusCode);
     }
 
+    [Fact]
+    public async Task AdminLayout_EmitsOneSharedJsStringBundle()
+    {
+        await SeedAdminAsync();
+        var client = _factory.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false
+        });
+
+        var loginPage = await client.GetAsync("/Admin?culture=en");
+        var token = ExtractAntiForgeryToken(await loginPage.Content.ReadAsStringAsync());
+        var form = new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["Email"] = AdminEmail,
+            ["Password"] = AdminPassword,
+            ["RememberMe"] = "false",
+            ["__RequestVerificationToken"] = token!
+        });
+        await client.PostAsync("/Admin/Accounts/Login?culture=en", form);
+
+        var html = await client.GetStringAsync("/Admin/Areas/Areas?culture=en");
+
+        Assert.Single(Regex.Matches(html, "window\\.bookify"));
+        Assert.Contains("\"search\":\"Search:\"", html);
+        Assert.DoesNotContain("let dtSearch", html);
+        Assert.DoesNotContain("initDataTablesLanguage();", html);
+    }
+
     private async Task SeedAdminAsync()
     {
         using var scope = _factory.Services.CreateScope();

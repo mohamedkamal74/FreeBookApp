@@ -24,7 +24,7 @@ function DeleteBookCopy(id) {
 Edit = (id, bookId, editionNumber, serialNumber, isAvailable) => {
     clearValidation(document.getElementById('exampleModal'));
     document.getElementById('bookCopyModalTitle').innerHTML = lbTitleEditBookCopy;
-    document.getElementById('bookCopyModalBtnSave').value = lbEdit;
+    document.getElementById('bookCopyModalBtnSave').value = bookify.ui.edit;
     document.getElementById('bookCopyId').value = id;
     document.getElementById('bookId').value = bookId;
     document.getElementById('editionNumber').value = editionNumber;
@@ -35,7 +35,7 @@ Edit = (id, bookId, editionNumber, serialNumber, isAvailable) => {
 Rest = () => {
     clearValidation(document.getElementById('exampleModal'));
     document.getElementById('bookCopyModalTitle').innerHTML = lbBtnSaveNewBookCopy;
-    document.getElementById('bookCopyModalBtnSave').value = lbBtnSave;
+    document.getElementById('bookCopyModalBtnSave').value = bookify.ui.save;
     document.getElementById('bookCopyId').value = "";
     document.getElementById('bookId').value = "";
     document.getElementById('editionNumber').value = "";

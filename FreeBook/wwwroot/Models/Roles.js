@@ -1,4 +1,4 @@
-﻿
+
 $(document).ready(function () {
     $('#tableRoles').DataTable();
 });
@@ -17,7 +17,7 @@ function DeleteRoles(id) {
 Edit = (id, name) => {
     clearValidation(document.getElementById('exampleModal'));
     document.getElementById('roleModalTitle').innerHTML = lbTitleEdit;
-    document.getElementById('roleModalBtnSave').value = lbEdit;
+    document.getElementById('roleModalBtnSave').value = bookify.ui.edit;
     document.getElementById('roleId').value = id;
     document.getElementById('roleName').value = name;
 }
@@ -25,7 +25,7 @@ Edit = (id, name) => {
 Rest = () => {
     clearValidation(document.getElementById('exampleModal'));
     document.getElementById('roleModalTitle').innerHTML = lbEditNewRole;
-    document.getElementById('roleModalBtnSave').value = lbBtnSave;
+    document.getElementById('roleModalBtnSave').value = bookify.ui.save;
     document.getElementById('roleId').value = "";
     document.getElementById('roleName').value = "";
 }

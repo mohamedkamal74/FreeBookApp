@@ -24,7 +24,7 @@ function DeleteArea(id) {
 Edit = (id, name, governorateId) => {
     clearValidation(document.getElementById('exampleModal'));
     document.getElementById('areaModalTitle').innerHTML = lbTitleEditArea;
-    document.getElementById('areaModalBtnSave').value = lbEdit;
+    document.getElementById('areaModalBtnSave').value = bookify.ui.edit;
     document.getElementById('areaId').value = id;
     document.getElementById('areaName').value = name;
     document.getElementById('governorateId').value = governorateId;
@@ -33,7 +33,7 @@ Edit = (id, name, governorateId) => {
 Rest = () => {
     clearValidation(document.getElementById('exampleModal'));
     document.getElementById('areaModalTitle').innerHTML = lbBtnSaveNewArea;
-    document.getElementById('areaModalBtnSave').value = lbBtnSave;
+    document.getElementById('areaModalBtnSave').value = bookify.ui.save;
     document.getElementById('areaId').value = "";
     document.getElementById('areaName').value = "";
     document.getElementById('governorateId').value = "";
