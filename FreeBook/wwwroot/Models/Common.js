@@ -42,16 +42,32 @@ function clearValidation(modal) {
 }
 
 function confirmDelete() {
-    // The lb* strings are declared by each view; fall back to Arabic when a page
-    // does not declare them so the confirmation never shows "undefined".
+    // The lb* strings are declared by each view. If a view omits them, use a
+    // complete fallback set in the page's language so the dialog is never
+    // mixed-language or showing "undefined".
+    const arabic = (document.documentElement.lang || '').toLowerCase().startsWith('ar');
+    const fallback = arabic
+        ? {
+            title: 'هل أنت متأكد؟',
+            text: 'لن تتمكن من التراجع!',
+            confirm: 'نعم، احذفها',
+            cancel: 'الغاء'
+        }
+        : {
+            title: 'Are you sure?',
+            text: 'You will not be able to undo this!',
+            confirm: 'Yes, delete it',
+            cancel: 'Cancel'
+        };
+
     return Swal.fire({
-        title: (typeof lbTitleDeleteMsg !== 'undefined') ? lbTitleDeleteMsg : 'هل انت متاكد ؟',
-        text: (typeof lmTextMsgDelete !== 'undefined') ? lmTextMsgDelete : 'لن تتمكن من التراجع !',
+        title: (typeof lbTitleDeleteMsg !== 'undefined' && lbTitleDeleteMsg) ? lbTitleDeleteMsg : fallback.title,
+        text: (typeof lmTextMsgDelete !== 'undefined' && lmTextMsgDelete) ? lmTextMsgDelete : fallback.text,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: (typeof lbconfirmButtonText !== 'undefined') ? lbconfirmButtonText : 'Yes, delete it!',
-        cancelButtonText: (typeof lbCancelButtonText !== 'undefined') ? lbCancelButtonText : 'الغاء'
+        confirmButtonText: (typeof lbconfirmButtonText !== 'undefined' && lbconfirmButtonText) ? lbconfirmButtonText : fallback.confirm,
+        cancelButtonText: (typeof lbCancelButtonText !== 'undefined' && lbCancelButtonText) ? lbCancelButtonText : fallback.cancel
     });
 }
