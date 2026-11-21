@@ -994,3 +994,16 @@ a, button, .btn, .card, .form-control, .badge, .dropdown-item,
 .bg-danger-light    { background: var(--bk-danger-light) !important; }
 .bg-warning-light   { background: var(--bk-warning-light) !important; }
 .bg-info-light      { background: var(--bk-info-light) !important; }
+
+/* ============================================================
+   22) ERROR PAGES
+   ============================================================ */
+.error-code {
+  color: var(--bk-primary);
+  font-size: clamp(3.5rem, 12vw, 5.5rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: .05em;
+}
+
+.card-outline.card-danger .error-code { color: var(--bk-danger); }

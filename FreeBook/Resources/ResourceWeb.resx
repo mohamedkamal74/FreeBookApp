@@ -888,6 +888,15 @@
   <data name="dtAriaSortDescending" xml:space="preserve">
     <value>: تفعيل ترتيب العمود تنازليًا</value>
   </data>
+  <data name="lbErrorTitle" xml:space="preserve">
+    <value>حدث خطأ غير متوقع</value>
+  </data>
+  <data name="lbErrorMessage" xml:space="preserve">
+    <value>تعذر معالجة طلبك. يُرجى المحاولة مرة أخرى لاحقًا.</value>
+  </data>
+  <data name="lbErrorRequestId" xml:space="preserve">
+    <value>معرّف الطلب</value>
+  </data>
   <data name="msgRentalSelectSubscriber" xml:space="preserve">
     <value>يرجى اختيار المشترك</value>
   </data>

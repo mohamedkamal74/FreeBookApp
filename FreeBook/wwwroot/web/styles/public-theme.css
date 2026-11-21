@@ -235,6 +235,14 @@ img {
 .text-danger { color: var(--bk-danger) !important; }
 .text-warning { color: var(--bk-warning) !important; }
 
+.error-code {
+  color: var(--bk-primary);
+  font-size: clamp(3.5rem, 12vw, 5.5rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: .05em;
+}
+
 .fw-400 { font-weight: 400 !important; }
 .fw-500 { font-weight: 500 !important; }
 .fw-600 { font-weight: 600 !important; }

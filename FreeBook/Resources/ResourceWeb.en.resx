@@ -783,6 +783,15 @@
   <data name="dtAriaSortDescending" xml:space="preserve">
     <value>: activate to sort column descending</value>
   </data>
+  <data name="lbErrorTitle" xml:space="preserve">
+    <value>Something went wrong</value>
+  </data>
+  <data name="lbErrorMessage" xml:space="preserve">
+    <value>We couldn't process your request. Please try again later.</value>
+  </data>
+  <data name="lbErrorRequestId" xml:space="preserve">
+    <value>Request ID</value>
+  </data>
   <data name="msgRentalSelectSubscriber" xml:space="preserve">
     <value>Please select a subscriber</value>
   </data>
