@@ -1,3 +1,4 @@
+@model BooksDashboardData
 @inject IStringLocalizer<ResourceWeb> Localizer
 
 <style>
@@ -62,8 +63,8 @@
     </div>
 
     @{
-        var dashboard = (BooksDashboardViewModel)ViewBag.Dashboard;
-        var filter = (BooksDashboardFilterViewModel)ViewBag.Filter;
+        var dashboard = Model.Dashboard;
+        var filter = Model.Filter;
     }
 
     <div class="row">
@@ -265,7 +266,24 @@
 
 @section Scripts {
     @{
-        var chartJson = System.Text.Json.JsonSerializer.Serialize(dashboard, new System.Text.Json.JsonSerializerOptions
+        // Availability labels are resource keys until the Razor layer localizes them.
+        var localizedAvailability = dashboard.Availability
+            .Select(row => new NamedCount { Name = Localizer[row.Name].Value, Count = row.Count })
+            .ToList();
+        var localizedDashboard = new BooksDashboardViewModel
+        {
+            TotalBooks = dashboard.TotalBooks,
+            TotalCopies = dashboard.TotalCopies,
+            AvailableCopies = dashboard.AvailableCopies,
+            RentedCopies = dashboard.RentedCopies,
+            BooksWithoutCopies = dashboard.BooksWithoutCopies,
+            ByCategory = dashboard.ByCategory,
+            ByAuthor = dashboard.ByAuthor,
+            TopRentedBooks = dashboard.TopRentedBooks,
+            RentalsPerMonth = dashboard.RentalsPerMonth,
+            Availability = localizedAvailability
+        };
+        var chartJson = System.Text.Json.JsonSerializer.Serialize(localizedDashboard, new System.Text.Json.JsonSerializerOptions
         {
             PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
         });

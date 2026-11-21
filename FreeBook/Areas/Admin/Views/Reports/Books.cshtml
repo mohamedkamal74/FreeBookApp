@@ -1,8 +1,8 @@
-@model List<FreeBook.Models.BookInventoryReport>
+@model BookInventoryReportData
 @inject IStringLocalizer<ResourceWeb> Localizer
 @{
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
-    var filter = (BookReportFilterViewModel)ViewBag.Filter;
+    var filter = Model.Filter;
 }
 
 <div class="content-wrapper">
@@ -89,7 +89,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in Model)
+                    @foreach (var item in Model.Rows)
                     {
                         var coverUrl = !string.IsNullOrWhiteSpace(item.Book.ImageThumbnailUrl)
                             ? item.Book.ImageThumbnailUrl

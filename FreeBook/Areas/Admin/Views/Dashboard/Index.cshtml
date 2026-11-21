@@ -1,4 +1,6 @@
+@model GeneralDashboardData
 @inject IStringLocalizer<ResourceWeb> Localizer
+@{ var filter = Model.Filter; }
 
 <style>
     .small-box-link {
@@ -124,7 +126,7 @@
             <a asp-area="Admin" asp-controller="Categories" asp-action="Categories" class="small-box-link">
                 <div class="small-box bg-info">
                     <div class="inner">
-                        <h3>@ViewBag.TotalBooks</h3>
+                        <h3>@Model.TotalBooks</h3>
                         <p>@Localizer["lbTotalBooks"]</p>
                     </div>
                     <div class="icon">
@@ -137,7 +139,7 @@
             <a asp-area="Admin" asp-controller="BookCopies" asp-action="BookCopies" class="small-box-link">
                 <div class="small-box bg-success">
                     <div class="inner">
-                        <h3>@ViewBag.AvailableCopies</h3>
+                        <h3>@Model.AvailableCopies</h3>
                         <p>@Localizer["lbAvailableCopies"]</p>
                     </div>
                     <div class="icon">
@@ -150,7 +152,7 @@
             <a asp-area="Admin" asp-controller="Subscribers" asp-action="Subscribers" class="small-box-link">
                 <div class="small-box bg-warning">
                     <div class="inner">
-                        <h3>@ViewBag.TotalSubscribers</h3>
+                        <h3>@Model.TotalSubscribers</h3>
                         <p>@Localizer["lbTotalSubscribers"]</p>
                     </div>
                     <div class="icon">
@@ -163,7 +165,7 @@
             <a asp-area="Admin" asp-controller="Subscriptions" asp-action="Subscriptions" class="small-box-link">
                 <div class="small-box bg-primary">
                     <div class="inner">
-                        <h3>@ViewBag.ActiveSubscriptions</h3>
+                        <h3>@Model.ActiveSubscriptions</h3>
                         <p>@Localizer["lbActiveSubscriptions"]</p>
                     </div>
                     <div class="icon">
@@ -176,7 +178,7 @@
             <a asp-area="Admin" asp-controller="Rentals" asp-action="Rentals" class="small-box-link">
                 <div class="small-box bg-danger">
                     <div class="inner">
-                        <h3>@ViewBag.ActiveRentals</h3>
+                        <h3>@Model.ActiveRentals</h3>
                         <p>@Localizer["lbActiveRentals"]</p>
                     </div>
                     <div class="icon">
@@ -189,7 +191,7 @@
             <a asp-area="Admin" asp-controller="Rentals" asp-action="Rentals" asp-route-filter="overdue" class="small-box-link">
                 <div class="small-box bg-danger">
                     <div class="inner">
-                        <h3>@ViewBag.OverdueRentals</h3>
+                        <h3>@Model.OverdueRentals</h3>
                         <p>@Localizer["lbOverdueBooks"]</p>
                     </div>
                     <div class="icon">
@@ -202,7 +204,7 @@
             <a asp-area="Admin" asp-controller="Subscriptions" asp-action="Subscriptions" asp-route-filter="expiring" class="small-box-link">
                 <div class="small-box bg-info">
                     <div class="inner">
-                        <h3>@ViewBag.ExpiringSubscriptions</h3>
+                        <h3>@Model.ExpiringSubscriptions</h3>
                         <p>@Localizer["lbExpiringSubscriptions"]</p>
                     </div>
                     <div class="icon">
@@ -215,7 +217,7 @@
             <a asp-area="Admin" asp-controller="Subscribers" asp-action="Subscribers" asp-route-filter="blacklisted" class="small-box-link">
                 <div class="small-box bg-secondary">
                     <div class="inner">
-                        <h3>@ViewBag.BlacklistedSubscribers</h3>
+                        <h3>@Model.BlacklistedSubscribers</h3>
                         <p>@Localizer["lbBlacklistedSubscribers"]</p>
                     </div>
                     <div class="icon">
@@ -227,9 +229,6 @@
     </div>
 
     <!-- Filters: rentals-based widgets below are scoped by this form -->
-    @{
-        var filter = (FreeBook.Models.DashboardFilterViewModel)ViewBag.Filter;
-    }
     <div class="row">
         <div class="col-12">
             <div class="card card-outline card-primary dashboard-filter-card">
@@ -351,7 +350,7 @@
                 </div>
                 <div class="card-body">
                     @{
-                        var topRenters = ((FreeBook.Models.DashboardChartsViewModel)ViewBag.Charts).TopRenters;
+                        var topRenters = Model.Charts.TopRenters;
                         var maxRentals = topRenters.Count > 0 ? topRenters.Max(x => x.Count) : 0;
                         var rank = 1;
                     }
@@ -401,7 +400,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var rental in ViewBag.RecentRentals)
+                            @foreach (var rental in Model.RecentRentals)
                             {
                                 <tr>
                                     <td>@rental.Subscriber?.FullName</td>
@@ -432,7 +431,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var rental in (List<Rental>)ViewBag.OverdueList)
+                            @foreach (var rental in Model.OverdueList)
                             {
                                 var overdueCopies = rental.RentalCopies.Where(c => c.ReturnDate == null && c.EndDate < DateTime.UtcNow).ToList();
                                 foreach (var rc in overdueCopies)
@@ -467,7 +466,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var sub in ViewBag.ExpiringSubs)
+                            @foreach (var sub in Model.ExpiringSubs)
                             {
                                 var daysLeft = (sub.EndDate - DateTime.UtcNow).Days;
                                 <tr class="@(daysLeft <= 7 ? "table-danger" : (daysLeft <= 14 ? "table-warning" : ""))">
@@ -496,7 +495,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var subscriber in ViewBag.RecentSubscribers)
+                            @foreach (var subscriber in Model.RecentSubscribers)
                             {
                                 <tr>
                                     <td>@subscriber.FullName</td>
@@ -513,7 +512,7 @@
 
     @section Scripts {
         @{
-            var chartData = (FreeBook.Models.DashboardChartsViewModel)ViewBag.Charts;
+            var chartData = Model.Charts;
             var chartJson = System.Text.Json.JsonSerializer.Serialize(chartData, new System.Text.Json.JsonSerializerOptions
             {
                 PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase

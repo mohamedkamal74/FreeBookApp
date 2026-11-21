@@ -1,4 +1,4 @@
-namespace FreeBook.Models
+namespace Infrastructure.ViewModel
 {
     /// <summary>A display label paired with a count, used to feed the dashboard charts.</summary>
     public class NamedCount
@@ -7,7 +7,7 @@ namespace FreeBook.Models
         public int Count { get; set; }
     }
 
-    /// <summary>Everything the dashboard charts need, computed once per request.</summary>
+    /// <summary>Everything the general dashboard charts need, computed once per request.</summary>
     public class DashboardChartsViewModel
     {
         public List<NamedCount> TopRentedBooks { get; set; } = new();

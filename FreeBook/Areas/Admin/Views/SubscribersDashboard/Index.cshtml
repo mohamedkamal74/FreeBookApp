@@ -1,3 +1,4 @@
+@model SubscribersDashboardData
 @inject IStringLocalizer<ResourceWeb> Localizer
 
 <style>
@@ -56,8 +57,8 @@
     </div>
 
     @{
-        var dashboard = (FreeBook.Models.SubscribersDashboardViewModel)ViewBag.Dashboard;
-        var filter = (FreeBook.Models.SubscribersDashboardFilterViewModel)ViewBag.Filter;
+        var dashboard = Model.Dashboard;
+        var filter = Model.Filter;
     }
 
     <!-- Filters: the rental and subscription charts below are scoped by this form -->
@@ -255,7 +256,28 @@
 
 @section Scripts {
         @{
-            var chartJson = System.Text.Json.JsonSerializer.Serialize(dashboard, new System.Text.Json.JsonSerializerOptions
+            // The repository stays localization-free; chart labels are resource keys until here.
+            var localizedAgeGroups = dashboard.AgeGroups
+                .Select(row => new NamedCount { Name = Localizer[row.Name].Value, Count = row.Count })
+                .ToList();
+            var localizedStatus = dashboard.SubscriptionStatus
+                .Select(row => new NamedCount { Name = Localizer[row.Name].Value, Count = row.Count })
+                .ToList();
+            var localizedDashboard = new SubscribersDashboardViewModel
+            {
+                TotalSubscribers = dashboard.TotalSubscribers,
+                ActiveSubscriptions = dashboard.ActiveSubscriptions,
+                ExpiredSubscriptions = dashboard.ExpiredSubscriptions,
+                ExpiringSoon = dashboard.ExpiringSoon,
+                Blacklisted = dashboard.Blacklisted,
+                WhatsAppEnabled = dashboard.WhatsAppEnabled,
+                ByGovernorate = dashboard.ByGovernorate,
+                AgeGroups = localizedAgeGroups,
+                SubscriptionsPerMonth = dashboard.SubscriptionsPerMonth,
+                SubscriptionStatus = localizedStatus,
+                TopRenters = dashboard.TopRenters
+            };
+            var chartJson = System.Text.Json.JsonSerializer.Serialize(localizedDashboard, new System.Text.Json.JsonSerializerOptions
             {
                 PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
             });

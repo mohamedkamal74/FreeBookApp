@@ -106,6 +106,8 @@ try
     builder.Services.AddScoped<IServiceRepository<Governorate>, Infrastructure.IRepository.ServiceRepository.ServicesGovernorate>();
     builder.Services.AddScoped<IServiceRepository<Area>, Infrastructure.IRepository.ServiceRepository.ServicesArea>();
     builder.Services.AddScoped<Infrastructure.IRepository.INotificationRepository, Infrastructure.IRepository.ServiceRepository.ServicesNotification>();
+    builder.Services.AddScoped<IDashboardRepository, ServicesDashboard>();
+    builder.Services.AddScoped<IReportRepository, ServicesReports>();
 
     // Core services
     builder.Services.AddScoped<Infrastructure.Common.Interfaces.IEmailService, Infrastructure.Services.EmailService>();

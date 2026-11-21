@@ -1,10 +1,9 @@
 using Domin.Entity;
-using FreeBook.Models;
 using Infrastructure.Common;
 using Infrastructure.IRepository;
+using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace FreeBook.Areas.Admin.Controllers
 {
@@ -12,203 +11,70 @@ namespace FreeBook.Areas.Admin.Controllers
     [Authorize(Roles = "Admin")]
     public class ReportsController : Controller
     {
-        private readonly IServiceRepository<Book> _serviceBook;
-        private readonly IServiceRepository<BookCopy> _serviceBookCopy;
-        private readonly IServiceRepository<Subscriber> _serviceSubscriber;
-        private readonly IServiceRepository<Subscription> _serviceSubscription;
-        private readonly IServiceRepository<Rental> _serviceRental;
-        private readonly IServiceRepository<Author> _serviceAuthor;
-        private readonly IServiceRepository<Category> _serviceCategory;
+        private readonly IReportRepository _reportRepository;
 
-        public ReportsController(
-            IServiceRepository<Book> serviceBook,
-            IServiceRepository<BookCopy> serviceBookCopy,
-            IServiceRepository<Subscriber> serviceSubscriber,
-            IServiceRepository<Subscription> serviceSubscription,
-            IServiceRepository<Rental> serviceRental,
-            IServiceRepository<Author> serviceAuthor,
-            IServiceRepository<Category> serviceCategory)
+        public ReportsController(IReportRepository reportRepository)
         {
-            _serviceBook = serviceBook;
-            _serviceBookCopy = serviceBookCopy;
-            _serviceSubscriber = serviceSubscriber;
-            _serviceSubscription = serviceSubscription;
-            _serviceRental = serviceRental;
-            _serviceAuthor = serviceAuthor;
-            _serviceCategory = serviceCategory;
+            _reportRepository = reportRepository;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             return View();
         }
 
         public async Task<IActionResult> OverdueBooks()
         {
-            var now = DateTime.UtcNow;
-            var rentalsResult = await _serviceRental.GetAllAsync();
-            var rentals = rentalsResult.IsSuccess ? rentalsResult.Value ?? new List<Rental>() : new List<Rental>();
-            var overdueRentals = rentals
-                .Where(r => r.RentalCopies.Any(rc => rc.ReturnDate == null && rc.EndDate < now))
-                .OrderBy(r => r.StartDate)
-                .ToList();
-            return View(overdueRentals);
+            var result = await _reportRepository.GetOverdueBooksAsync();
+            return View(result.ValueOr(new List<Rental>()));
         }
 
         public async Task<IActionResult> PopularBooks()
         {
-            var rentalsResult = await _serviceRental.GetAllAsync();
-            var rentals = rentalsResult.IsSuccess ? rentalsResult.Value ?? new List<Rental>() : new List<Rental>();
-            var popularBooks = rentals
-                .SelectMany(r => r.RentalCopies)
-                .GroupBy(rc => rc.BookCopy.BookId)
-                .Select(g => new PopularBookReport
-                {
-                    Book = g.First().BookCopy.Book,
-                    RentalCount = g.Count()
-                })
-                .OrderByDescending(x => x.RentalCount)
-                .Take(20)
-                .ToList();
-            return View(popularBooks);
+            var result = await _reportRepository.GetPopularBooksAsync();
+            return View(result.ValueOr(new List<PopularBookReport>()));
         }
 
         public async Task<IActionResult> ActiveSubscribers()
         {
-            var subsResult = await _serviceSubscriber.GetAllAsync();
-            var subscribers = subsResult.IsSuccess ? subsResult.Value ?? new List<Subscriber>() : new List<Subscriber>();
-            var now = DateTime.UtcNow;
-            var activeSubs = subscribers
-                .Where(s => s.Subscriptions.Any(sub => sub.StartDate <= now && sub.EndDate >= now))
-                .OrderBy(s => s.FirstName)
-                .ToList();
-            return View(activeSubs);
+            var result = await _reportRepository.GetActiveSubscribersAsync();
+            return View(result.ValueOr(new List<Subscriber>()));
         }
 
         public async Task<IActionResult> ExpiringSubscriptions(int days = 30)
         {
-            var subsResult = await _serviceSubscription.GetAllAsync();
-            var subscriptions = subsResult.IsSuccess ? subsResult.Value ?? new List<Subscription>() : new List<Subscription>();
-            var now = DateTime.UtcNow;
-            var future = now.AddDays(days);
-            var expiring = subscriptions
-                .Where(s => s.EndDate >= now && s.EndDate <= future)
-                .OrderBy(s => s.EndDate)
-                .ToList();
-            ViewBag.Days = days;
-            return View(expiring);
+            var result = await _reportRepository.GetExpiringSubscriptionsAsync(days);
+            return View(result.ValueOr(new ExpiringSubscriptionsData { Days = days }));
         }
 
         public async Task<IActionResult> RentalHistory(Guid? subscriberId = null)
         {
-            var rentalsResult = await _serviceRental.GetAllAsync();
-            var subsResult = await _serviceSubscriber.GetAllAsync();
-            var rentals = rentalsResult.IsSuccess ? rentalsResult.Value ?? new List<Rental>() : new List<Rental>();
-            var subscribers = subsResult.IsSuccess ? subsResult.Value ?? new List<Subscriber>() : new List<Subscriber>();
-
-            if (subscriberId.HasValue)
-            {
-                rentals = rentals.Where(r => r.SubscriberId == subscriberId.Value).ToList();
-            }
-
-            ViewBag.Subscribers = subscribers;
-            ViewBag.SelectedSubscriberId = subscriberId;
-            return View(rentals.OrderByDescending(r => r.StartDate).ToList());
+            var result = await _reportRepository.GetRentalHistoryAsync(subscriberId);
+            return View(result.ValueOr(new RentalHistoryData { SelectedSubscriberId = subscriberId }));
         }
 
         public async Task<IActionResult> BooksByCategory()
         {
-            var booksResult = await _serviceBook.GetAllAsync();
-            var catResult = await _serviceCategory.GetAllAsync();
-            var books = booksResult.IsSuccess ? booksResult.Value ?? new List<Book>() : new List<Book>();
-            var categories = catResult.IsSuccess ? catResult.Value ?? new List<Category>() : new List<Category>();
-
-            var booksByCategory = books
-                .Where(b => b.CategoryId.HasValue)
-                .GroupBy(b => b.CategoryId!.Value)
-                .Select(g => new BooksByCategoryReport
-                {
-                    Category = categories.FirstOrDefault(c => c.Id == g.Key),
-                    Count = g.Count()
-                })
-                .Where(x => x.Category != null)
-                .OrderByDescending(x => x.Count)
-                .ToList();
-
-            return View(booksByCategory);
+            var result = await _reportRepository.GetBooksByCategoryAsync();
+            return View(result.ValueOr(new List<BooksByCategoryReport>()));
         }
 
         public async Task<IActionResult> BooksByAuthor()
         {
-            var booksResult = await _serviceBook.GetAllAsync();
-            var authResult = await _serviceAuthor.GetAllAsync();
-            var books = booksResult.IsSuccess ? booksResult.Value ?? new List<Book>() : new List<Book>();
-            var authors = authResult.IsSuccess ? authResult.Value ?? new List<Author>() : new List<Author>();
-
-            var booksByAuthor = books
-                .Where(b => b.AuthorId != Guid.Empty)
-                .GroupBy(b => b.AuthorId)
-                .Select(g => new BooksByAuthorReport
-                {
-                    Author = authors.FirstOrDefault(a => a.Id == g.Key),
-                    Count = g.Count()
-                })
-                .Where(x => x.Author != null)
-                .OrderByDescending(x => x.Count)
-                .ToList();
-
-            return View(booksByAuthor);
+            var result = await _reportRepository.GetBooksByAuthorAsync();
+            return View(result.ValueOr(new List<BooksByAuthorReport>()));
         }
 
         public async Task<IActionResult> Books(Guid? authorId = null, Guid? categoryId = null, bool availableOnly = false)
         {
-            var booksResult = await _serviceBook.GetAllAsync();
-            var copiesResult = await _serviceBookCopy.GetAllAsync();
-            var rentalsResult = await _serviceRental.GetAllAsync();
-            var authorsResult = await _serviceAuthor.GetAllAsync();
-            var categoriesResult = await _serviceCategory.GetAllAsync();
-
-            var books = booksResult.IsSuccess ? booksResult.Value ?? new List<Book>() : new List<Book>();
-            var copies = copiesResult.IsSuccess ? copiesResult.Value ?? new List<BookCopy>() : new List<BookCopy>();
-            var rentals = rentalsResult.IsSuccess ? rentalsResult.Value ?? new List<Rental>() : new List<Rental>();
-            var authors = authorsResult.IsSuccess ? authorsResult.Value ?? new List<Author>() : new List<Author>();
-            var categories = categoriesResult.IsSuccess ? categoriesResult.Value ?? new List<Category>() : new List<Category>();
-
-            var copyCounts = copies.GroupBy(c => c.BookId).ToDictionary(g => g.Key, g => g.Count());
-            var availableCounts = copies.Where(c => c.IsAvailableForRental)
-                .GroupBy(c => c.BookId).ToDictionary(g => g.Key, g => g.Count());
-            var rentalCounts = rentals.SelectMany(r => r.RentalCopies)
-                .Where(rc => rc.BookCopy != null)
-                .GroupBy(rc => rc.BookCopy!.BookId)
-                .ToDictionary(g => g.Key, g => g.Count());
-
-            var rows = books
-                .Where(b => !authorId.HasValue || b.AuthorId == authorId.Value)
-                .Where(b => !categoryId.HasValue || b.CategoryId == categoryId.Value)
-                .Where(b => !availableOnly || b.IsAvailableForRental)
-                .Select(b => new BookInventoryReport
-                {
-                    Book = b,
-                    AuthorName = b.Author?.Name,
-                    CategoryName = b.Category?.Name,
-                    SubCategoryName = b.SubCategory?.Name,
-                    CopyCount = copyCounts.TryGetValue(b.Id, out var copyCount) ? copyCount : 0,
-                    AvailableCopyCount = availableCounts.TryGetValue(b.Id, out var availableCount) ? availableCount : 0,
-                    RentalCount = rentalCounts.TryGetValue(b.Id, out var rentalCount) ? rentalCount : 0
-                })
-                .OrderBy(x => x.Book.Name, StringComparer.Ordinal)
-                .ToList();
-
-            ViewBag.Filter = new BookReportFilterViewModel
+            var result = await _reportRepository.GetBooksAsync(new BookInventoryQuery
             {
                 AuthorId = authorId,
                 CategoryId = categoryId,
-                AvailableOnly = availableOnly,
-                Authors = authors.OrderBy(a => a.Name, StringComparer.Ordinal).ToList(),
-                Categories = categories.OrderBy(c => c.Name, StringComparer.Ordinal).ToList()
-            };
+                AvailableOnly = availableOnly
+            });
 
-            return View(rows);
+            return View(result.ValueOr(new BookInventoryReportData()));
         }
     }
 }

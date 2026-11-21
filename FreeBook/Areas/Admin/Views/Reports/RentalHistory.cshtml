@@ -1,4 +1,4 @@
-@model List<Rental>
+@model RentalHistoryData
 @inject IStringLocalizer<ResourceWeb> Localizer
 @{
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
@@ -28,9 +28,9 @@
                     <label class="mr-2">@Localizer["lbSubscriber"]</label>
                     <select name="subscriberId" class="form-control" onchange="this.form.submit()">
                         <option value="">@Localizer["lbAllSubscribers"]</option>
-                        @foreach (var sub in ViewBag.Subscribers)
+                        @foreach (var sub in Model.Subscribers)
                         {
-                            @if (ViewBag.SelectedSubscriberId == sub.Id)
+                            @if (Model.SelectedSubscriberId == sub.Id)
                             {
                                 <option value="@sub.Id" selected>@sub.FullName</option>
                             }
@@ -56,7 +56,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var rental in Model)
+                    @foreach (var rental in Model.Rentals)
                     {
                         foreach (var rc in rental.RentalCopies)
                         {

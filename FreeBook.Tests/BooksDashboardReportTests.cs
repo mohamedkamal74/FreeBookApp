@@ -82,6 +82,68 @@ public class BooksDashboardReportTests : IClassFixture<CustomWebApplicationFacto
     }
 
     [Fact]
+    public async Task DashboardsAndReports_LoadForAdmin_WithLocalizedChartLabelsAndRtl()
+    {
+        await SeedUserAsync(AdminEmail, "Admin", "Books Administrator");
+        var client = CreateClient();
+        await LoginAsync(client, AdminEmail);
+
+        var dashboardUrls = new[]
+        {
+            "/Admin/Dashboard/Index",
+            "/Admin/SubscribersDashboard/Index",
+            "/Admin/BooksDashboard/Index"
+        };
+        var reportUrls = new[]
+        {
+            "/Admin/Reports/Index",
+            "/Admin/Reports/OverdueBooks",
+            "/Admin/Reports/PopularBooks",
+            "/Admin/Reports/ActiveSubscribers",
+            "/Admin/Reports/ExpiringSubscriptions",
+            "/Admin/Reports/RentalHistory",
+            "/Admin/Reports/BooksByCategory",
+            "/Admin/Reports/BooksByAuthor",
+            "/Admin/Reports/Books"
+        };
+
+        foreach (var url in dashboardUrls.Concat(reportUrls))
+        {
+            var response = await client.GetAsync($"{url}?culture=en");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        var generalDashboard = await client.GetStringAsync("/Admin/Dashboard/Index?culture=en");
+        Assert.Contains("id=\"chartRentalsPerMonth\"", generalDashboard);
+        Assert.Contains("id=\"chartBooksByCategory\"", generalDashboard);
+        Assert.Contains("id=\"chartCopyAvailability\"", generalDashboard);
+        Assert.Contains("id=\"chartTopRentedBooks\"", generalDashboard);
+        Assert.Contains("\"availableCopies\":", generalDashboard);
+
+        var subscribersDashboard = await client.GetStringAsync("/Admin/SubscribersDashboard/Index?culture=en");
+        Assert.Contains("id=\"chartByGovernorate\"", subscribersDashboard);
+        Assert.Contains("id=\"chartAgeGroups\"", subscribersDashboard);
+        Assert.Contains("id=\"chartSubscriptionsPerMonth\"", subscribersDashboard);
+        Assert.Contains("id=\"chartSubscriptionStatus\"", subscribersDashboard);
+        Assert.Contains("Under 18", subscribersDashboard);
+        Assert.Contains("Active", subscribersDashboard);
+        Assert.DoesNotContain("lbAgeUnder18", subscribersDashboard);
+        Assert.DoesNotContain("lbSubscriptionStatus", subscribersDashboard);
+
+        var booksDashboard = await client.GetStringAsync("/Admin/BooksDashboard/Index?culture=en");
+        Assert.DoesNotContain("\"lbAvailable\"", booksDashboard);
+        Assert.DoesNotContain("\"lbRented\"", booksDashboard);
+
+        foreach (var url in dashboardUrls.Concat(reportUrls))
+        {
+            var arabic = WebUtility.HtmlDecode(await client.GetStringAsync($"{url}?culture=ar"));
+            Assert.Contains("dir=\"rtl\"", arabic);
+            Assert.DoesNotContain("lbAgeUnder18", arabic);
+            Assert.DoesNotContain("\"lbAvailable\"", arabic);
+        }
+    }
+
+    [Fact]
     public async Task BooksDashboard_AllowsUserRole_ButReportDeniesIt()
     {
         await SeedUserAsync(UserEmail, "User", "Regular User");
