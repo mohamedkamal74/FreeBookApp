@@ -76,7 +76,7 @@
                                 }
                             </td>
                             <td>
-                                <input type="checkbox" disabled checked="@rental.PenaltyPaid" style="width:30px;height:30px"/>
+                                <input type="checkbox" disabled checked="@rental.PenaltyPaid" aria-label="@Localizer["lbPenaltyPaid"]" style="width:30px;height:30px"/>
                             </td>
                             <td>
                                 @foreach (var rc in rental.RentalCopies)
@@ -88,15 +88,15 @@
                                                 <input type="hidden" name="RentalId" value="@rental.Id" />
                                                 <input type="hidden" name="RentalCopyId" value="@rc.BookCopyId" />
                                                 <input type="hidden" name="ReturnDate" value="@DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss")" />
-                                                <button type="submit" class="btn btn-success" title="@Localizer["lbReturn"]">
+                                                <button type="submit" class="btn btn-success" title="@Localizer["lbReturn"]" aria-label="@Localizer["lbReturn"]">
                                                     <i class="fas fa-undo"></i>
                                                 </button>
                                             </form>
                                             <form asp-action="ExtendRental" asp-controller="Rentals" method="post" style="display:inline;">
                                                 <input type="hidden" name="RentalId" value="@rental.Id" />
                                                 <input type="hidden" name="RentalCopyId" value="@rc.BookCopyId" />
-                                                <input type="date" name="NewEndDate" value="@rc.EndDate.AddDays(7).ToString("yyyy-MM-dd")" class="form-control form-control-sm" style="width:130px;display:inline-block;" />
-                                                <button type="submit" class="btn btn-info" title="@Localizer["lbExtend"]">
+                                                <input type="date" name="NewEndDate" value="@rc.EndDate.AddDays(7).ToString("yyyy-MM-dd")" class="form-control form-control-sm" aria-label="@Localizer["lbEndDate"]" style="width:130px;display:inline-block;" />
+                                                <button type="submit" class="btn btn-info" title="@Localizer["lbExtend"]" aria-label="@Localizer["lbExtend"]">
                                                     <i class="fas fa-calendar-plus"></i>
                                                 </button>
                                             </form>
