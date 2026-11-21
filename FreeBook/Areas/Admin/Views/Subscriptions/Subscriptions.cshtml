@@ -45,7 +45,10 @@
                             <td>@item.StartDate.ToString("yyyy-MM-dd")</td>
                             <td>@item.EndDate.ToString("yyyy-MM-dd")</td>
                             <td>
-                                <input type="button" class="btn btn-danger btn-sm" onclick="DeleteSubscription('@item.Id')" value="@Localizer["lbbtnDelete"]" />
+                                <button type="button" class="btn btn-danger btn-sm" onclick="DeleteSubscription('@item.Id')"
+                                        title="@Localizer["lbbtnDelete"]" aria-label="@Localizer["lbbtnDelete"]">
+                                    <i class="fas fa-trash" aria-hidden="true"></i>
+                                </button>
                             </td>
                         </tr>
                     }

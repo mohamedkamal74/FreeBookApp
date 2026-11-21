@@ -1007,3 +1007,49 @@ a, button, .btn, .card, .form-control, .badge, .dropdown-item,
 }
 
 .card-outline.card-danger .error-code { color: var(--bk-danger); }
+
+/* ============================================================
+   23) TABLE THUMBNAILS
+   ============================================================ */
+.book-cover-thumb {
+  width: 48px;
+  height: 64px;
+  object-fit: cover;
+  border: 1px solid var(--bk-border);
+  border-radius: var(--bk-radius-sm);
+  background: var(--bk-bg);
+}
+
+.book-cover-placeholder,
+.user-avatar-placeholder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--bk-text-light);
+  background: var(--bk-bg);
+  border: 1px dashed var(--bk-border);
+}
+
+.book-cover-placeholder {
+  width: 48px;
+  height: 64px;
+  border-radius: var(--bk-radius-sm);
+}
+
+.user-avatar-thumb {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border: 1px solid var(--bk-border);
+  border-radius: 50%;
+}
+
+.user-avatar-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.table .btn-group .btn {
+  min-width: 2.25rem;
+}

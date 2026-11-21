@@ -102,8 +102,17 @@
                                 </td>
                                 <td>@item.Description</td>
 <td>
-    <input type="button" class="btn btn-info btn-sm" onclick="Edit('@item.Id','@Js.Encode(item.Name)','@Js.Encode(item.Description)')" value="@Localizer["lbBtnEdit"]" data-bs-toggle="modal" data-bs-target="#exampleModal" />
-    <input type="button" class="btn btn-danger btn-sm" onclick="Delete('@item.Id')" value="@Localizer["lbbtnDelete"]" />
+    <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn btn-info" onclick="Edit('@item.Id','@Js.Encode(item.Name)','@Js.Encode(item.Description)')"
+                title="@Localizer["lbBtnEdit"]" aria-label="@Localizer["lbBtnEdit"]"
+                data-bs-toggle="modal" data-bs-target="#exampleModal">
+            <i class="fas fa-edit" aria-hidden="true"></i>
+        </button>
+        <button type="button" class="btn btn-danger" onclick="Delete('@item.Id')"
+                title="@Localizer["lbbtnDelete"]" aria-label="@Localizer["lbbtnDelete"]">
+            <i class="fas fa-trash" aria-hidden="true"></i>
+        </button>
+    </div>
 </td>
                             </tr>
 
@@ -151,8 +160,10 @@
                                 <td>@item.Date</td>
                                 <td>@usermanager.FindByIdAsync(item.UserId.ToString()).Result?.Name</td>
                                 <td>
-
-                                    <input type="button" class="btn btn-danger btn-sm" onclick="DeleteLog('@item.Id')" value="@Localizer["lbbtnDelete"]" />
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="DeleteLog('@item.Id')"
+                                            title="@Localizer["lbbtnDelete"]" aria-label="@Localizer["lbbtnDelete"]">
+                                        <i class="fas fa-trash" aria-hidden="true"></i>
+                                    </button>
                                 </td>
                             </tr>
 

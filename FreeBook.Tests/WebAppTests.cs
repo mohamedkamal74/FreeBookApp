@@ -150,15 +150,46 @@ public class WebAppTests : IClassFixture<CustomWebApplicationFactory>
     public async Task BooksPage_LoadsForAdmin_WithExpectedHooks()
     {
         await SeedAdminAsync();
+        Guid authorId;
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var authors = scope.ServiceProvider.GetRequiredService<IServiceRepository<Author>>();
+            var author = new Author { Name = $"Test Author {Guid.NewGuid():N}" };
+            Assert.True((await authors.SaveAsync(author)).IsSuccess);
+            authorId = author.Id;
+        }
+
         var client = _factory.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
         {
             AllowAutoRedirect = false
         });
         await LoginAsync(client);
 
+        var bookName = $"Thumbnail Book {Guid.NewGuid():N}";
+        var initialPage = await client.GetStringAsync("/Admin/Books/Books?culture=en");
+        var createResponse = await client.PostAsync("/Admin/Books/Save?culture=en", new FormUrlEncodedContent(
+            new Dictionary<string, string>
+            {
+                ["NewBook.BookId"] = string.Empty,
+                ["NewBook.Name"] = bookName,
+                ["NewBook.AuthorId"] = authorId.ToString(),
+                ["NewBook.ImageThumbnailUrl"] = "https://res.cloudinary.com/example/image/upload/thumb.png",
+                ["__RequestVerificationToken"] = ExtractAntiForgeryToken(initialPage)!
+            }));
+        Assert.Equal(HttpStatusCode.Redirect, createResponse.StatusCode);
+
         var html = await client.GetStringAsync("/Admin/Books/Books?culture=en");
 
         Assert.Contains("id=\"tableBooks\"", html);
+        Assert.Contains(bookName, html);
+        Assert.Contains("book-cover-thumb", html);
+        Assert.Contains("https://res.cloudinary.com/example/image/upload/thumb.png", html);
+        Assert.Contains("fas fa-edit", html);
+        Assert.Contains("fas fa-trash", html);
+        Assert.Contains("aria-label=\"Edit\"", html);
+        Assert.Contains("aria-label=\"Delete\"", html);
+        Assert.DoesNotContain("value=\"Edit\"", html);
+        Assert.DoesNotContain("value=\"Delete\"", html);
         Assert.Contains("id=\"bookModalBtnSave\"", html);
         Assert.Contains("id=\"coverImage\"", html);
         Assert.Contains("enctype=\"multipart/form-data\"", html);

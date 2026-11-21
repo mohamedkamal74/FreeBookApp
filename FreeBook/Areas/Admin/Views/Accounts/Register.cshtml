@@ -68,17 +68,34 @@
                             <td>
                                 @if (!string.IsNullOrWhiteSpace(user.ImageUser))
                                 {
-                                    <img src="@Helper.PathImageUser/@user.ImageUser" class="img-bordered img-circle" style="width:50px;height:50px" />
+                                    <img src="@Helper.PathImageUser/@user.ImageUser" class="user-avatar-thumb"
+                                         alt="@Localizer["lbImageUser"]" loading="lazy" />
+                                }
+                                else
+                                {
+                                    <i class="fas fa-user-circle user-avatar-placeholder" role="img"
+                                       title="@Localizer["lbImageUser"]" aria-label="@Localizer["lbImageUser"]"></i>
                                 }
                             </td>
                             <td>@user.Email</td>
                         <td><input type="checkbox" disabled checked="@user.ActiveUser" style="width:30px;height:30px"/></td>
 <td>
-    <input type="button" class="btn btn-info btn-sm" onclick="Edit('@user.Id','@Js.Encode(user.Name)','@Js.Encode(user.Email)','@Js.Encode(user.ImageUser)','@Js.Encode(user.Role)','@user.ActiveUser')"
-    value="@Localizer["lbBtnEdit"]" data-bs-toggle="modal" data-bs-target="#exampleModal" />
-    <input type="button" class="btn btn-danger btn-sm" onclick="DeleteUser('@user.Id')" value="@Localizer["lbbtnDelete"]"/>
-    <input type="button" class="btn btn-dark btn-sm" onclick="ChangePassword('@user.Id')" value="@Localizer["lbbtnChangePassword"]"
-    data-bs-toggle="modal" data-bs-target="#ChangePasswordModal"/>
+    <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn btn-info" onclick="Edit('@user.Id','@Js.Encode(user.Name)','@Js.Encode(user.Email)','@Js.Encode(user.ImageUser)','@Js.Encode(user.Role)','@user.ActiveUser')"
+                title="@Localizer["lbBtnEdit"]" aria-label="@Localizer["lbBtnEdit"]"
+                data-bs-toggle="modal" data-bs-target="#exampleModal">
+            <i class="fas fa-edit" aria-hidden="true"></i>
+        </button>
+        <button type="button" class="btn btn-danger" onclick="DeleteUser('@user.Id')"
+                title="@Localizer["lbbtnDelete"]" aria-label="@Localizer["lbbtnDelete"]">
+            <i class="fas fa-trash" aria-hidden="true"></i>
+        </button>
+        <button type="button" class="btn btn-dark" onclick="ChangePassword('@user.Id')"
+                title="@Localizer["lbbtnChangePassword"]" aria-label="@Localizer["lbbtnChangePassword"]"
+                data-bs-toggle="modal" data-bs-target="#ChangePasswordModal">
+            <i class="fas fa-key" aria-hidden="true"></i>
+        </button>
+    </div>
 </td>
 
                         </tr>

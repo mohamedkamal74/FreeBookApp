@@ -56,9 +56,29 @@
                                 <input type="checkbox" disabled checked="@subscriber.IsBlackListed" style="width:30px;height:30px"/>
                             </td>
                             <td>
-                                <input type="button" class="btn btn-info btn-sm" onclick="Edit('@subscriber.Id','@Js.Encode(subscriber.FirstName)','@Js.Encode(subscriber.LastName)','@Js.Encode(subscriber.NationalId)','@Js.Encode(subscriber.MobileNumber)','@(subscriber.HasWhatsApp ? "true" : "false")','@Js.Encode(subscriber.Email)','@subscriber.AreaId','@subscriber.GovernorateId','@Js.Encode(subscriber.Address)','@(subscriber.IsBlackListed ? "true" : "false")','@subscriber.DateOfBirth.ToString("yyyy-MM-dd")')" value="@Localizer["lbBtnEdit"]" data-bs-toggle="modal" data-bs-target="#exampleModal" />
-                                <input type="button" class="btn btn-danger btn-sm" onclick="DeleteSubscriber('@subscriber.Id')" value="@Localizer["lbbtnDelete"]"/>
-                                <input type="button" class="btn btn-warning btn-sm" onclick="ToggleBlacklist('@subscriber.Id')" value="@(subscriber.IsBlackListed ? Localizer["lbActiveUser"] : Localizer["lbIsBlackListed"])" />
+                                @{
+                                    var blacklistLabel = subscriber.IsBlackListed
+                                        ? Localizer["lbActiveUser"]
+                                        : Localizer["lbIsBlackListed"];
+                                    var blacklistIcon = subscriber.IsBlackListed
+                                        ? "fas fa-user-check"
+                                        : "fas fa-user-times";
+                                }
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button type="button" class="btn btn-info" onclick="Edit('@subscriber.Id','@Js.Encode(subscriber.FirstName)','@Js.Encode(subscriber.LastName)','@Js.Encode(subscriber.NationalId)','@Js.Encode(subscriber.MobileNumber)','@(subscriber.HasWhatsApp ? "true" : "false")','@Js.Encode(subscriber.Email)','@subscriber.AreaId','@subscriber.GovernorateId','@Js.Encode(subscriber.Address)','@(subscriber.IsBlackListed ? "true" : "false")','@subscriber.DateOfBirth.ToString("yyyy-MM-dd")')"
+                                            title="@Localizer["lbBtnEdit"]" aria-label="@Localizer["lbBtnEdit"]"
+                                            data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                        <i class="fas fa-edit" aria-hidden="true"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger" onclick="DeleteSubscriber('@subscriber.Id')"
+                                            title="@Localizer["lbbtnDelete"]" aria-label="@Localizer["lbbtnDelete"]">
+                                        <i class="fas fa-trash" aria-hidden="true"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-warning" onclick="ToggleBlacklist('@subscriber.Id')"
+                                            title="@blacklistLabel" aria-label="@blacklistLabel">
+                                        <i class="@blacklistIcon" aria-hidden="true"></i>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     }

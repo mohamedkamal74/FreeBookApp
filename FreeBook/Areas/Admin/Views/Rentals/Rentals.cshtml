@@ -108,8 +108,8 @@
                                 {
                                     <form asp-action="PayPenalty" asp-controller="Rentals" method="post" style="display:inline;">
                                         <input type="hidden" name="rentalId" value="@rental.Id" />
-                                        <button type="submit" class="btn btn-danger btn-sm" title="@Localizer["lbPayPenalty"]">
-                                            <i class="fas fa-money-bill-wave"></i> @Localizer["lbPenaltyPaid"]
+                                        <button type="submit" class="btn btn-danger btn-sm" title="@Localizer["lbPayPenalty"]" aria-label="@Localizer["lbPayPenalty"]">
+                                            <i class="fas fa-money-bill-wave" aria-hidden="true"></i>
                                         </button>
                                     </form>
                                 }

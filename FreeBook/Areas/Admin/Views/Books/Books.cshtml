@@ -30,6 +30,7 @@
             <table id="tableBooks" class="table table-bordered table-hover table-striped">
                 <thead>
                     <tr>
+                        <th scope="col" style="width:80px">@Localizer["lbCoverImage"]</th>
                         <th scope="col">@Localizer["lbBookName"]</th>
                         <th scope="col">@Localizer["lbAuthor"]</th>
                         <th scope="col">@Localizer["lbPublisher"]</th>
@@ -43,6 +44,22 @@
                     @foreach (var item in Model.Books)
                     {
                         <tr>
+                            <td>
+                                @{
+                                    var coverUrl = !string.IsNullOrWhiteSpace(item.ImageThumbnailUrl)
+                                        ? item.ImageThumbnailUrl
+                                        : item.ImageUrl;
+                                }
+                                @if (!string.IsNullOrWhiteSpace(coverUrl))
+                                {
+                                    <img src="@coverUrl" class="book-cover-thumb" alt="@Localizer["lbCoverImage"]" loading="lazy" />
+                                }
+                                else
+                                {
+                                    <i class="fas fa-image book-cover-placeholder" role="img"
+                                       title="@Localizer["lbCoverImage"]" aria-label="@Localizer["lbCoverImage"]"></i>
+                                }
+                            </td>
                             <td>@item.Name</td>
                             <td>@item.Author?.Name</td>
                             <td>@item.Publisher</td>
@@ -52,22 +69,30 @@
                                 <input type="checkbox" disabled checked="@item.IsAvailableForRental" style="width:30px;height:30px" aria-label="@Localizer["lbAvailableForRental"]" />
                             </td>
                             <td>
-                                <input type="button" class="btn btn-info btn-sm js-edit-book" onclick="Edit(this)" value="@Localizer["lbBtnEdit"]"
-                                       data-bs-toggle="modal" data-bs-target="#exampleModal"
-                                       data-id="@item.Id"
-                                       data-name="@item.Name"
-                                       data-author="@item.AuthorId"
-                                       data-publisher="@item.Publisher"
-                                       data-publishing-date="@(item.PublishingDate?.ToString("yyyy-MM-dd"))"
-                                       data-image-url="@item.ImageUrl"
-                                       data-thumbnail-url="@item.ImageThumbnailUrl"
-                                       data-public-id="@item.ImagePublicId"
-                                       data-hall="@item.Hall"
-                                       data-available="@(item.IsAvailableForRental ? "true" : "false")"
-                                       data-description="@item.Description"
-                                       data-category="@item.CategoryId"
-                                       data-subcategory="@item.SubCategoryId" />
-                                <input type="button" class="btn btn-danger btn-sm" onclick="DeleteBook('@item.Id')" value="@Localizer["lbbtnDelete"]" />
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button type="button" class="btn btn-info js-edit-book" onclick="Edit(this)"
+                                            title="@Localizer["lbBtnEdit"]" aria-label="@Localizer["lbBtnEdit"]"
+                                            data-bs-toggle="modal" data-bs-target="#exampleModal"
+                                            data-id="@item.Id"
+                                            data-name="@item.Name"
+                                            data-author="@item.AuthorId"
+                                            data-publisher="@item.Publisher"
+                                            data-publishing-date="@(item.PublishingDate?.ToString("yyyy-MM-dd"))"
+                                            data-image-url="@item.ImageUrl"
+                                            data-thumbnail-url="@item.ImageThumbnailUrl"
+                                            data-public-id="@item.ImagePublicId"
+                                            data-hall="@item.Hall"
+                                            data-available="@(item.IsAvailableForRental ? "true" : "false")"
+                                            data-description="@item.Description"
+                                            data-category="@item.CategoryId"
+                                            data-subcategory="@item.SubCategoryId">
+                                        <i class="fas fa-edit" aria-hidden="true"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger" onclick="DeleteBook('@item.Id')"
+                                            title="@Localizer["lbbtnDelete"]" aria-label="@Localizer["lbbtnDelete"]">
+                                        <i class="fas fa-trash" aria-hidden="true"></i>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     }
