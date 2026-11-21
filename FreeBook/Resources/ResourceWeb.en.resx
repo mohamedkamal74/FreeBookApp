@@ -150,9 +150,6 @@
   <data name="lbTextMsgDelete" xml:space="preserve">
     <value>Deleted successfully</value>
   </data>
-  <data name="lbTitleDeletedOk" xml:space="preserve">
-    <value>Deleted Successfully</value>
-  </data>
   <data name="lbTitleDeleteMsg" xml:space="preserve">
     <value>Are you sure?</value>
   </data>

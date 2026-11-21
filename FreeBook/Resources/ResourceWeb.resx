@@ -255,9 +255,6 @@
   <data name="lbTextMsgDelete" xml:space="preserve">
     <value>تم الحذف بنجاح</value>
   </data>
-  <data name="lbTitleDeletedOk" xml:space="preserve">
-    <value>تم الحذف بنجاح</value>
-  </data>
   <data name="lbTitleDeleteMsg" xml:space="preserve">
     <value>هل انت متاكد ؟</value>
   </data>
