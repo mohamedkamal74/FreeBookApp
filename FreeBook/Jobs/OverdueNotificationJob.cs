@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Domin.Entity;
@@ -15,6 +16,7 @@ namespace FreeBook.Jobs
     {
         private readonly IRentalRepository _rentalRepo;
         private readonly IServiceRepository<Subscriber> _subscriberRepo;
+        private readonly INotificationRepository _notificationRepo;
         private readonly IEmailService _emailService;
         private readonly ISmsService _smsService;
         private readonly ILogger<OverdueNotificationJob> _logger;
@@ -22,12 +24,14 @@ namespace FreeBook.Jobs
         public OverdueNotificationJob(
             IRentalRepository rentalRepo,
             IServiceRepository<Subscriber> subscriberRepo,
+            INotificationRepository notificationRepo,
             IEmailService emailService,
             ISmsService smsService,
             ILogger<OverdueNotificationJob> logger)
         {
             _rentalRepo = rentalRepo;
             _subscriberRepo = subscriberRepo;
+            _notificationRepo = notificationRepo;
             _emailService = emailService;
             _smsService = smsService;
             _logger = logger;
@@ -58,8 +62,24 @@ namespace FreeBook.Jobs
                         if (!subscriberResult.IsSuccess || subscriberResult.Value == null) continue;
 
                         var subscriber = subscriberResult.Value;
+                        var bookTitle = copy.BookCopy?.Book?.Name;
                         _logger.LogInformation("Overdue notification for {Subscriber}: {BookTitle} ({Days} days overdue)",
-                            subscriber.FullName, copy.BookCopy.Book.Name, daysOverdue);
+                            subscriber.FullName, bookTitle, daysOverdue);
+
+                        var saved = await _notificationRepo.UpsertAsync(new Notification
+                        {
+                            Type = NotificationType.RentalOverdue,
+                            DedupeKey = $"overdue:{rental.Id}:{copy.BookCopyId}",
+                            SubscriberName = subscriber.FullName,
+                            BookTitle = bookTitle,
+                            Days = daysOverdue,
+                            TargetUrl = "/Admin/Rentals/Rentals"
+                        });
+                        if (!saved.IsSuccess)
+                        {
+                            _logger.LogWarning("Failed to save overdue notification: {Error}", saved.Error?.Message);
+                            continue;
+                        }
                         notificationsSent++;
                     }
                 }

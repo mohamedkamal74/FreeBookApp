@@ -16,6 +16,7 @@ namespace FreeBook.Jobs
     {
         private readonly IRentalRepository _rentalRepo;
         private readonly IServiceRepository<Subscriber> _subscriberRepo;
+        private readonly INotificationRepository _notificationRepo;
         private readonly IEmailService _emailService;
         private readonly ISmsService _smsService;
         private readonly FineSettings _fineSettings;
@@ -24,6 +25,7 @@ namespace FreeBook.Jobs
         public FineCalculationJob(
             IRentalRepository rentalRepo,
             IServiceRepository<Subscriber> subscriberRepo,
+            INotificationRepository notificationRepo,
             IEmailService emailService,
             ISmsService smsService,
             IOptions<FineSettings> fineSettings,
@@ -31,6 +33,7 @@ namespace FreeBook.Jobs
         {
             _rentalRepo = rentalRepo;
             _subscriberRepo = subscriberRepo;
+            _notificationRepo = notificationRepo;
             _emailService = emailService;
             _smsService = smsService;
             _fineSettings = fineSettings.Value;
@@ -77,6 +80,21 @@ namespace FreeBook.Jobs
                         if (subscriberResult.IsSuccess && subscriberResult.Value != null)
                         {
                             var subscriber = subscriberResult.Value;
+                            var bookTitle = copy.BookCopy?.Book?.Name;
+
+                            var saved = await _notificationRepo.UpsertAsync(new Notification
+                            {
+                                Type = NotificationType.FineApplied,
+                                DedupeKey = $"fine:{rental.Id}:{copy.BookCopyId}",
+                                SubscriberName = subscriber.FullName,
+                                BookTitle = bookTitle,
+                                Days = daysOverdue,
+                                Amount = fine,
+                                TargetUrl = "/Admin/Rentals/Rentals"
+                            });
+                            if (!saved.IsSuccess)
+                                _logger.LogWarning("Failed to save fine notification: {Error}", saved.Error?.Message);
+
                             if (subscriber.HasWhatsApp && !string.IsNullOrEmpty(subscriber.MobileNumber))
                             {
                                 await _smsService.SendAsync(subscriber.MobileNumber,
