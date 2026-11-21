@@ -1,5 +1,7 @@
 using System.Net;
 using System.Text.RegularExpressions;
+using Domin.Entity;
+using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -142,6 +144,97 @@ public class WebAppTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Contains("\"search\":\"Search:\"", html);
         Assert.DoesNotContain("let dtSearch", html);
         Assert.DoesNotContain("initDataTablesLanguage();", html);
+    }
+
+    [Fact]
+    public async Task BooksPage_LoadsForAdmin_WithExpectedHooks()
+    {
+        await SeedAdminAsync();
+        var client = _factory.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false
+        });
+        await LoginAsync(client);
+
+        var html = await client.GetStringAsync("/Admin/Books/Books?culture=en");
+
+        Assert.Contains("id=\"tableBooks\"", html);
+        Assert.Contains("id=\"bookModalBtnSave\"", html);
+        Assert.Contains("id=\"deleteForm\"", html);
+        Assert.Contains("Add New Book", html);
+        Assert.Contains("/Admin/Books/Save", html);
+        Assert.Single(Regex.Matches(html, "window\\.bookify"));
+    }
+
+    [Fact]
+    public async Task BooksSave_CreatesBookAndRejectsDuplicateName()
+    {
+        await SeedAdminAsync();
+        Guid authorId;
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var authors = scope.ServiceProvider.GetRequiredService<IServiceRepository<Author>>();
+            var author = new Author { Name = $"Test Author {Guid.NewGuid():N}" };
+            Assert.True((await authors.SaveAsync(author)).IsSuccess);
+            authorId = author.Id;
+        }
+
+        var client = _factory.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false
+        });
+        await LoginAsync(client);
+
+        var bookName = $"Unique Book {Guid.NewGuid():N}";
+        var page = await client.GetStringAsync("/Admin/Books/Books?culture=en");
+        var createResponse = await client.PostAsync("/Admin/Books/Save?culture=en", new FormUrlEncodedContent(
+            new Dictionary<string, string>
+            {
+                ["NewBook.BookId"] = string.Empty,
+                ["NewBook.Name"] = bookName,
+                ["NewBook.AuthorId"] = authorId.ToString(),
+                ["NewBook.Publisher"] = "Test Press",
+                ["NewBook.PublishingDate"] = "2020-01-01",
+                ["NewBook.Hall"] = "A1",
+                ["NewBook.IsAvailableForRental"] = "true",
+                ["__RequestVerificationToken"] = ExtractAntiForgeryToken(page)!
+            }));
+        Assert.Equal(HttpStatusCode.Redirect, createResponse.StatusCode);
+
+        var afterCreate = await client.GetStringAsync("/Admin/Books/Books?culture=en");
+        Assert.Contains(bookName, afterCreate);
+
+        var duplicateResponse = await client.PostAsync("/Admin/Books/Save?culture=en", new FormUrlEncodedContent(
+            new Dictionary<string, string>
+            {
+                ["NewBook.BookId"] = string.Empty,
+                ["NewBook.Name"] = bookName,
+                ["NewBook.AuthorId"] = authorId.ToString(),
+                ["__RequestVerificationToken"] = ExtractAntiForgeryToken(afterCreate)!
+            }));
+        Assert.Equal(HttpStatusCode.Redirect, duplicateResponse.StatusCode);
+
+        var afterDuplicate = await client.GetStringAsync("/Admin/Books/Books?culture=en");
+        Assert.Contains("This name already exists!", afterDuplicate);
+    }
+
+    private async Task LoginAsync(HttpClient client)
+    {
+        var loginPage = await client.GetAsync("/Admin?culture=en");
+        var token = ExtractAntiForgeryToken(await loginPage.Content.ReadAsStringAsync());
+        Assert.False(string.IsNullOrWhiteSpace(token));
+
+        var form = new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["Email"] = AdminEmail,
+            ["Password"] = AdminPassword,
+            ["RememberMe"] = "false",
+            ["__RequestVerificationToken"] = token!
+        });
+        var response = await client.PostAsync("/Admin/Accounts/Login?culture=en", form);
+        Assert.True(
+            response.StatusCode is HttpStatusCode.Redirect or HttpStatusCode.OK,
+            $"Unexpected login status: {response.StatusCode}");
     }
 
     private async Task SeedAdminAsync()

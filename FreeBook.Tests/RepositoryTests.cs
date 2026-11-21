@@ -17,6 +17,14 @@ public class RepositoryTests
 
     private static ILogger<T> CreateLogger<T>() => Mock.Of<ILogger<T>>();
 
+    private static async Task<Author> SeedAuthorAsync(FreeBookDbContext context, Guid id)
+    {
+        var author = new Author { Id = id, Name = "Test Author" };
+        context.Authors.Add(author);
+        await context.SaveChangesAsync();
+        return author;
+    }
+
     [Fact]
     public async Task Save_NewCategory_PersistsAndCanBeFound()
     {
@@ -128,5 +136,118 @@ public class RepositoryTests
         var logs = logsResult.Value ?? new List<LogCategory>();
         Assert.Single(logs);
         Assert.Equal(Helper.Delete, logs[0].Action);
+    }
+
+    [Fact]
+    public async Task Save_NewBook_PersistsAndCanBeFound()
+    {
+        using var context = CreateContext();
+        var service = new ServicesBook(context, CreateLogger<ServicesBook>());
+        var authorId = Guid.NewGuid();
+        await SeedAuthorAsync(context, authorId);
+        var categoryId = Guid.NewGuid();
+        var book = new Book
+        {
+            Name = "Clean Code",
+            AuthorId = authorId,
+            Publisher = "Prentice Hall",
+            PublishingDate = new DateTime(2008, 8, 1),
+            Hall = "A1",
+            Description = "A handbook of agile software craftsmanship.",
+            CategoryId = categoryId
+        };
+
+        var saveResult = await service.SaveAsync(book);
+        Assert.True(saveResult.IsSuccess);
+
+        var findResult = await service.FindByIdAsync(book.Id);
+        Assert.True(findResult.IsSuccess);
+        var saved = findResult.Value;
+        Assert.NotNull(saved);
+        Assert.Equal("Clean Code", saved!.Name);
+        Assert.Equal(authorId, saved.AuthorId);
+        Assert.Equal(categoryId, saved.CategoryId);
+        Assert.True(saved.IsAvailableForRental);
+        Assert.Equal((int)Helper.ECurrentState.Active, saved.CurrentState);
+    }
+
+    [Fact]
+    public async Task Save_ExistingBook_UpdatesFields()
+    {
+        using var context = CreateContext();
+        var service = new ServicesBook(context, CreateLogger<ServicesBook>());
+        var authorId = Guid.NewGuid();
+        await SeedAuthorAsync(context, authorId);
+        var book = new Book { Name = "Clean Code", AuthorId = authorId };
+        Assert.True((await service.SaveAsync(book)).IsSuccess);
+
+        book.Name = "Clean Architecture";
+        book.Publisher = "Prentice Hall";
+        book.Hall = "B2";
+        book.IsAvailableForRental = false;
+        Assert.True((await service.SaveAsync(book)).IsSuccess);
+
+        var findResult = await service.FindByIdAsync(book.Id);
+        var saved = findResult.Value;
+        Assert.NotNull(saved);
+        Assert.Equal("Clean Architecture", saved!.Name);
+        Assert.Equal("Prentice Hall", saved.Publisher);
+        Assert.Equal("B2", saved.Hall);
+        Assert.False(saved.IsAvailableForRental);
+    }
+
+    [Fact]
+    public async Task FindBy_TrimsAndMatchesBookName()
+    {
+        using var context = CreateContext();
+        var service = new ServicesBook(context, CreateLogger<ServicesBook>());
+        var authorId = Guid.NewGuid();
+        await SeedAuthorAsync(context, authorId);
+        Assert.True((await service.SaveAsync(new Book { Name = "The Pragmatic Programmer", AuthorId = authorId })).IsSuccess);
+
+        var findResult = await service.FindByAsync("  The Pragmatic Programmer  ");
+        Assert.True(findResult.IsSuccess);
+        Assert.NotNull(findResult.Value);
+    }
+
+    [Fact]
+    public async Task Delete_MarksBookAsDeleted()
+    {
+        using var context = CreateContext();
+        var service = new ServicesBook(context, CreateLogger<ServicesBook>());
+        var authorId = Guid.NewGuid();
+        await SeedAuthorAsync(context, authorId);
+        var book = new Book { Name = "Refactoring", AuthorId = authorId };
+        Assert.True((await service.SaveAsync(book)).IsSuccess);
+
+        var deleteResult = await service.DeleteAsync(book.Id);
+        Assert.True(deleteResult.IsSuccess);
+
+        var findResult = await service.FindByIdAsync(book.Id);
+        Assert.True(findResult.IsSuccess);
+        Assert.Null(findResult.Value);
+
+        var allResult = await service.GetAllAsync();
+        Assert.True(allResult.IsSuccess);
+        Assert.DoesNotContain(allResult.Value!, x => x.Id == book.Id);
+    }
+
+    [Fact]
+    public async Task Save_NewSubCategory_PersistsAndAppearsInGetAll()
+    {
+        using var context = CreateContext();
+        var service = new ServicesSubCategory(context, CreateLogger<ServicesSubCategory>());
+        var categoryId = Guid.NewGuid();
+        var subCategory = new SubCategory { Name = "Software Engineering", CategoryId = categoryId };
+
+        var saveResult = await service.SaveAsync(subCategory);
+        Assert.True(saveResult.IsSuccess);
+
+        var allResult = await service.GetAllAsync();
+        Assert.True(allResult.IsSuccess);
+        var saved = Assert.Single(allResult.Value!);
+        Assert.Equal("Software Engineering", saved.Name);
+        Assert.Equal(categoryId, saved.CategoryId);
+        Assert.Equal((int)Helper.ECurrentState.Active, saved.Currentstate);
     }
 }

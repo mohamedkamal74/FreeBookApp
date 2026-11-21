@@ -678,6 +678,45 @@
   <data name="lbBtnSaveNewAuthor" xml:space="preserve">
     <value>إضافة ناشر جديد</value>
   </data>
+  <data name="lbBooks" xml:space="preserve">
+    <value>الكتب</value>
+  </data>
+  <data name="lbBtnSaveNewBook" xml:space="preserve">
+    <value>إضافة كتاب جديد</value>
+  </data>
+  <data name="lbTitleEditBook" xml:space="preserve">
+    <value>تعديل الكتاب</value>
+  </data>
+  <data name="lbBookDescription" xml:space="preserve">
+    <value>وصف الكتاب</value>
+  </data>
+  <data name="lbPublisher" xml:space="preserve">
+    <value>الناشر</value>
+  </data>
+  <data name="lbPublishingDate" xml:space="preserve">
+    <value>تاريخ النشر</value>
+  </data>
+  <data name="lbHall" xml:space="preserve">
+    <value>القاعة</value>
+  </data>
+  <data name="lbImageUrl" xml:space="preserve">
+    <value>رابط صورة الغلاف</value>
+  </data>
+  <data name="lbImageThumbnailUrl" xml:space="preserve">
+    <value>رابط الصورة المصغرة</value>
+  </data>
+  <data name="lbImagePublicId" xml:space="preserve">
+    <value>معرّف الصورة</value>
+  </data>
+  <data name="lbSubCategory" xml:space="preserve">
+    <value>الفئة الفرعية</value>
+  </data>
+  <data name="lbAvailableForRental" xml:space="preserve">
+    <value>متاح للإعارة</value>
+  </data>
+  <data name="lbSelectOption" xml:space="preserve">
+    <value>اختر...</value>
+  </data>
   <data name="lbBtnSaveNewBookCopy" xml:space="preserve">
     <value>إضافة نسخة كتاب جديدة</value>
   </data>

@@ -543,6 +543,45 @@
   <data name="lbBtnSaveNewAuthor" xml:space="preserve">
     <value>Add New Author</value>
   </data>
+  <data name="lbBooks" xml:space="preserve">
+    <value>Books</value>
+  </data>
+  <data name="lbBtnSaveNewBook" xml:space="preserve">
+    <value>Add New Book</value>
+  </data>
+  <data name="lbTitleEditBook" xml:space="preserve">
+    <value>Edit Book</value>
+  </data>
+  <data name="lbBookDescription" xml:space="preserve">
+    <value>Book Description</value>
+  </data>
+  <data name="lbPublisher" xml:space="preserve">
+    <value>Publisher</value>
+  </data>
+  <data name="lbPublishingDate" xml:space="preserve">
+    <value>Publishing Date</value>
+  </data>
+  <data name="lbHall" xml:space="preserve">
+    <value>Hall</value>
+  </data>
+  <data name="lbImageUrl" xml:space="preserve">
+    <value>Cover Image URL</value>
+  </data>
+  <data name="lbImageThumbnailUrl" xml:space="preserve">
+    <value>Thumbnail URL</value>
+  </data>
+  <data name="lbImagePublicId" xml:space="preserve">
+    <value>Image Public ID</value>
+  </data>
+  <data name="lbSubCategory" xml:space="preserve">
+    <value>Subcategory</value>
+  </data>
+  <data name="lbAvailableForRental" xml:space="preserve">
+    <value>Available for rental</value>
+  </data>
+  <data name="lbSelectOption" xml:space="preserve">
+    <value>Select...</value>
+  </data>
   <data name="lbBtnSaveNewBookCopy" xml:space="preserve">
     <value>Add New Book Copy</value>
   </data>

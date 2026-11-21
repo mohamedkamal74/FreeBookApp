@@ -91,6 +91,7 @@ try
     });
 
     builder.Services.AddScoped<IServiceRepository<Category>, ServicesCategory>();
+    builder.Services.AddScoped<IServiceRepository<SubCategory>, ServicesSubCategory>();
     builder.Services.AddScoped<IServiceRepositoryLog<LogCategory>, ServiceLogCategory>();
 
     builder.Services.AddScoped<Infrastructure.IRepository.IAuthorRepository, Infrastructure.IRepository.ServiceRepository.ServicesAuthor>();

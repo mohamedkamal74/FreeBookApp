@@ -137,6 +137,10 @@ Convenience scripts live in `scripts/` (`build.ps1`, `run.ps1`, `migrate.ps1`).
   per minute per client, and passwords require 8+ characters with upper, lower, digit, and
   symbol.
 - Destructive admin actions are POST-only and protected by antiforgery tokens.
+- The admin-only Books page at `/Admin/Books/Books` manages book metadata (name, author,
+  publisher, publishing date, category/subcategory, hall, rental availability, cover image
+  URLs and description). Deletes are soft deletes, so copies and rental history are preserved.
+  Cover image upload is not part of this page; the existing image URL fields are editable.
 - The admin-only notification center at `/Admin/Notifications/Index` shows alerts from
   the Hangfire expiry, overdue and fine jobs. A navbar bell shows the unread count;
   admins can mark individual/all alerts as read and clear read ones. Jobs upsert by

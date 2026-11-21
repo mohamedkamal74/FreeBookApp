@@ -1,0 +1,212 @@
+@model BookViewModel
+@inject IStringLocalizer<ResourceWeb> Localizer
+
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">@Localizer["lbBooks"]</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/Admin/Dashboard/Index">@Localizer["lbHomePage"]</a></li>
+                        <li class="breadcrumb-item active">@Localizer["lbBooks"]</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header d-flex align-items-center justify-content-start">
+            <h3 class="card-title">@Localizer["lbBooks"]</h3>
+        </div>
+        <div class="card-tools">
+            <button type="button" class="btn btn-outline-primary rounded-pill mr-5 mt-2" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="Rest()">
+                @Localizer["lbBtnSaveNewBook"]
+            </button>
+        </div>
+        <div class="card-body">
+            <table id="tableBooks" class="table table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">@Localizer["lbBookName"]</th>
+                        <th scope="col">@Localizer["lbAuthor"]</th>
+                        <th scope="col">@Localizer["lbPublisher"]</th>
+                        <th scope="col">@Localizer["lbCategory"]</th>
+                        <th scope="col">@Localizer["lbPublishingDate"]</th>
+                        <th scope="col">@Localizer["lbAvailableForRental"]</th>
+                        <th scope="col">@Localizer["lbEvents"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Books)
+                    {
+                        <tr>
+                            <td>@item.Name</td>
+                            <td>@item.Author?.Name</td>
+                            <td>@item.Publisher</td>
+                            <td>@item.Category?.Name</td>
+                            <td>@item.PublishingDate?.ToString("yyyy-MM-dd")</td>
+                            <td>
+                                <input type="checkbox" disabled checked="@item.IsAvailableForRental" style="width:30px;height:30px" aria-label="@Localizer["lbAvailableForRental"]" />
+                            </td>
+                            <td>
+                                <input type="button" class="btn btn-info btn-sm js-edit-book" onclick="Edit(this)" value="@Localizer["lbBtnEdit"]"
+                                       data-bs-toggle="modal" data-bs-target="#exampleModal"
+                                       data-id="@item.Id"
+                                       data-name="@item.Name"
+                                       data-author="@item.AuthorId"
+                                       data-publisher="@item.Publisher"
+                                       data-publishing-date="@(item.PublishingDate?.ToString("yyyy-MM-dd"))"
+                                       data-image-url="@item.ImageUrl"
+                                       data-thumbnail-url="@item.ImageThumbnailUrl"
+                                       data-public-id="@item.ImagePublicId"
+                                       data-hall="@item.Hall"
+                                       data-available="@(item.IsAvailableForRental ? "true" : "false")"
+                                       data-description="@item.Description"
+                                       data-category="@item.CategoryId"
+                                       data-subcategory="@item.SubCategoryId" />
+                                <input type="button" class="btn btn-danger btn-sm" onclick="DeleteBook('@item.Id')" value="@Localizer["lbbtnDelete"]" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <modal id="exampleModal" title-id="bookModalTitle" title="@Localizer["lbBtnSaveNewBook"]">
+        <form asp-action="Save" asp-controller="Books" method="post">
+            <input type="hidden" asp-for="NewBook.BookId" id="bookId" />
+
+            <div class="form-group">
+                <label class="control-label" asp-for="NewBook.Name">@Localizer["lbBookName"]</label>
+                <input type="text" asp-for="NewBook.Name" class="form-control" id="bookName" />
+                <span asp-validation-for="NewBook.Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label" asp-for="NewBook.AuthorId">@Localizer["lbAuthor"]</label>
+                <select asp-for="NewBook.AuthorId" class="form-control" id="authorId"
+                        asp-items="@(new SelectList(Model.Authors, "Id", "Name"))">
+                    <option value="">@Localizer["lbSelectOption"]</option>
+                </select>
+                <span asp-validation-for="NewBook.AuthorId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label" asp-for="NewBook.Publisher">@Localizer["lbPublisher"]</label>
+                <input type="text" asp-for="NewBook.Publisher" class="form-control" id="publisher" />
+                <span asp-validation-for="NewBook.Publisher" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label" asp-for="NewBook.PublishingDate">@Localizer["lbPublishingDate"]</label>
+                <input type="date" asp-for="NewBook.PublishingDate" class="form-control" id="publishingDate" />
+                <span asp-validation-for="NewBook.PublishingDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label" asp-for="NewBook.CategoryId">@Localizer["lbCategory"]</label>
+                <select asp-for="NewBook.CategoryId" class="form-control" id="categoryId"
+                        asp-items="@(new SelectList(Model.Categories, "Id", "Name"))">
+                    <option value="">@Localizer["lbSelectOption"]</option>
+                </select>
+                <span asp-validation-for="NewBook.CategoryId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label" asp-for="NewBook.SubCategoryId">@Localizer["lbSubCategory"]</label>
+                <select asp-for="NewBook.SubCategoryId" class="form-control" id="subCategoryId">
+                    <option value="">@Localizer["lbSelectOption"]</option>
+                    @foreach (var subCategory in Model.SubCategories)
+                    {
+                        <option value="@subCategory.Id" data-category="@subCategory.CategoryId">@subCategory.Name</option>
+                    }
+                </select>
+                <span asp-validation-for="NewBook.SubCategoryId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label" asp-for="NewBook.Hall">@Localizer["lbHall"]</label>
+                <input type="text" asp-for="NewBook.Hall" class="form-control" id="hall" />
+                <span asp-validation-for="NewBook.Hall" class="text-danger"></span>
+            </div>
+
+            <div class="form-check mt-2">
+                <input type="checkbox" asp-for="NewBook.IsAvailableForRental" class="form-check-input" id="isAvailableForRental" />
+                <label class="form-check-label" for="isAvailableForRental">@Localizer["lbAvailableForRental"]</label>
+            </div>
+
+            <div class="form-group mt-3">
+                <label class="control-label" asp-for="NewBook.ImageUrl">@Localizer["lbImageUrl"]</label>
+                <input type="text" asp-for="NewBook.ImageUrl" class="form-control" id="imageUrl" />
+                <span asp-validation-for="NewBook.ImageUrl" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label" asp-for="NewBook.ImageThumbnailUrl">@Localizer["lbImageThumbnailUrl"]</label>
+                <input type="text" asp-for="NewBook.ImageThumbnailUrl" class="form-control" id="imageThumbnailUrl" />
+                <span asp-validation-for="NewBook.ImageThumbnailUrl" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label" asp-for="NewBook.ImagePublicId">@Localizer["lbImagePublicId"]</label>
+                <input type="text" asp-for="NewBook.ImagePublicId" class="form-control" id="imagePublicId" />
+                <span asp-validation-for="NewBook.ImagePublicId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label" asp-for="NewBook.Description">@Localizer["lbBookDescription"]</label>
+                <textarea asp-for="NewBook.Description" class="form-control" id="description" rows="3"></textarea>
+                <span asp-validation-for="NewBook.Description" class="text-danger"></span>
+            </div>
+
+            <input type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="bookModalBtnSave" />
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["lbClose"]</button>
+        </form>
+    </modal>
+
+    <form id="deleteForm" method="post" class="d-none">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Id" id="deleteFormId" />
+    </form>
+
+    @section Script{
+        @if (!string.IsNullOrEmpty(Context.Session.GetString(Helper.MsgType)))
+        {
+            if (Context.Session.GetString(Helper.MsgType) == Helper.Success)
+            {
+                <script>
+                    Swal.fire({
+                        icon: 'success',
+                        title: '@Context.Session.GetString(Helper.Title)',
+                        text: '@Html.Raw(Context.Session.GetString(Helper.Msg))',
+                        confirmButtonText: '@Localizer["lbOk"]'
+                    })
+                </script>
+            }
+            else
+            {
+                <script>
+                    Swal.fire({
+                        icon: 'error',
+                        title: '@Context.Session.GetString(Helper.Title)',
+                        text: '@Html.Raw(Context.Session.GetString(Helper.Msg))',
+                        confirmButtonText: '@Localizer["lbOk"]'
+                    })
+                </script>
+            }
+            Context.Session.SetString(Helper.MsgType, string.Empty);
+        }
+
+        <script src="~/Models/Books.js"></script>
+
+        <script>
+            let lbTitleEditBook = '@Html.Raw(Localizer["lbTitleEditBook"])';
+            let lbBtnSaveNewBook = '@Html.Raw(Localizer["lbBtnSaveNewBook"])';
+        </script>
+    }
+</div>
