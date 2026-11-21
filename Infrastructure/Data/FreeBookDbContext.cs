@@ -46,6 +46,15 @@ namespace Infrastructure.Data
             builder.Entity<Area>().Property(x => x.Id).HasDefaultValueSql("(newid())");
             builder.Entity<Subscriber>().Property(x => x.Id).HasDefaultValueSql("(newid())");
             builder.Entity<Subscription>().Property(x => x.Id).HasDefaultValueSql("(newid())");
+            builder.Entity<Notification>().Property(x => x.Id).HasDefaultValueSql("(newid())");
+
+            // One row per underlying event even when a recurring job runs daily.
+            builder.Entity<Notification>()
+                .HasIndex(x => x.DedupeKey)
+                .IsUnique();
+
+            builder.Entity<Notification>()
+                .HasIndex(x => new { x.IsRead, x.CreatedOn });
 
             builder.Entity<VwUser>().HasNoKey().ToView("VwUsers");
 
@@ -144,6 +153,7 @@ namespace Infrastructure.Data
         public DbSet<Area> Areas { get; set; }
         public DbSet<Subscriber> Subscribers { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
         public DbSet<VwUser> VwUsers { get; set; }
     }
 }
