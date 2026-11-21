@@ -942,4 +942,28 @@
   <data name="msgGovernorateInUse" xml:space="preserve">
     <value>Cannot delete governorate with associated areas or subscribers</value>
   </data>
+  <data name="lbBooksDashboard" xml:space="preserve">
+    <value>Books Dashboard</value>
+  </data>
+  <data name="lbBooksReport" xml:space="preserve">
+    <value>Books Report</value>
+  </data>
+  <data name="lbViewBooksReport" xml:space="preserve">
+    <value>View the full book inventory with copy and rental counts</value>
+  </data>
+  <data name="lbTotalCopies" xml:space="preserve">
+    <value>Total Copies</value>
+  </data>
+  <data name="lbRentedCopies" xml:space="preserve">
+    <value>Rented Copies</value>
+  </data>
+  <data name="lbBooksWithoutCopies" xml:space="preserve">
+    <value>Books Without Copies</value>
+  </data>
+  <data name="lbAvailability" xml:space="preserve">
+    <value>Availability</value>
+  </data>
+  <data name="lbUnavailable" xml:space="preserve">
+    <value>Unavailable</value>
+  </data>
 </root>

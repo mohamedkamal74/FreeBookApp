@@ -22,4 +22,26 @@ namespace FreeBook.Models
         public Author? Author { get; set; }
         public int Count { get; set; }
     }
+
+    /// <summary>Filter selections and option lists for the book inventory report.</summary>
+    public class BookReportFilterViewModel
+    {
+        public Guid? AuthorId { get; set; }
+        public Guid? CategoryId { get; set; }
+        public bool AvailableOnly { get; set; }
+        public List<Author> Authors { get; set; } = new();
+        public List<Category> Categories { get; set; } = new();
+    }
+
+    /// <summary>One row of the full book inventory report.</summary>
+    public class BookInventoryReport
+    {
+        public Book Book { get; set; } = null!;
+        public string? AuthorName { get; set; }
+        public string? CategoryName { get; set; }
+        public string? SubCategoryName { get; set; }
+        public int CopyCount { get; set; }
+        public int AvailableCopyCount { get; set; }
+        public int RentalCount { get; set; }
+    }
 }

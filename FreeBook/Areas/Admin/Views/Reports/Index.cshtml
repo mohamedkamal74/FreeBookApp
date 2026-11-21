@@ -15,6 +15,15 @@
         <div class="col-md-4">
             <div class="card card-primary card-outline">
                 <div class="card-body text-center">
+                    <h4>@Localizer["lbBooksReport"]</h4>
+                    <p class="text-muted">@Localizer["lbViewBooksReport"]</p>
+                    <a asp-area="Admin" asp-controller="Reports" asp-action="Books" class="btn btn-primary">@Localizer["lbViewReport"]</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-primary card-outline">
+                <div class="card-body text-center">
                     <h4>@Localizer["lbOverdueBooks"]</h4>
                     <p class="text-muted">@Localizer["lbViewOverdueBooks"]</p>
                     <a href="/Admin/Reports/OverdueBooks" class="btn btn-primary">@Localizer["lbViewReport"]</a>

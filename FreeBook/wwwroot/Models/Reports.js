@@ -40,24 +40,36 @@ function customizeReportPrint(win) {
 
 // selector must be an id selector, e.g. '#tableRentalHistory'.
 function initReportTable(selector, options) {
+    // Reports can opt columns out of exports (for example, thumbnail cells).
+    var exportOptions = options && options.exportOptions;
+    var settings = $.extend(true, {}, options || {});
+    delete settings.exportOptions;
+
+    function withExport(button) {
+        if (exportOptions) {
+            button.exportOptions = $.extend(true, {}, exportOptions);
+        }
+        return button;
+    }
+
     var table = $(selector).DataTable($.extend(true, {
         responsive: true,
         lengthChange: false,
         autoWidth: false,
         buttons: [
-            { extend: 'csv', bom: true },
-            'excel',
-            {
+            withExport({ extend: 'csv', bom: true }),
+            withExport({ extend: 'excel' }),
+            withExport({
                 // Same print view as the print button, labelled the way users
                 // look for it: their browser saves the dialog as a PDF.
                 extend: 'print',
                 text: '<i class="fas fa-file-pdf"></i> PDF',
                 className: 'buttons-print buttons-pdf',
                 customize: customizeReportPrint
-            },
-            { extend: 'print', customize: customizeReportPrint }
+            }),
+            withExport({ extend: 'print', customize: customizeReportPrint })
         ]
-    }, options || {}));
+    }, settings));
 
     // btn-group glues the buttons together and strips their corner radius.
     // Dropping it lets theme.css space them evenly in both directions.

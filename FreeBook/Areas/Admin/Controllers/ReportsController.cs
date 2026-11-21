@@ -159,5 +159,56 @@ namespace FreeBook.Areas.Admin.Controllers
 
             return View(booksByAuthor);
         }
+
+        public async Task<IActionResult> Books(Guid? authorId = null, Guid? categoryId = null, bool availableOnly = false)
+        {
+            var booksResult = await _serviceBook.GetAllAsync();
+            var copiesResult = await _serviceBookCopy.GetAllAsync();
+            var rentalsResult = await _serviceRental.GetAllAsync();
+            var authorsResult = await _serviceAuthor.GetAllAsync();
+            var categoriesResult = await _serviceCategory.GetAllAsync();
+
+            var books = booksResult.IsSuccess ? booksResult.Value ?? new List<Book>() : new List<Book>();
+            var copies = copiesResult.IsSuccess ? copiesResult.Value ?? new List<BookCopy>() : new List<BookCopy>();
+            var rentals = rentalsResult.IsSuccess ? rentalsResult.Value ?? new List<Rental>() : new List<Rental>();
+            var authors = authorsResult.IsSuccess ? authorsResult.Value ?? new List<Author>() : new List<Author>();
+            var categories = categoriesResult.IsSuccess ? categoriesResult.Value ?? new List<Category>() : new List<Category>();
+
+            var copyCounts = copies.GroupBy(c => c.BookId).ToDictionary(g => g.Key, g => g.Count());
+            var availableCounts = copies.Where(c => c.IsAvailableForRental)
+                .GroupBy(c => c.BookId).ToDictionary(g => g.Key, g => g.Count());
+            var rentalCounts = rentals.SelectMany(r => r.RentalCopies)
+                .Where(rc => rc.BookCopy != null)
+                .GroupBy(rc => rc.BookCopy!.BookId)
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            var rows = books
+                .Where(b => !authorId.HasValue || b.AuthorId == authorId.Value)
+                .Where(b => !categoryId.HasValue || b.CategoryId == categoryId.Value)
+                .Where(b => !availableOnly || b.IsAvailableForRental)
+                .Select(b => new BookInventoryReport
+                {
+                    Book = b,
+                    AuthorName = b.Author?.Name,
+                    CategoryName = b.Category?.Name,
+                    SubCategoryName = b.SubCategory?.Name,
+                    CopyCount = copyCounts.TryGetValue(b.Id, out var copyCount) ? copyCount : 0,
+                    AvailableCopyCount = availableCounts.TryGetValue(b.Id, out var availableCount) ? availableCount : 0,
+                    RentalCount = rentalCounts.TryGetValue(b.Id, out var rentalCount) ? rentalCount : 0
+                })
+                .OrderBy(x => x.Book.Name, StringComparer.Ordinal)
+                .ToList();
+
+            ViewBag.Filter = new BookReportFilterViewModel
+            {
+                AuthorId = authorId,
+                CategoryId = categoryId,
+                AvailableOnly = availableOnly,
+                Authors = authors.OrderBy(a => a.Name, StringComparer.Ordinal).ToList(),
+                Categories = categories.OrderBy(c => c.Name, StringComparer.Ordinal).ToList()
+            };
+
+            return View(rows);
+        }
     }
 }

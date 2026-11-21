@@ -1,0 +1,139 @@
+@model List<FreeBook.Models.BookInventoryReport>
+@inject IStringLocalizer<ResourceWeb> Localizer
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    var filter = (BookReportFilterViewModel)ViewBag.Filter;
+}
+
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">@Localizer["lbBooksReport"]</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Reports" asp-action="Index">@Localizer["lbReports"]</a></li>
+                        <li class="breadcrumb-item active">@Localizer["lbBooksReport"]</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card card-outline card-primary">
+        <div class="card-header">
+            <h3 class="card-title">@Localizer["lbFilter"]</h3>
+        </div>
+        <div class="card-body">
+            <form method="get" asp-area="Admin" asp-controller="Reports" asp-action="Books">
+                <div class="form-row align-items-end">
+                    <div class="form-group col-lg-3 col-md-6">
+                        <label for="reportAuthor">@Localizer["lbAuthor"]</label>
+                        <select class="form-control" id="reportAuthor" name="authorId">
+                            <option value="">@Localizer["lbAll"]</option>
+                            @foreach (var author in filter.Authors)
+                            {
+                                <option value="@author.Id" selected="@(filter.AuthorId == author.Id ? "selected" : null)">@author.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group col-lg-3 col-md-6">
+                        <label for="reportCategory">@Localizer["lbCategory"]</label>
+                        <select class="form-control" id="reportCategory" name="categoryId">
+                            <option value="">@Localizer["lbAll"]</option>
+                            @foreach (var category in filter.Categories)
+                            {
+                                <option value="@category.Id" selected="@(filter.CategoryId == category.Id ? "selected" : null)">@category.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group col-lg-3 col-md-6">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="reportAvailableOnly" name="availableOnly" value="true"
+                                   checked="@filter.AvailableOnly" />
+                            <label class="form-check-label" for="reportAvailableOnly">@Localizer["lbAvailableForRental"]</label>
+                        </div>
+                    </div>
+                    <div class="form-group col-lg-3 col-md-6">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-filter" aria-hidden="true"></i>
+                            @Localizer["lbApplyFilter"]
+                        </button>
+                        <a asp-area="Admin" asp-controller="Reports" asp-action="Books" class="btn btn-outline-secondary">
+                            @Localizer["lbResetFilter"]
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <table id="tableBooksReport" class="table table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col" class="no-export">@Localizer["lbCoverImage"]</th>
+                        <th scope="col">@Localizer["lbBookName"]</th>
+                        <th scope="col">@Localizer["lbAuthor"]</th>
+                        <th scope="col">@Localizer["lbCategory"]</th>
+                        <th scope="col">@Localizer["lbSubCategory"]</th>
+                        <th scope="col">@Localizer["lbPublisher"]</th>
+                        <th scope="col">@Localizer["lbHall"]</th>
+                        <th scope="col">@Localizer["lbBookCopies"]</th>
+                        <th scope="col">@Localizer["lbAvailableCopies"]</th>
+                        <th scope="col">@Localizer["lbRentalCount"]</th>
+                        <th scope="col">@Localizer["lbAvailability"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        var coverUrl = !string.IsNullOrWhiteSpace(item.Book.ImageThumbnailUrl)
+                            ? item.Book.ImageThumbnailUrl
+                            : item.Book.ImageUrl;
+                        <tr>
+                            <td class="no-export">
+                                @if (!string.IsNullOrWhiteSpace(coverUrl))
+                                {
+                                    <img src="@coverUrl" class="book-cover-thumb" alt="@Localizer["lbCoverImage"]" loading="lazy" />
+                                }
+                                else
+                                {
+                                    <i class="fas fa-image book-cover-placeholder" role="img"
+                                       title="@Localizer["lbCoverImage"]" aria-label="@Localizer["lbCoverImage"]"></i>
+                                }
+                            </td>
+                            <td>@item.Book.Name</td>
+                            <td>@item.AuthorName</td>
+                            <td>@item.CategoryName</td>
+                            <td>@item.SubCategoryName</td>
+                            <td>@item.Book.Publisher</td>
+                            <td>@item.Book.Hall</td>
+                            <td>@item.CopyCount</td>
+                            <td>@item.AvailableCopyCount</td>
+                            <td>@item.RentalCount</td>
+                            <td>
+                                <span class="badge @(item.Book.IsAvailableForRental ? "badge-success" : "badge-secondary")">
+                                    @(item.Book.IsAvailableForRental ? Localizer["lbAvailable"] : Localizer["lbUnavailable"])
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Script {
+    <script>
+        $(function () {
+            initReportTable('#tableBooksReport', {
+                exportOptions: { columns: ':not(.no-export)' }
+            });
+        });
+    </script>
+}

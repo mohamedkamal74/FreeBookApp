@@ -942,4 +942,28 @@
   <data name="msgGovernorateInUse" xml:space="preserve">
     <value>لا يمكن حذف محافظة مرتبطة بمناطق أو مشتركين</value>
   </data>
+  <data name="lbBooksDashboard" xml:space="preserve">
+    <value>لوحة الكتب</value>
+  </data>
+  <data name="lbBooksReport" xml:space="preserve">
+    <value>تقرير الكتب</value>
+  </data>
+  <data name="lbViewBooksReport" xml:space="preserve">
+    <value>عرض تقرير شامل لمخزون الكتب مع عدد النسخ والإعارات</value>
+  </data>
+  <data name="lbTotalCopies" xml:space="preserve">
+    <value>إجمالي النسخ</value>
+  </data>
+  <data name="lbRentedCopies" xml:space="preserve">
+    <value>النسخ المستأجرة</value>
+  </data>
+  <data name="lbBooksWithoutCopies" xml:space="preserve">
+    <value>كتب بدون نسخ</value>
+  </data>
+  <data name="lbAvailability" xml:space="preserve">
+    <value>التوفر</value>
+  </data>
+  <data name="lbUnavailable" xml:space="preserve">
+    <value>غير متاح</value>
+  </data>
 </root>
