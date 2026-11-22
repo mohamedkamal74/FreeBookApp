@@ -1,4 +1,4 @@
-@model List<Rental>
+@model List<OverdueBookReport>
 @inject IStringLocalizer<ResourceWeb> Localizer
 @{
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
@@ -37,21 +37,18 @@
                 <tbody>
                     @foreach (var rental in Model)
                     {
-                        foreach (var rc in rental.RentalCopies.Where(c => c.ReturnDate == null && c.EndDate < DateTime.UtcNow))
-                        {
-                            var daysOverdue = (DateTime.UtcNow - rc.EndDate).Days;
-                            <tr class="table-danger">
-                                <td>@rental.Subscriber?.FullName</td>
-                                <td>@rc.BookCopy?.Book?.Name</td>
-                                <td>@rc.RentalDate.ToString("yyyy-MM-dd")</td>
-                                <td>@rc.EndDate.ToString("yyyy-MM-dd")</td>
-                                <td>@daysOverdue @Localizer["lbDays"]</td>
-                                <td>
-                                    <input type="checkbox" disabled checked="@rental.PenaltyPaid" />
-                                    @(rental.PenaltyPaid ? Localizer["lbPaid"] : Localizer["lbPending"])
-                                </td>
-                            </tr>
-                        }
+                        var daysOverdue = (DateTime.UtcNow - rental.EndDate).Days;
+                        <tr class="table-danger">
+                            <td>@rental.SubscriberName</td>
+                            <td>@rental.BookName</td>
+                            <td>@rental.RentalDate.ToString("yyyy-MM-dd")</td>
+                            <td>@rental.EndDate.ToString("yyyy-MM-dd")</td>
+                            <td>@daysOverdue @Localizer["lbDays"]</td>
+                            <td>
+                                <input type="checkbox" disabled checked="@rental.PenaltyPaid" />
+                                @(rental.PenaltyPaid ? Localizer["lbPaid"] : Localizer["lbPending"])
+                            </td>
+                        </tr>
                     }
                 </tbody>
             </table>

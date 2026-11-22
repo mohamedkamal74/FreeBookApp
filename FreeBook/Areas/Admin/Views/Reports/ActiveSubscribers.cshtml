@@ -1,4 +1,4 @@
-@model List<Subscriber>
+@model List<ActiveSubscriberReport>
 @inject IStringLocalizer<ResourceWeb> Localizer
 @{
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
@@ -38,15 +38,14 @@
                 <tbody>
                     @foreach (var subscriber in Model)
                     {
-                        var activeSub = subscriber.Subscriptions.FirstOrDefault(s => s.StartDate <= DateTime.UtcNow && s.EndDate >= DateTime.UtcNow);
                         <tr>
                             <td>@subscriber.FullName</td>
                             <td>@subscriber.NationalId</td>
                             <td>@subscriber.MobileNumber</td>
                             <td>@subscriber.Email</td>
-                            <td>@subscriber.Area?.Name</td>
-                            <td>@subscriber.Governorate?.Name</td>
-                            <td>@(activeSub?.EndDate.ToString("yyyy-MM-dd") ?? "-")</td>
+                            <td>@subscriber.AreaName</td>
+                            <td>@subscriber.GovernorateName</td>
+                            <td>@(subscriber.ActiveSubscriptionEndDate?.ToString("yyyy-MM-dd") ?? "-")</td>
                         </tr>
                     }
                 </tbody>

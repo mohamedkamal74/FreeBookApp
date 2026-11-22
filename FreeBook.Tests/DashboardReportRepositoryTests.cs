@@ -88,6 +88,7 @@ public class DashboardReportRepositoryTests
         using var context = CreateContext();
         var seed = await SeedAsync(context);
         var reports = CreateReportRepository(context);
+        var now = DateTime.UtcNow;
 
         var booksResult = await reports.GetBooksAsync(new BookInventoryQuery
         {
@@ -97,34 +98,66 @@ public class DashboardReportRepositoryTests
         Assert.True(booksResult.IsSuccess);
         var books = booksResult.Value;
         var row = Assert.Single(books.Rows);
-        Assert.Equal(seed.Book.Name, row.Book.Name);
+        Assert.Equal(seed.Book.Name, row.BookName);
         Assert.Equal(seed.Author.Name, row.AuthorName);
         Assert.Equal(seed.Category.Name, row.CategoryName);
+        Assert.Equal(seed.SubCategory.Name, row.SubCategoryName);
         Assert.Equal(2, row.CopyCount);
         Assert.Equal(1, row.AvailableCopyCount);
         Assert.Equal(2, row.RentalCount);
         Assert.True(books.Filter.AvailableOnly);
         Assert.Equal(seed.Category.Id, books.Filter.CategoryId);
+        Assert.Contains(seed.Author.Id, books.Filter.Authors.Select(option => option.Id));
+        Assert.Contains(seed.Category.Id, books.Filter.Categories.Select(option => option.Id));
+
+        var activeResult = await reports.GetActiveSubscribersAsync();
+        Assert.True(activeResult.IsSuccess);
+        var active = Assert.Single(activeResult.Value);
+        Assert.Equal(seed.Subscriber.Id, active.Id);
+        Assert.Equal("Repository Subscriber", active.FullName);
+        Assert.Equal("Test Governorate", active.GovernorateName);
+        Assert.NotNull(active.ActiveSubscriptionEndDate);
+        Assert.True(active.ActiveSubscriptionEndDate!.Value > now.AddDays(9));
 
         var expiringResult = await reports.GetExpiringSubscriptionsAsync(30);
         Assert.True(expiringResult.IsSuccess);
         Assert.Equal(30, expiringResult.Value.Days);
-        Assert.Single(expiringResult.Value.Subscriptions);
+        var expiring = Assert.Single(expiringResult.Value.Subscriptions);
+        Assert.Equal("Repository Subscriber", expiring.SubscriberName);
+        Assert.Equal(seed.Subscriber.NationalId, expiring.NationalId);
 
         var historyResult = await reports.GetRentalHistoryAsync(seed.Subscriber.Id);
         Assert.True(historyResult.IsSuccess);
         Assert.Equal(2, historyResult.Value.Rentals.Count);
         Assert.Equal(2, historyResult.Value.Subscribers.Count);
         Assert.Equal(seed.Subscriber.Id, historyResult.Value.SelectedSubscriberId);
+        Assert.All(historyResult.Value.Rentals, historyRow => Assert.NotNull(historyRow.BookName));
+        Assert.Contains(seed.Subscriber.Id, historyResult.Value.Subscribers.Select(option => option.Id));
 
         var overdueResult = await reports.GetOverdueBooksAsync();
         Assert.True(overdueResult.IsSuccess);
-        Assert.Single(overdueResult.Value);
+        var overdue = Assert.Single(overdueResult.Value);
+        Assert.Equal("Repository Subscriber", overdue.SubscriberName);
+        Assert.Equal(seed.Book.Name, overdue.BookName);
+        Assert.False(overdue.PenaltyPaid);
 
         var popularResult = await reports.GetPopularBooksAsync();
         Assert.True(popularResult.IsSuccess);
         Assert.Equal(2, popularResult.Value.Count);
-        Assert.Equal(2, popularResult.Value.First(item => item.Book.Id == seed.Book.Id).RentalCount);
+        var popular = Assert.Single(popularResult.Value, item => item.BookId == seed.Book.Id);
+        Assert.Equal(2, popular.RentalCount);
+        Assert.Equal(seed.Author.Name, popular.AuthorName);
+        Assert.Equal(seed.Category.Name, popular.CategoryName);
+
+        var categoryResult = await reports.GetBooksByCategoryAsync();
+        Assert.True(categoryResult.IsSuccess);
+        Assert.Contains(categoryResult.Value, item =>
+            item.CategoryName == seed.Category.Name && item.Count == 1);
+
+        var authorResult = await reports.GetBooksByAuthorAsync();
+        Assert.True(authorResult.IsSuccess);
+        Assert.Contains(authorResult.Value, item =>
+            item.AuthorName == seed.Author.Name && item.Count == 1);
     }
 
     [Fact]
@@ -133,6 +166,45 @@ public class DashboardReportRepositoryTests
         var result = Result.Failure<List<string>>("ERROR", "Failed");
 
         Assert.Empty(result.ValueOr(new List<string>()));
+    }
+
+    [Fact]
+    public void ReportDtos_DoNotExposeEntityTypes()
+    {
+        var entityTypes = typeof(Book).Assembly
+            .GetTypes()
+            .Where(type => type.Namespace == "Domin.Entity")
+            .ToHashSet();
+        var dtoTypes = new[]
+        {
+            typeof(OverdueBookReport),
+            typeof(PopularBookReport),
+            typeof(ActiveSubscriberReport),
+            typeof(ExpiringSubscriptionReport),
+            typeof(RentalHistoryReportRow),
+            typeof(BooksByCategoryReport),
+            typeof(BooksByAuthorReport),
+            typeof(ReportFilterOption),
+            typeof(BookInventoryReport),
+            typeof(BookReportFilterViewModel),
+            typeof(BookInventoryReportData),
+            typeof(RentalHistoryData),
+            typeof(ExpiringSubscriptionsData)
+        };
+
+        foreach (var dtoType in dtoTypes)
+        {
+            foreach (var property in dtoType.GetProperties())
+            {
+                var propertyType = property.PropertyType;
+                if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(List<>))
+                {
+                    propertyType = propertyType.GetGenericArguments()[0];
+                }
+
+                Assert.DoesNotContain(propertyType, entityTypes);
+            }
+        }
     }
 
     [Fact]
@@ -173,15 +245,22 @@ public class DashboardReportRepositoryTests
         AssertSql(DashboardReportQueries.SubscriptionMonths(context, from, toExclusive, governorateId));
         AssertSql(DashboardReportQueries.TopRentedBooksForBooks(context, from, toExclusive, bookIds));
         AssertSql(DashboardReportQueries.RentalMonthsForBooks(context, from, toExclusive, bookIds));
-        AssertSql(DashboardReportQueries.BookInventoryRows(context, new BookInventoryQuery
+        AssertSql(ReportQueries.OverdueBooks(context, from));
+        AssertSql(ReportQueries.PopularBooks(context));
+        AssertSql(ReportQueries.ActiveSubscribers(context, from));
+        AssertSql(ReportQueries.ExpiringSubscriptions(context, from, toExclusive));
+        AssertSql(ReportQueries.RentalHistoryRows(context, null));
+        AssertSql(ReportQueries.RentalHistoryOptions(context));
+        AssertSql(ReportQueries.BooksByCategoryRows(context));
+        AssertSql(ReportQueries.BooksByAuthorRows(context));
+        AssertSql(ReportQueries.BookInventoryRows(context, new BookInventoryQuery
         {
             AuthorId = authorId,
             CategoryId = categoryId,
             AvailableOnly = true
         }));
-        AssertSql(DashboardReportQueries.PopularBookCounts(context));
-        AssertSql(DashboardReportQueries.BooksByCategoryCounts(context));
-        AssertSql(DashboardReportQueries.BooksByAuthorCounts(context));
+        AssertSql(ReportQueries.AuthorOptions(context));
+        AssertSql(ReportQueries.CategoryOptions(context));
     }
 
     private static FreeBookDbContext CreateContext() =>
@@ -218,6 +297,13 @@ public class DashboardReportRepositoryTests
         var otherAuthor = new Author { Id = Guid.NewGuid(), Name = "Other Author" };
         var category = new Category { Id = Guid.NewGuid(), Name = "Repository Category" };
         var otherCategory = new Category { Id = Guid.NewGuid(), Name = "Other Category" };
+        var subCategory = new SubCategory
+        {
+            Id = Guid.NewGuid(),
+            Name = "Repository Subcategory",
+            CategoryId = category.Id,
+            Currentstate = (int)Helper.ECurrentState.Active
+        };
 
         var book = new Book
         {
@@ -225,6 +311,7 @@ public class DashboardReportRepositoryTests
             Name = "Repository Book",
             AuthorId = author.Id,
             CategoryId = category.Id,
+            SubCategoryId = subCategory.Id,
             IsAvailableForRental = true
         };
         var otherBook = new Book
@@ -363,6 +450,7 @@ public class DashboardReportRepositoryTests
             otherAuthor,
             category,
             otherCategory,
+            subCategory,
             book,
             otherBook,
             availableCopy,
@@ -377,13 +465,14 @@ public class DashboardReportRepositoryTests
             returnedRental);
         await context.SaveChangesAsync();
 
-        return new SeedData(governorate, author, category, book, subscriber);
+        return new SeedData(governorate, author, category, subCategory, book, subscriber);
     }
 
     private sealed record SeedData(
         Governorate Governorate,
         Author Author,
         Category Category,
+        SubCategory SubCategory,
         Book Book,
         Subscriber Subscriber);
 }

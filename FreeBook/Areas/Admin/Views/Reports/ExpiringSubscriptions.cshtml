@@ -40,10 +40,10 @@
                     {
                         var daysLeft = (sub.EndDate - DateTime.UtcNow).Days;
                         <tr class="@(daysLeft <= 7 ? "table-danger" : (daysLeft <= 14 ? "table-warning" : ""))">
-                            <td>@sub.Subscriber?.FullName</td>
-                            <td>@sub.Subscriber?.NationalId</td>
-                            <td>@sub.Subscriber?.MobileNumber</td>
-                            <td>@sub.Subscriber?.Email</td>
+                            <td>@sub.SubscriberName</td>
+                            <td>@sub.NationalId</td>
+                            <td>@sub.MobileNumber</td>
+                            <td>@sub.Email</td>
                             <td>@sub.StartDate.ToString("yyyy-MM-dd")</td>
                             <td>@sub.EndDate.ToString("yyyy-MM-dd")</td>
                             <td>@daysLeft @Localizer["lbDays"]</td>

@@ -32,11 +32,11 @@
                         {
                             @if (Model.SelectedSubscriberId == sub.Id)
                             {
-                                <option value="@sub.Id" selected>@sub.FullName</option>
+                                <option value="@sub.Id" selected>@sub.Name</option>
                             }
                             else
                             {
-                                <option value="@sub.Id">@sub.FullName</option>
+                                <option value="@sub.Id">@sub.Name</option>
                             }
                         }
                     </select>
@@ -58,21 +58,18 @@
                 <tbody>
                     @foreach (var rental in Model.Rentals)
                     {
-                        foreach (var rc in rental.RentalCopies)
-                        {
-                            var status = rc.ReturnDate != null ? Localizer["lbReturned"] : 
-                                (rc.EndDate < DateTime.UtcNow ? Localizer["lbOverdue"] : Localizer["lbActive"]);
-                            var statusClass = rc.ReturnDate != null ? "badge-success" : 
-                                (rc.EndDate < DateTime.UtcNow ? "badge-danger" : "badge-warning");
-                            <tr>
-                                <td>@rental.Subscriber?.FullName</td>
-                                <td>@rc.BookCopy?.Book?.Name</td>
-                                <td>@rc.RentalDate.ToString("yyyy-MM-dd")</td>
-                                <td>@rc.EndDate.ToString("yyyy-MM-dd")</td>
-                                <td>@(rc.ReturnDate?.ToString("yyyy-MM-dd") ?? "-")</td>
-                                <td><span class="badge @statusClass">@status</span></td>
-                            </tr>
-                        }
+                        var status = rental.ReturnDate != null ? Localizer["lbReturned"] :
+                            (rental.EndDate < DateTime.UtcNow ? Localizer["lbOverdue"] : Localizer["lbActive"]);
+                        var statusClass = rental.ReturnDate != null ? "badge-success" :
+                            (rental.EndDate < DateTime.UtcNow ? "badge-danger" : "badge-warning");
+                        <tr>
+                            <td>@rental.SubscriberName</td>
+                            <td>@rental.BookName</td>
+                            <td>@rental.RentalDate.ToString("yyyy-MM-dd")</td>
+                            <td>@rental.EndDate.ToString("yyyy-MM-dd")</td>
+                            <td>@(rental.ReturnDate?.ToString("yyyy-MM-dd") ?? "-")</td>
+                            <td><span class="badge @statusClass">@status</span></td>
+                        </tr>
                     }
                 </tbody>
             </table>

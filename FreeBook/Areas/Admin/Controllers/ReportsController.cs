@@ -26,7 +26,7 @@ namespace FreeBook.Areas.Admin.Controllers
         public async Task<IActionResult> OverdueBooks()
         {
             var result = await _reportRepository.GetOverdueBooksAsync();
-            return View(result.ValueOr(new List<Rental>()));
+            return View(result.ValueOr(new List<OverdueBookReport>()));
         }
 
         public async Task<IActionResult> PopularBooks()
@@ -38,7 +38,7 @@ namespace FreeBook.Areas.Admin.Controllers
         public async Task<IActionResult> ActiveSubscribers()
         {
             var result = await _reportRepository.GetActiveSubscribersAsync();
-            return View(result.ValueOr(new List<Subscriber>()));
+            return View(result.ValueOr(new List<ActiveSubscriberReport>()));
         }
 
         public async Task<IActionResult> ExpiringSubscriptions(int days = 30)

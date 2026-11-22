@@ -26,7 +26,7 @@ public class BooksDashboardReportTests : IClassFixture<CustomWebApplicationFacto
     public async Task BooksDashboardAndReport_LoadForAdmin_WithLocalizedHooks()
     {
         await SeedUserAsync(AdminEmail, "Admin", "Books Administrator");
-        var (_, bookName) = await SeedBookWithCopiesAsync();
+        var (_, bookName, subCategoryName) = await SeedBookWithCopiesAsync();
         var client = CreateClient();
         await LoginAsync(client, AdminEmail);
 
@@ -63,6 +63,7 @@ public class BooksDashboardReportTests : IClassFixture<CustomWebApplicationFacto
             .Select(match => Regex.Replace(match.Groups[1].Value, "<[^>]+>", string.Empty).Trim())
             .ToList();
         Assert.Equal(11, cells.Count);
+        Assert.Equal(subCategoryName, cells[4]);
         Assert.Equal("2", cells[7]);
         Assert.Equal("1", cells[8]);
         Assert.Equal("0", cells[9]);
@@ -176,20 +177,36 @@ public class BooksDashboardReportTests : IClassFixture<CustomWebApplicationFacto
         AllowAutoRedirect = false
     });
 
-    private async Task<(Guid Id, string Name)> SeedBookWithCopiesAsync()
+    private async Task<(Guid Id, string Name, string SubCategoryName)> SeedBookWithCopiesAsync()
     {
         using var scope = _factory.Services.CreateScope();
         var authors = scope.ServiceProvider.GetRequiredService<IServiceRepository<Author>>();
+        var categories = scope.ServiceProvider.GetRequiredService<IServiceRepository<Category>>();
+        var subCategories = scope.ServiceProvider.GetRequiredService<IServiceRepository<SubCategory>>();
         var books = scope.ServiceProvider.GetRequiredService<IServiceRepository<Book>>();
         var copies = scope.ServiceProvider.GetRequiredService<IServiceRepository<BookCopy>>();
 
         var author = new Author { Name = $"Books Dashboard Author {Guid.NewGuid():N}" };
         Assert.True((await authors.SaveAsync(author)).IsSuccess);
 
+        var category = new Category { Name = $"Books Dashboard Category {Guid.NewGuid():N}" };
+        Assert.True((await categories.SaveAsync(category)).IsSuccess);
+
+        var subCategoryName = $"Books Dashboard Subcategory {Guid.NewGuid():N}";
+        var subCategory = new SubCategory
+        {
+            Name = subCategoryName,
+            CategoryId = category.Id,
+            Currentstate = (int)Helper.ECurrentState.Active
+        };
+        Assert.True((await subCategories.SaveAsync(subCategory)).IsSuccess);
+
         var book = new Book
         {
             Name = $"Books Dashboard Book {Guid.NewGuid():N}",
             AuthorId = author.Id,
+            CategoryId = category.Id,
+            SubCategoryId = subCategory.Id,
             Publisher = "Test Press",
             Hall = "A1",
             IsAvailableForRental = true
@@ -211,7 +228,7 @@ public class BooksDashboardReportTests : IClassFixture<CustomWebApplicationFacto
             IsAvailableForRental = false
         })).IsSuccess);
 
-        return (book.Id, book.Name);
+        return (book.Id, book.Name, subCategoryName);
     }
 
     private async Task SeedUserAsync(string email, string role, string name)

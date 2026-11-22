@@ -14,12 +14,6 @@ namespace Infrastructure.IRepository.ServiceRepository
             public int Count { get; set; }
         }
 
-        internal sealed class GroupCount<TKey>
-        {
-            public TKey Key { get; set; } = default!;
-            public int Count { get; set; }
-        }
-
         internal static (DateTime From, DateTime To) NormalizeRange(DateTime? from, DateTime? to)
         {
             var today = DateTime.UtcNow.Date;

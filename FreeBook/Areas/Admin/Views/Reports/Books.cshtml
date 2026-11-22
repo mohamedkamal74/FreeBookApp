@@ -91,9 +91,9 @@
                 <tbody>
                     @foreach (var item in Model.Rows)
                     {
-                        var coverUrl = !string.IsNullOrWhiteSpace(item.Book.ImageThumbnailUrl)
-                            ? item.Book.ImageThumbnailUrl
-                            : item.Book.ImageUrl;
+                        var coverUrl = !string.IsNullOrWhiteSpace(item.ImageThumbnailUrl)
+                            ? item.ImageThumbnailUrl
+                            : item.ImageUrl;
                         <tr>
                             <td class="no-export">
                                 @if (!string.IsNullOrWhiteSpace(coverUrl))
@@ -106,18 +106,18 @@
                                        title="@Localizer["lbCoverImage"]" aria-label="@Localizer["lbCoverImage"]"></i>
                                 }
                             </td>
-                            <td>@item.Book.Name</td>
+                            <td>@item.BookName</td>
                             <td>@item.AuthorName</td>
                             <td>@item.CategoryName</td>
                             <td>@item.SubCategoryName</td>
-                            <td>@item.Book.Publisher</td>
-                            <td>@item.Book.Hall</td>
+                            <td>@item.Publisher</td>
+                            <td>@item.Hall</td>
                             <td>@item.CopyCount</td>
                             <td>@item.AvailableCopyCount</td>
                             <td>@item.RentalCount</td>
                             <td>
-                                <span class="badge @(item.Book.IsAvailableForRental ? "badge-success" : "badge-secondary")">
-                                    @(item.Book.IsAvailableForRental ? Localizer["lbAvailable"] : Localizer["lbUnavailable"])
+                                <span class="badge @(item.IsAvailableForRental ? "badge-success" : "badge-secondary")">
+                                    @(item.IsAvailableForRental ? Localizer["lbAvailable"] : Localizer["lbUnavailable"])
                                 </span>
                             </td>
                         </tr>
