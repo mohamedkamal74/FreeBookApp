@@ -4,6 +4,7 @@ using Infrastructure.Common.Interfaces;
 using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace FreeBook.Tests;
@@ -13,6 +14,7 @@ public class CrudDtoContractTests
     private static readonly Type[] CrudDtoTypes =
     {
         typeof(FlashMessageDto),
+        typeof(RoleDto), typeof(UserDto),
         typeof(AuthorDto), typeof(AuthorCommand),
         typeof(CategoryDto), typeof(CategoryCommand), typeof(NewCategory),
         typeof(SubCategoryDto), typeof(SubCategoryCommand),
@@ -31,10 +33,16 @@ public class CrudDtoContractTests
     {
         typeof(IServiceRepository<,>),
         typeof(IServiceRepositoryLog<>),
+        typeof(IAccountQueryService),
         typeof(IAuthorRepository),
         typeof(ISubscriptionRepository),
         typeof(IRentalRepository),
         typeof(INotificationRepository)
+    };
+
+    private static readonly Type[] AccountViewModels =
+    {
+        typeof(RegisterViewModel), typeof(RolesViewModel)
     };
 
     [Theory]
@@ -68,6 +76,19 @@ public class CrudDtoContractTests
         }
     }
 
+    [Theory]
+    [MemberData(nameof(AccountViewModelsData))]
+    public void AccountViewModel_DoesNotExposePersistenceTypes(Type viewModelType)
+    {
+        foreach (var property in viewModelType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+        {
+            Assert.False(ContainsDominEntity(property.PropertyType),
+                $"{viewModelType.Name}.{property.Name} exposes a Domin.Entity type: {property.PropertyType}");
+            Assert.False(ContainsIdentityEntity(property.PropertyType),
+                $"{viewModelType.Name}.{property.Name} exposes an Identity entity: {property.PropertyType}");
+        }
+    }
+
     [Fact]
     public void FlashMessage_RoundTripsThroughTempDataOnce()
     {
@@ -95,8 +116,18 @@ public class CrudDtoContractTests
         return type.IsArray && ContainsDominEntity(type.GetElementType()!);
     }
 
+    private static bool ContainsIdentityEntity(Type type)
+    {
+        if (typeof(IdentityRole).IsAssignableFrom(type) || typeof(IdentityUser<string>).IsAssignableFrom(type))
+            return true;
+        if (type.IsGenericType)
+            return type.GetGenericArguments().Any(ContainsIdentityEntity);
+        return type.IsArray && ContainsIdentityEntity(type.GetElementType()!);
+    }
+
     public static IEnumerable<object[]> CrudDtoTypesData() => CrudDtoTypes.Select(t => new object[] { t });
     public static IEnumerable<object[]> RepositoryContractsData() => RepositoryContracts.Select(t => new object[] { t });
+    public static IEnumerable<object[]> AccountViewModelsData() => AccountViewModels.Select(t => new object[] { t });
 
     private sealed class MemoryTempDataProvider : ITempDataProvider
     {

@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using Domin.Entity;
 using Infrastructure.IRepository;
@@ -253,6 +254,42 @@ public class WebAppTests : IClassFixture<CustomWebApplicationFactory>
 
         var afterFlashConsumed = await client.GetStringAsync("/Admin/Books/Books?culture=en");
         Assert.DoesNotContain("This name already exists!", afterFlashConsumed);
+    }
+
+    [Fact]
+    public async Task RolesSave_FlashMessage_IsLocalizedAndConsumedOnce()
+    {
+        await SeedAdminAsync();
+        var client = _factory.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false
+        });
+        await LoginAsync(client);
+
+        await CreateRoleAndAssertFlashAsync(client, "en", "User group saved successfully");
+        await CreateRoleAndAssertFlashAsync(client, "ar", "تم حفظ مجموعة المستخدم بنجاح");
+    }
+
+    private static async Task CreateRoleAndAssertFlashAsync(HttpClient client, string culture, string expectedText)
+    {
+        var page = await client.GetStringAsync($"/Admin/Accounts/Roles?culture={culture}");
+        var roleName = $"FlashRole-{Guid.NewGuid():N}";
+
+        var response = await client.PostAsync($"/Admin/Accounts/Roles?culture={culture}", new FormUrlEncodedContent(
+            new Dictionary<string, string>
+            {
+                ["NewRole.RoleName"] = roleName,
+                ["__RequestVerificationToken"] = ExtractAntiForgeryToken(page)!
+            }));
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+
+        var serializedText = JsonSerializer.Serialize(expectedText);
+        var afterSave = await client.GetStringAsync($"/Admin/Accounts/Roles?culture={culture}");
+        Assert.Contains(roleName, afterSave);
+        Assert.Contains(serializedText, afterSave);
+
+        var afterFlashConsumed = await client.GetStringAsync($"/Admin/Accounts/Roles?culture={culture}");
+        Assert.DoesNotContain(serializedText, afterFlashConsumed);
     }
 
     private async Task LoginAsync(HttpClient client)

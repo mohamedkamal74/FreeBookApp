@@ -4,17 +4,15 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Domin.Entity;
 using Domin.Resources;
-using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure.ViewModel
 {
     public class RegisterViewModel
     {
-        public List<VwUser> Users { get; set; } = new();
+        public List<UserDto> Users { get; set; } = new();
         public NewRegister NewRegister { get; set; } = new();
-        public List<IdentityRole> Roles { get; set; } = new();
+        public List<RoleDto> Roles { get; set; } = new();
         public ChangePasswordViewModel changePassword { get; set; } = new();
     }
 

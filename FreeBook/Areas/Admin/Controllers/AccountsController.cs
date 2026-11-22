@@ -1,6 +1,7 @@
 using System.IO;
 using Domin.Entity;
-using Infrastructure.Data;
+using Infrastructure.Common.Interfaces;
+using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -18,18 +19,21 @@ namespace FreeBook.Areas.Admin.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly FreeBookDbContext _context;
+        private readonly IAccountQueryService _accountQueries;
+        private IFlashMessageService Flash { get; }
 
         #endregion
 
         #region Constructor
         public AccountsController(RoleManager<IdentityRole> roleManager,
-           UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, FreeBookDbContext context)
+           UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager,
+           IAccountQueryService accountQueries, IFlashMessageService flash)
         {
             _roleManager = roleManager;
             _userManager = userManager;
             _signInManager = signInManager;
-            _context = context;
+            _accountQueries = accountQueries;
+            Flash = flash;
         }
         #endregion
 
@@ -40,7 +44,7 @@ namespace FreeBook.Areas.Admin.Controllers
             var model = new RolesViewModel()
             {
                 NewRole = new NewRole(),
-                Roles = await _roleManager.Roles.OrderBy(x => x.Name).ToListAsync()
+                Roles = await _accountQueries.GetRolesAsync()
             };
             return View(model);
         }
@@ -63,17 +67,17 @@ namespace FreeBook.Areas.Admin.Controllers
                     var Result = await _roleManager.CreateAsync(role);
                     if (Result.Succeeded)
                         // succeeded
-                        SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbSaveMsgRole);
+                        Flash.Success(Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbSaveMsgRole);
                     else
                         //not succeeded
-                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbNotSaveMsgRole);
+                        Flash.Error(Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbNotSaveMsgRole);
                 }
                 else
                 {   //update
                     var RoleUpdate = await _roleManager.FindByIdAsync(role.Id);
                     if (RoleUpdate is null)
                     {
-                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbNotUpdateMsgRole);
+                        Flash.Error(Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbNotUpdateMsgRole);
                         return RedirectToAction(nameof(Roles));
                     }
 
@@ -81,20 +85,13 @@ namespace FreeBook.Areas.Admin.Controllers
                     RoleUpdate.Name = role.Name;
                     var result = await _roleManager.UpdateAsync(RoleUpdate);
                     if (result.Succeeded)
-                        SessionMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbUpdateMsgRole);
+                        Flash.Success(Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbUpdateMsgRole);
 
                     else
-                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbNotUpdateMsgRole);
+                        Flash.Error(Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbNotUpdateMsgRole);
                 }
             }
             return RedirectToAction(nameof(Roles));
-        }
-
-        private void SessionMsg(string MsgType, string Title, string Msg)
-        {
-            HttpContext.Session.SetString(Helper.MsgType, MsgType);
-            HttpContext.Session.SetString(Helper.Title, Title);
-            HttpContext.Session.SetString(Helper.Msg, Msg);
         }
 
         [Authorize(Roles = "Admin")]
@@ -120,10 +117,8 @@ namespace FreeBook.Areas.Admin.Controllers
             var model = new RegisterViewModel
             {
                 NewRegister = new NewRegister(),
-                Roles = await _roleManager.Roles.OrderBy(x => x.Name).ToListAsync(),
-                Users = await _context.VwUsers.OrderBy(x => x.Role).ToListAsync()
-
-
+                Roles = await _accountQueries.GetRolesAsync(),
+                Users = await _accountQueries.GetUsersAsync()
             };
             return View(model);
         }
@@ -153,7 +148,7 @@ namespace FreeBook.Areas.Admin.Controllers
 
                     if (!Helper.AllowedImageExtensions.Contains(extension) || uploaded.Length > Helper.MaxImageSizeBytes)
                     {
-                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave,
+                        Flash.Error(Resources.ResourceWeb.lbNotSave,
                             "Only JPG, JPEG, PNG, GIF, or WEBP images up to 5 MB are allowed.");
                         return RedirectToAction("Register", "Accounts");
                     }
@@ -188,14 +183,14 @@ namespace FreeBook.Areas.Admin.Controllers
                         //Succeded
                         var role = await _userManager.AddToRoleAsync(user, model.NewRegister.RoleName);
                         if (role.Succeeded)
-                            SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbMsgSavedOk);
+                            Flash.Success(Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbMsgSavedOk);
                         else
-                            SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSavedOk);
+                            Flash.Error(Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSavedOk);
                     }
                     else
                     {
                         //Not Succeded
-                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSavedOk);
+                        Flash.Error(Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSavedOk);
                     }
                 }
                 else
@@ -204,7 +199,7 @@ namespace FreeBook.Areas.Admin.Controllers
                     var userUpdate = await _userManager.FindByIdAsync(user.Id);
                     if (userUpdate is null)
                     {
-                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbMsgNotUpdatedOk);
+                        Flash.Error(Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbMsgNotUpdatedOk);
                         return RedirectToAction("Register", "Accounts");
                     }
 
@@ -223,15 +218,15 @@ namespace FreeBook.Areas.Admin.Controllers
                         var addRole = await _userManager.AddToRoleAsync(userUpdate, model.NewRegister.RoleName);
                         if (addRole.Succeeded)
 
-                            SessionMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbMsgUpdatedOk);
+                            Flash.Success(Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbMsgUpdatedOk);
                         else
 
-                            SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbMsgNotUpdatedOk);
+                            Flash.Error(Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbMsgNotUpdatedOk);
                     }
                     else
                     {
                         //Not Succeded
-                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbMsgNotUpdatedOk);
+                        Flash.Error(Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbMsgNotUpdatedOk);
                     }
                 }
                 return RedirectToAction("Register", "Accounts");
@@ -281,9 +276,9 @@ namespace FreeBook.Areas.Admin.Controllers
                 await _userManager.RemovePasswordAsync(user);
                 var AddNewPassword = await _userManager.AddPasswordAsync(user, model.changePassword.NewPassword);
                 if (AddNewPassword.Succeeded)
-                    SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbMsgSaveChangePassword);
+                    Flash.Success(Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbMsgSaveChangePassword);
                 else
-                    SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSaveChangePassword);
+                    Flash.Error(Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSaveChangePassword);
                 return RedirectToAction("Register");
             }
             return RedirectToAction("Register");

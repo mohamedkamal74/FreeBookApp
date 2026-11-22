@@ -23,6 +23,24 @@ namespace Infrastructure.ViewModel
             new() { Type = ErrorType, Title = title, Text = text };
     }
 
+    /// <summary>Read model for an Identity role displayed by the account views.</summary>
+    public class RoleDto
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+    }
+
+    /// <summary>Read model for the VwUsers database view displayed by the account views.</summary>
+    public class UserDto
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string? ImageUser { get; set; }
+        public bool ActiveUser { get; set; }
+        public string? Role { get; set; }
+    }
+
     public class AuthorDto
     {
         public Guid Id { get; set; }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Domin.Entity;
 using Infrastructure.ViewModel;
+using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure.IRepository.ServiceRepository
 {
@@ -13,6 +14,22 @@ namespace Infrastructure.IRepository.ServiceRepository
     /// </summary>
     internal static class CrudMapping
     {
+        internal static RoleDto ToDto(IdentityRole entity) => new()
+        {
+            Id = entity.Id ?? string.Empty,
+            Name = entity.Name ?? string.Empty
+        };
+
+        internal static UserDto ToDto(VwUser entity) => new()
+        {
+            Id = entity.Id ?? string.Empty,
+            Name = entity.Name ?? string.Empty,
+            Email = entity.Email ?? string.Empty,
+            ImageUser = entity.ImageUser,
+            ActiveUser = entity.ActiveUser,
+            Role = entity.Role
+        };
+
         internal static AuthorDto ToDto(Author entity) => new()
         {
             Id = entity.Id,

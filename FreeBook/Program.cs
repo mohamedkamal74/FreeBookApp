@@ -61,7 +61,6 @@ try
     });
     builder.Services.AddHealthChecks().AddDbContextCheck<FreeBookDbContext>("database");
 
-    builder.Services.AddSession();
     builder.Services.AddDbContext<FreeBookDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("BookConnection")));
     builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
@@ -104,6 +103,7 @@ try
     builder.Services.AddScoped<IServiceRepository<GovernorateDto, GovernorateCommand>, ServicesGovernorate>();
     builder.Services.AddScoped<IServiceRepository<AreaDto, AreaCommand>, ServicesArea>();
     builder.Services.AddScoped<INotificationRepository, ServicesNotification>();
+    builder.Services.AddScoped<IAccountQueryService, ServicesAccount>();
     builder.Services.AddScoped<IDashboardRepository, ServicesDashboard>();
     builder.Services.AddScoped<IReportRepository, ServicesReports>();
 
@@ -203,7 +203,6 @@ try
     app.UseRequestLocalization();
     app.UseRouting();
     app.UseRateLimiter();
-    app.UseSession();
     app.UseAuthentication();
     app.UseAuthorization();
 

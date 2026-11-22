@@ -5,13 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Domin.Resources;
-using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure.ViewModel
 {
     public class RolesViewModel
     {
-        public List<IdentityRole> Roles { get; set; } = new();
+        public List<RoleDto> Roles { get; set; } = new();
         public NewRole NewRole { get; set; } = new();
     }
     public class NewRole
