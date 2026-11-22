@@ -40,6 +40,15 @@ public class DashboardReportRepositoryTests
         Assert.Equal(seed.Author.Id, general.Filter.AuthorId);
         Assert.Equal(seed.Category.Id, general.Filter.CategoryId);
         Assert.Equal(2, general.Charts.RentalsPerMonth.Sum(row => row.Count));
+        Assert.Contains(general.RecentRentals, row =>
+            row.SubscriberName == "Repository Subscriber" && row.RentalCopyCount == 1);
+        Assert.Contains(general.OverdueList, row =>
+            row.SubscriberName == "Repository Subscriber" && row.BookName == seed.Book.Name && !row.PenaltyPaid);
+        Assert.Contains(general.ExpiringSubs, row => row.SubscriberName == "Repository Subscriber");
+        Assert.Contains(general.RecentSubscribers, row =>
+            row.FullName == "Repository Subscriber" && row.AreaName == "Test Area" && row.GovernorateName == "Test Governorate");
+        Assert.Contains(seed.Author.Id, general.Filter.Authors.Select(option => option.Id));
+        Assert.Contains(seed.Category.Id, general.Filter.Categories.Select(option => option.Id));
 
         var subscribersResult = await dashboards.GetSubscribersAsync(new SubscribersDashboardQuery
         {
@@ -56,6 +65,7 @@ public class DashboardReportRepositoryTests
         Assert.Equal(1, subscribers.Dashboard.ExpiringSoon);
         Assert.Equal(1, subscribers.Dashboard.WhatsAppEnabled);
         Assert.Equal(seed.Governorate.Id, subscribers.Filter.GovernorateId);
+        Assert.Contains(seed.Governorate.Id, subscribers.Filter.Governorates.Select(option => option.Id));
         Assert.Equal(
             new[] { "lbAgeUnder18", "lbAge18to25", "lbAge26to35", "lbAge36to50", "lbAgeOver50" },
             subscribers.Dashboard.AgeGroups.Select(row => row.Name));
@@ -80,6 +90,8 @@ public class DashboardReportRepositoryTests
         Assert.Equal(0, books.Dashboard.BooksWithoutCopies);
         Assert.Equal(new[] { "lbAvailable", "lbRented" }, books.Dashboard.Availability.Select(row => row.Name));
         Assert.Equal(seed.Author.Id, books.Filter.AuthorId);
+        Assert.Contains(seed.Author.Id, books.Filter.Authors.Select(option => option.Id));
+        Assert.Contains(seed.Category.Id, books.Filter.Categories.Select(option => option.Id));
     }
 
     [Fact]
@@ -208,6 +220,47 @@ public class DashboardReportRepositoryTests
     }
 
     [Fact]
+    public void DashboardDtos_DoNotExposeEntityTypes()
+    {
+        var entityTypes = typeof(Book).Assembly
+            .GetTypes()
+            .Where(type => type.Namespace == "Domin.Entity")
+            .ToHashSet();
+        var dtoTypes = new[]
+        {
+            typeof(RecentRentalRow),
+            typeof(OverdueRentalRow),
+            typeof(ExpiringSubscriptionRow),
+            typeof(RecentSubscriberRow),
+            typeof(GeneralDashboardData),
+            typeof(DashboardFilterViewModel),
+            typeof(DashboardChartsViewModel),
+            typeof(SubscribersDashboardData),
+            typeof(SubscribersDashboardFilterViewModel),
+            typeof(SubscribersDashboardViewModel),
+            typeof(BooksDashboardData),
+            typeof(BooksDashboardFilterViewModel),
+            typeof(BooksDashboardViewModel),
+            typeof(NamedCount),
+            typeof(ReportFilterOption)
+        };
+
+        foreach (var dtoType in dtoTypes)
+        {
+            foreach (var property in dtoType.GetProperties())
+            {
+                var propertyType = property.PropertyType;
+                if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(List<>))
+                {
+                    propertyType = propertyType.GetGenericArguments()[0];
+                }
+
+                Assert.DoesNotContain(propertyType, entityTypes);
+            }
+        }
+    }
+
+    [Fact]
     public void MonthlyBuckets_CapsAtTwelveMonthsAndUsesGroupedCounts()
     {
         var counts = new[]
@@ -236,6 +289,13 @@ public class DashboardReportRepositoryTests
         var categoryId = Guid.NewGuid();
         var governorateId = Guid.NewGuid();
 
+        AssertSql(DashboardReportQueries.RecentRentals(context, 5));
+        AssertSql(DashboardReportQueries.RecentSubscribers(context, 5));
+        AssertSql(DashboardReportQueries.OverdueRentalRows(context, from, 10));
+        AssertSql(DashboardReportQueries.ExpiringSubscriptionRows(context, from, toExclusive, 10));
+        AssertSql(DashboardReportQueries.AuthorOptions(context));
+        AssertSql(DashboardReportQueries.CategoryOptions(context));
+        AssertSql(DashboardReportQueries.GovernorateOptions(context));
         AssertSql(DashboardReportQueries.TopRentedBooks(context));
         AssertSql(DashboardReportQueries.TopRenters(context));
         AssertSql(DashboardReportQueries.BooksByCategory(context, authorId, categoryId));

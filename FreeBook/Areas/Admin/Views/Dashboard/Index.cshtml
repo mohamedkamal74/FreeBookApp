@@ -403,10 +403,10 @@
                             @foreach (var rental in Model.RecentRentals)
                             {
                                 <tr>
-                                    <td>@rental.Subscriber?.FullName</td>
+                                    <td>@rental.SubscriberName</td>
                                     <td>@rental.StartDate.ToString("yyyy-MM-dd")</td>
                                     <td>
-                                        @rental.RentalCopies.Count copies
+                                        @rental.RentalCopyCount copies
                                     </td>
                                 </tr>
                             }
@@ -433,18 +433,14 @@
                         <tbody>
                             @foreach (var rental in Model.OverdueList)
                             {
-                                var overdueCopies = rental.RentalCopies.Where(c => c.ReturnDate == null && c.EndDate < DateTime.UtcNow).ToList();
-                                foreach (var rc in overdueCopies)
-                                {
-                                    <tr class="table-danger">
-                                        <td>@rental.Subscriber?.FullName</td>
-                                        <td>@rc.BookCopy?.Book?.Name</td>
-                                        <td>@rc.EndDate.ToString("yyyy-MM-dd")</td>
-                                        <td>
-                                            @(rental.PenaltyPaid ? Localizer["lbPaid"] : Localizer["lbPending"])
-                                        </td>
-                                    </tr>
-                                }
+                                <tr class="table-danger">
+                                    <td>@rental.SubscriberName</td>
+                                    <td>@rental.BookName</td>
+                                    <td>@rental.EndDate.ToString("yyyy-MM-dd")</td>
+                                    <td>
+                                        @(rental.PenaltyPaid ? Localizer["lbPaid"] : Localizer["lbPending"])
+                                    </td>
+                                </tr>
                             }
                         </tbody>
                     </table>
@@ -470,7 +466,7 @@
                             {
                                 var daysLeft = (sub.EndDate - DateTime.UtcNow).Days;
                                 <tr class="@(daysLeft <= 7 ? "table-danger" : (daysLeft <= 14 ? "table-warning" : ""))">
-                                    <td>@sub.Subscriber?.FullName</td>
+                                    <td>@sub.SubscriberName</td>
                                     <td>@sub.EndDate.ToString("yyyy-MM-dd")</td>
                                     <td>@daysLeft @Localizer["lbDays"]</td>
                                 </tr>
@@ -499,8 +495,8 @@
                             {
                                 <tr>
                                     <td>@subscriber.FullName</td>
-                                    <td>@subscriber.Area?.Name</td>
-                                    <td>@subscriber.Governorate?.Name</td>
+                                    <td>@subscriber.AreaName</td>
+                                    <td>@subscriber.GovernorateName</td>
                                 </tr>
                             }
                         </tbody>

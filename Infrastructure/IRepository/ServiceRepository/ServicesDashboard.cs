@@ -1,4 +1,3 @@
-using Domin.Entity;
 using Infrastructure.Common;
 using Infrastructure.Data;
 using Infrastructure.IRepository;
@@ -30,52 +29,31 @@ namespace Infrastructure.IRepository.ServiceRepository
                 var now = DateTime.UtcNow;
                 var warningTo = now.AddDays(ExpiryWarningDays);
 
-                var rentals = DashboardReportQueries.Rentals(_context);
-                var subscribers = DashboardReportQueries.Subscribers(_context);
-                var subscriptions = DashboardReportQueries.Subscriptions(_context);
-
                 var totalBooks = await DashboardReportQueries.ActiveBooks(_context).CountAsync();
                 var totalCopies = await DashboardReportQueries.BookCopies(_context).CountAsync();
                 var availableCopies = await DashboardReportQueries.BookCopies(_context)
                     .CountAsync(copy => copy.IsAvailableForRental);
-                var totalSubscribers = await subscribers.CountAsync();
-                var activeSubscriptions = await subscriptions
+                var totalSubscribers = await _context.Subscribers.AsNoTracking().CountAsync();
+                var activeSubscriptions = await _context.Subscriptions.AsNoTracking()
                     .CountAsync(subscription => subscription.StartDate <= now && subscription.EndDate >= now);
-                var expiringSubscriptions = await subscriptions
+                var expiringSubscriptions = await _context.Subscriptions.AsNoTracking()
                     .CountAsync(subscription => subscription.EndDate >= now && subscription.EndDate <= warningTo);
-                var blacklistedSubscribers = await subscribers.CountAsync(subscriber => subscriber.IsBlackListed);
-                var activeRentals = await rentals
+                var blacklistedSubscribers = await _context.Subscribers.AsNoTracking()
+                    .CountAsync(subscriber => subscriber.IsBlackListed);
+                var activeRentals = await _context.Rentals.AsNoTracking()
                     .CountAsync(rental => rental.RentalCopies.Any(copy => copy.ReturnDate == null));
-                var overdueRentals = await rentals
+                var overdueRentals = await _context.Rentals.AsNoTracking()
                     .CountAsync(rental => rental.RentalCopies.Any(copy => copy.ReturnDate == null && copy.EndDate < now));
 
-                var recentRentals = await rentals
-                    .OrderByDescending(rental => rental.StartDate)
-                    .Take(5)
-                    .ToListAsync();
-                var recentSubscribers = await subscribers
-                    .OrderByDescending(subscriber => subscriber.CreatedOn)
-                    .ThenBy(subscriber => subscriber.FirstName)
-                    .ThenBy(subscriber => subscriber.LastName)
-                    .Take(5)
-                    .ToListAsync();
-                var overdueList = await rentals
-                    .Where(rental => rental.RentalCopies.Any(copy => copy.ReturnDate == null && copy.EndDate < now))
-                    .OrderByDescending(rental => rental.StartDate)
-                    .Take(10)
-                    .ToListAsync();
-                var expiringSubs = await subscriptions
-                    .Where(subscription => subscription.EndDate >= now && subscription.EndDate <= warningTo)
-                    .OrderByDescending(subscription => subscription.StartDate)
-                    .Take(10)
+                var recentRentals = await DashboardReportQueries.RecentRentals(_context, 5).ToListAsync();
+                var recentSubscribers = await DashboardReportQueries.RecentSubscribers(_context, 5).ToListAsync();
+                var overdueList = await DashboardReportQueries.OverdueRentalRows(_context, now, 10).ToListAsync();
+                var expiringSubs = await DashboardReportQueries
+                    .ExpiringSubscriptionRows(_context, now, warningTo, 10)
                     .ToListAsync();
 
-                var authors = await DashboardReportQueries.ActiveAuthors(_context)
-                    .OrderBy(author => author.Name)
-                    .ToListAsync();
-                var categories = await DashboardReportQueries.ActiveCategories(_context)
-                    .OrderBy(category => category.Name)
-                    .ToListAsync();
+                var authors = await DashboardReportQueries.AuthorOptions(_context).ToListAsync();
+                var categories = await DashboardReportQueries.CategoryOptions(_context).ToListAsync();
 
                 var topRentedBooks = await DashboardReportQueries.TopRentedBooks(_context).ToListAsync();
                 var topRenters = await DashboardReportQueries.TopRenters(_context).ToListAsync();
@@ -167,9 +145,7 @@ namespace Infrastructure.IRepository.ServiceRepository
                 var topRenters = await DashboardReportQueries
                     .TopSubscriberRenters(_context, rangeFrom, toExclusive, governorateId)
                     .ToListAsync();
-                var governorates = await DashboardReportQueries.Governorates(_context)
-                    .OrderBy(governorate => governorate.Name)
-                    .ToListAsync();
+                var governorates = await DashboardReportQueries.GovernorateOptions(_context).ToListAsync();
 
                 var dashboard = new SubscribersDashboardViewModel
                 {
@@ -256,12 +232,8 @@ namespace Infrastructure.IRepository.ServiceRepository
                     .RentalMonthsForBooks(_context, rangeFrom, toExclusive, bookIds)
                     .ToListAsync();
 
-                var authors = await DashboardReportQueries.ActiveAuthors(_context)
-                    .OrderBy(author => author.Name)
-                    .ToListAsync();
-                var categories = await DashboardReportQueries.ActiveCategories(_context)
-                    .OrderBy(category => category.Name)
-                    .ToListAsync();
+                var authors = await DashboardReportQueries.AuthorOptions(_context).ToListAsync();
+                var categories = await DashboardReportQueries.CategoryOptions(_context).ToListAsync();
 
                 var copyLookup = copyBookIds.ToHashSet();
                 var dashboard = new BooksDashboardViewModel

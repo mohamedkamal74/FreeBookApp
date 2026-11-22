@@ -1,7 +1,37 @@
-using Domin.Entity;
-
 namespace Infrastructure.ViewModel
 {
+    /// <summary>Flattened recent-rental row shown on the general dashboard.</summary>
+    public sealed class RecentRentalRow
+    {
+        public string? SubscriberName { get; set; }
+        public DateTime StartDate { get; set; }
+        public int RentalCopyCount { get; set; }
+    }
+
+    /// <summary>Flattened overdue-rental row shown on the general dashboard.</summary>
+    public sealed class OverdueRentalRow
+    {
+        public string? SubscriberName { get; set; }
+        public string? BookName { get; set; }
+        public DateTime EndDate { get; set; }
+        public bool PenaltyPaid { get; set; }
+    }
+
+    /// <summary>Flattened expiring-subscription row shown on the general dashboard.</summary>
+    public sealed class ExpiringSubscriptionRow
+    {
+        public string? SubscriberName { get; set; }
+        public DateTime EndDate { get; set; }
+    }
+
+    /// <summary>Flattened recent-subscriber row shown on the general dashboard.</summary>
+    public sealed class RecentSubscriberRow
+    {
+        public string? FullName { get; set; }
+        public string? AreaName { get; set; }
+        public string? GovernorateName { get; set; }
+    }
+
     /// <summary>Everything the general dashboard renders, computed once per request.</summary>
     public class GeneralDashboardData
     {
@@ -15,10 +45,10 @@ namespace Infrastructure.ViewModel
         public int ExpiringSubscriptions { get; set; }
         public int BlacklistedSubscribers { get; set; }
 
-        public List<Rental> RecentRentals { get; set; } = new();
-        public List<Subscriber> RecentSubscribers { get; set; } = new();
-        public List<Rental> OverdueList { get; set; } = new();
-        public List<Subscription> ExpiringSubs { get; set; } = new();
+        public List<RecentRentalRow> RecentRentals { get; set; } = new();
+        public List<RecentSubscriberRow> RecentSubscribers { get; set; } = new();
+        public List<OverdueRentalRow> OverdueList { get; set; } = new();
+        public List<ExpiringSubscriptionRow> ExpiringSubs { get; set; } = new();
 
         public DashboardFilterViewModel Filter { get; set; } = new();
         public DashboardChartsViewModel Charts { get; set; } = new();

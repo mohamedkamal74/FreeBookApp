@@ -17,35 +17,100 @@ namespace Infrastructure.IRepository.ServiceRepository
         internal static IQueryable<Book> ActiveBooks(FreeBookDbContext context) =>
             Books(context).Where(book => book.CurrentState > 0);
 
-        internal static IQueryable<Author> ActiveAuthors(FreeBookDbContext context) =>
-            context.Authors.AsNoTracking().Where(author => !author.IsDeleted);
-
-        internal static IQueryable<Category> ActiveCategories(FreeBookDbContext context) =>
-            context.categories.AsNoTracking().Where(category => category.Currentstste > 0);
-
-        internal static IQueryable<Rental> Rentals(FreeBookDbContext context) =>
-            context.Rentals.AsNoTracking()
-                .Include(rental => rental.Subscriber)
-                .Include(rental => rental.RentalCopies)
-                    .ThenInclude(copy => copy.BookCopy)
-                        .ThenInclude(bookCopy => bookCopy.Book);
-
-        internal static IQueryable<Subscriber> Subscribers(FreeBookDbContext context) =>
-            context.Subscribers.AsNoTracking()
-                .Include(subscriber => subscriber.Area)
-                .Include(subscriber => subscriber.Governorate);
-
-        internal static IQueryable<Subscription> Subscriptions(FreeBookDbContext context) =>
-            context.Subscriptions.AsNoTracking()
-                .Include(subscription => subscription.Subscriber);
-
         internal static IQueryable<BookCopy> BookCopies(FreeBookDbContext context) =>
-            context.BookCopies.AsNoTracking()
-                .Include(copy => copy.Book);
+            context.BookCopies.AsNoTracking();
 
-        internal static IQueryable<Governorate> Governorates(FreeBookDbContext context) =>
+        internal static IQueryable<RecentRentalRow> RecentRentals(FreeBookDbContext context, int take) =>
+            context.Rentals.AsNoTracking()
+                .OrderByDescending(rental => rental.StartDate)
+                .Take(take)
+                .Select(rental => new RecentRentalRow
+                {
+                    SubscriberName = rental.Subscriber != null
+                        ? rental.Subscriber.FirstName + " " + rental.Subscriber.LastName
+                        : null,
+                    StartDate = rental.StartDate,
+                    RentalCopyCount = rental.RentalCopies.Count()
+                });
+
+        internal static IQueryable<RecentSubscriberRow> RecentSubscribers(FreeBookDbContext context, int take) =>
+            context.Subscribers.AsNoTracking()
+                .OrderByDescending(subscriber => subscriber.CreatedOn)
+                .ThenBy(subscriber => subscriber.FirstName)
+                .ThenBy(subscriber => subscriber.LastName)
+                .Take(take)
+                .Select(subscriber => new RecentSubscriberRow
+                {
+                    FullName = subscriber.FirstName + " " + subscriber.LastName,
+                    AreaName = subscriber.Area != null ? subscriber.Area.Name : null,
+                    GovernorateName = subscriber.Governorate != null ? subscriber.Governorate.Name : null
+                });
+
+        internal static IQueryable<OverdueRentalRow> OverdueRentalRows(
+            FreeBookDbContext context,
+            DateTime now,
+            int take) =>
+            (from rental in context.Rentals.AsNoTracking()
+             from copy in rental.RentalCopies
+             where copy.ReturnDate == null && copy.EndDate < now
+             orderby rental.StartDate descending
+             select new OverdueRentalRow
+             {
+                 SubscriberName = rental.Subscriber != null
+                     ? rental.Subscriber.FirstName + " " + rental.Subscriber.LastName
+                     : null,
+                 BookName = copy.BookCopy != null && copy.BookCopy.Book != null
+                     ? copy.BookCopy.Book.Name
+                     : null,
+                 EndDate = copy.EndDate,
+                 PenaltyPaid = rental.PenaltyPaid
+             }).Take(take);
+
+        internal static IQueryable<ExpiringSubscriptionRow> ExpiringSubscriptionRows(
+            FreeBookDbContext context,
+            DateTime now,
+            DateTime warningTo,
+            int take) =>
+            context.Subscriptions.AsNoTracking()
+                .Where(subscription => subscription.EndDate >= now && subscription.EndDate <= warningTo)
+                .OrderByDescending(subscription => subscription.StartDate)
+                .Take(take)
+                .Select(subscription => new ExpiringSubscriptionRow
+                {
+                    SubscriberName = subscription.Subscriber != null
+                        ? subscription.Subscriber.FirstName + " " + subscription.Subscriber.LastName
+                        : null,
+                    EndDate = subscription.EndDate
+                });
+
+        internal static IQueryable<ReportFilterOption> AuthorOptions(FreeBookDbContext context) =>
+            context.Authors.AsNoTracking()
+                .Where(author => !author.IsDeleted)
+                .OrderBy(author => author.Name)
+                .Select(author => new ReportFilterOption
+                {
+                    Id = author.Id,
+                    Name = author.Name
+                });
+
+        internal static IQueryable<ReportFilterOption> CategoryOptions(FreeBookDbContext context) =>
+            context.categories.AsNoTracking()
+                .Where(category => category.Currentstste > 0)
+                .OrderBy(category => category.Name)
+                .Select(category => new ReportFilterOption
+                {
+                    Id = category.Id,
+                    Name = category.Name
+                });
+
+        internal static IQueryable<ReportFilterOption> GovernorateOptions(FreeBookDbContext context) =>
             context.Governorates.AsNoTracking()
-                .Include(governorate => governorate.Areas);
+                .OrderBy(governorate => governorate.Name)
+                .Select(governorate => new ReportFilterOption
+                {
+                    Id = governorate.Id,
+                    Name = governorate.Name
+                });
 
         internal static IQueryable<NamedCount> TopRentedBooks(FreeBookDbContext context) =>
             from rentalCopy in context.RentalCopies.AsNoTracking()

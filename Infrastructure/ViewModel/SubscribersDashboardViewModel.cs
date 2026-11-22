@@ -1,5 +1,3 @@
-using Domin.Entity;
-
 namespace Infrastructure.ViewModel
 {
     /// <summary>Current subscribers-dashboard filter selections plus the governorate options.</summary>
@@ -8,7 +6,7 @@ namespace Infrastructure.ViewModel
         public DateTime From { get; set; }
         public DateTime To { get; set; }
         public Guid? GovernorateId { get; set; }
-        public List<Governorate> Governorates { get; set; } = new();
+        public List<ReportFilterOption> Governorates { get; set; } = new();
     }
 
     /// <summary>Raw subscribers-dashboard filter values supplied by the request.</summary>
