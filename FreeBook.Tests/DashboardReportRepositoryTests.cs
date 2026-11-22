@@ -135,33 +135,77 @@ public class DashboardReportRepositoryTests
         Assert.Empty(result.ValueOr(new List<string>()));
     }
 
+    [Fact]
+    public void MonthlyBuckets_CapsAtTwelveMonthsAndUsesGroupedCounts()
+    {
+        var counts = new[]
+        {
+            new ReportQueryHelpers.MonthCount { Year = 2025, Month = 1, Count = 2 },
+            new ReportQueryHelpers.MonthCount { Year = 2026, Month = 3, Count = 4 }
+        };
+
+        var rows = ReportQueryHelpers.MonthlyBuckets(
+            counts,
+            new DateTime(2025, 1, 1),
+            new DateTime(2026, 3, 1));
+
+        Assert.Equal(ReportQueryHelpers.MaxChartMonths, rows.Count);
+        Assert.Equal(4, rows.Sum(row => row.Count));
+    }
+
+    [Fact]
+    public void DashboardReportQueries_TranslateToSqlServer()
+    {
+        using var context = CreateSqlServerQueryContext();
+        var from = DateTime.UtcNow.AddMonths(-1);
+        var toExclusive = DateTime.UtcNow.AddDays(1);
+        var bookIds = new List<Guid> { Guid.NewGuid() };
+        var authorId = Guid.NewGuid();
+        var categoryId = Guid.NewGuid();
+        var governorateId = Guid.NewGuid();
+
+        AssertSql(DashboardReportQueries.TopRentedBooks(context));
+        AssertSql(DashboardReportQueries.TopRenters(context));
+        AssertSql(DashboardReportQueries.BooksByCategory(context, authorId, categoryId));
+        AssertSql(DashboardReportQueries.SubscribersByGovernorate(context, governorateId));
+        AssertSql(DashboardReportQueries.TopSubscriberRenters(context, from, toExclusive, governorateId));
+        AssertSql(DashboardReportQueries.RentalMonths(context, from, toExclusive, authorId, categoryId));
+        AssertSql(DashboardReportQueries.SubscriptionMonths(context, from, toExclusive, governorateId));
+        AssertSql(DashboardReportQueries.TopRentedBooksForBooks(context, from, toExclusive, bookIds));
+        AssertSql(DashboardReportQueries.RentalMonthsForBooks(context, from, toExclusive, bookIds));
+        AssertSql(DashboardReportQueries.BookInventoryRows(context, new BookInventoryQuery
+        {
+            AuthorId = authorId,
+            CategoryId = categoryId,
+            AvailableOnly = true
+        }));
+        AssertSql(DashboardReportQueries.PopularBookCounts(context));
+        AssertSql(DashboardReportQueries.BooksByCategoryCounts(context));
+        AssertSql(DashboardReportQueries.BooksByAuthorCounts(context));
+    }
+
     private static FreeBookDbContext CreateContext() =>
         new(new DbContextOptionsBuilder<FreeBookDbContext>()
             .UseInMemoryDatabase($"FreeBookDashboardTests_{Guid.NewGuid():N}")
             .Options);
 
+    private static FreeBookDbContext CreateSqlServerQueryContext() =>
+        new(new DbContextOptionsBuilder<FreeBookDbContext>()
+            .UseSqlServer("Server=localhost;Database=FreeBookQueryTranslation;Trusted_Connection=True;TrustServerCertificate=True;")
+            .Options);
+
+    private static void AssertSql(IQueryable query)
+    {
+        var sql = query.ToQueryString();
+        Assert.False(string.IsNullOrWhiteSpace(sql));
+        Assert.Contains("SELECT", sql, StringComparison.OrdinalIgnoreCase);
+    }
+
     private static ServicesDashboard CreateDashboardRepository(FreeBookDbContext context) =>
-        new(
-            new ServicesBook(context, Mock.Of<ILogger<ServicesBook>>()),
-            new ServicesBookCopy(context, Mock.Of<ILogger<ServicesBookCopy>>()),
-            new ServicesSubscriber(context, Mock.Of<ILogger<ServicesSubscriber>>()),
-            new ServicesSubscription(context, Mock.Of<ILogger<ServicesSubscription>>()),
-            new ServicesRental(context, Mock.Of<ILogger<ServicesRental>>()),
-            new ServicesAuthor(context, Mock.Of<ILogger<ServicesAuthor>>()),
-            new ServicesCategory(context, Mock.Of<ILogger<ServicesCategory>>()),
-            new ServicesGovernorate(context, Mock.Of<ILogger<ServicesGovernorate>>()),
-            Mock.Of<ILogger<ServicesDashboard>>());
+        new(context, Mock.Of<ILogger<ServicesDashboard>>());
 
     private static ServicesReports CreateReportRepository(FreeBookDbContext context) =>
-        new(
-            new ServicesBook(context, Mock.Of<ILogger<ServicesBook>>()),
-            new ServicesBookCopy(context, Mock.Of<ILogger<ServicesBookCopy>>()),
-            new ServicesSubscriber(context, Mock.Of<ILogger<ServicesSubscriber>>()),
-            new ServicesSubscription(context, Mock.Of<ILogger<ServicesSubscription>>()),
-            new ServicesRental(context, Mock.Of<ILogger<ServicesRental>>()),
-            new ServicesAuthor(context, Mock.Of<ILogger<ServicesAuthor>>()),
-            new ServicesCategory(context, Mock.Of<ILogger<ServicesCategory>>()),
-            Mock.Of<ILogger<ServicesReports>>());
+        new(context, Mock.Of<ILogger<ServicesReports>>());
 
     private static async Task<SeedData> SeedAsync(FreeBookDbContext context)
     {

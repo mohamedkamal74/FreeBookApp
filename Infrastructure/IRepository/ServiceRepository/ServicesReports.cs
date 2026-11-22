@@ -1,38 +1,21 @@
 using Domin.Entity;
 using Infrastructure.Common;
+using Infrastructure.Data;
+using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.IRepository.ServiceRepository
 {
     public class ServicesReports : IReportRepository
     {
-        private readonly IServiceRepository<Book> _serviceBook;
-        private readonly IServiceRepository<BookCopy> _serviceBookCopy;
-        private readonly IServiceRepository<Subscriber> _serviceSubscriber;
-        private readonly IServiceRepository<Subscription> _serviceSubscription;
-        private readonly IServiceRepository<Rental> _serviceRental;
-        private readonly IServiceRepository<Author> _serviceAuthor;
-        private readonly IServiceRepository<Category> _serviceCategory;
+        private readonly FreeBookDbContext _context;
         private readonly ILogger<ServicesReports> _logger;
 
-        public ServicesReports(
-            IServiceRepository<Book> serviceBook,
-            IServiceRepository<BookCopy> serviceBookCopy,
-            IServiceRepository<Subscriber> serviceSubscriber,
-            IServiceRepository<Subscription> serviceSubscription,
-            IServiceRepository<Rental> serviceRental,
-            IServiceRepository<Author> serviceAuthor,
-            IServiceRepository<Category> serviceCategory,
-            ILogger<ServicesReports> logger)
+        public ServicesReports(FreeBookDbContext context, ILogger<ServicesReports> logger)
         {
-            _serviceBook = serviceBook;
-            _serviceBookCopy = serviceBookCopy;
-            _serviceSubscriber = serviceSubscriber;
-            _serviceSubscription = serviceSubscription;
-            _serviceRental = serviceRental;
-            _serviceAuthor = serviceAuthor;
-            _serviceCategory = serviceCategory;
+            _context = context;
             _logger = logger;
         }
 
@@ -40,12 +23,8 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             try
             {
-                var now = DateTime.UtcNow;
-                var rentals = await AllAsync(_serviceRental.GetAllAsync());
-                var overdue = rentals
-                    .Where(r => r.RentalCopies.Any(rc => rc.ReturnDate == null && rc.EndDate < now))
-                    .OrderBy(r => r.StartDate)
-                    .ToList();
+                var overdue = await DashboardReportQueries.OverdueRentals(_context, DateTime.UtcNow)
+                    .ToListAsync();
                 return Result.Success(overdue);
             }
             catch (Exception ex)
@@ -59,17 +38,23 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             try
             {
-                var rentals = await AllAsync(_serviceRental.GetAllAsync());
-                var popular = rentals
-                    .SelectMany(r => r.RentalCopies)
-                    .GroupBy(rc => rc.BookCopy.BookId)
-                    .Select(g => new PopularBookReport
-                    {
-                        Book = g.First().BookCopy.Book,
-                        RentalCount = g.Count()
-                    })
-                    .OrderByDescending(x => x.RentalCount)
+                var counts = await DashboardReportQueries.PopularBookCounts(_context)
+                    .OrderByDescending(row => row.Count)
                     .Take(20)
+                    .ToListAsync();
+                var bookIds = counts.Select(row => row.Key).ToList();
+                var books = await DashboardReportQueries.Books(_context)
+                    .Where(book => bookIds.Contains(book.Id))
+                    .ToListAsync();
+                var bookLookup = books.ToDictionary(book => book.Id);
+
+                var popular = counts
+                    .Where(row => bookLookup.ContainsKey(row.Key))
+                    .Select(row => new PopularBookReport
+                    {
+                        Book = bookLookup[row.Key],
+                        RentalCount = row.Count
+                    })
                     .ToList();
                 return Result.Success(popular);
             }
@@ -84,12 +69,8 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             try
             {
-                var now = DateTime.UtcNow;
-                var subscribers = await AllAsync(_serviceSubscriber.GetAllAsync());
-                var active = subscribers
-                    .Where(s => s.Subscriptions.Any(sub => sub.StartDate <= now && sub.EndDate >= now))
-                    .OrderBy(s => s.FirstName)
-                    .ToList();
+                var active = await DashboardReportQueries.ActiveSubscribers(_context, DateTime.UtcNow)
+                    .ToListAsync();
                 return Result.Success(active);
             }
             catch (Exception ex)
@@ -104,15 +85,13 @@ namespace Infrastructure.IRepository.ServiceRepository
             try
             {
                 var now = DateTime.UtcNow;
-                var future = now.AddDays(days);
-                var subscriptions = await AllAsync(_serviceSubscription.GetAllAsync());
+                var subscriptions = await DashboardReportQueries
+                    .ExpiringSubscriptions(_context, now, now.AddDays(days))
+                    .ToListAsync();
                 var data = new ExpiringSubscriptionsData
                 {
                     Days = days,
                     Subscriptions = subscriptions
-                        .Where(s => s.EndDate >= now && s.EndDate <= future)
-                        .OrderBy(s => s.EndDate)
-                        .ToList()
                 };
                 return Result.Success(data);
             }
@@ -127,17 +106,14 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             try
             {
-                var rentals = await AllAsync(_serviceRental.GetAllAsync());
-                var subscribers = await AllAsync(_serviceSubscriber.GetAllAsync());
-
-                if (subscriberId.HasValue)
-                {
-                    rentals = rentals.Where(r => r.SubscriberId == subscriberId.Value).ToList();
-                }
+                var rentals = await DashboardReportQueries.RentalHistory(_context, subscriberId)
+                    .ToListAsync();
+                var subscribers = await DashboardReportQueries.RentalHistorySubscribers(_context)
+                    .ToListAsync();
 
                 var data = new RentalHistoryData
                 {
-                    Rentals = rentals.OrderByDescending(r => r.StartDate).ToList(),
+                    Rentals = rentals,
                     Subscribers = subscribers,
                     SelectedSubscriberId = subscriberId
                 };
@@ -154,18 +130,22 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             try
             {
-                var books = await AllAsync(_serviceBook.GetAllAsync());
-                var categories = await AllAsync(_serviceCategory.GetAllAsync());
-                var rows = books
-                    .Where(b => b.CategoryId.HasValue)
-                    .GroupBy(b => b.CategoryId!.Value)
-                    .Select(g => new BooksByCategoryReport
+                var counts = await DashboardReportQueries.BooksByCategoryCounts(_context)
+                    .OrderByDescending(row => row.Count)
+                    .ToListAsync();
+                var categoryIds = counts.Select(row => row.Key).ToList();
+                var categories = await DashboardReportQueries.ActiveCategories(_context)
+                    .Where(category => categoryIds.Contains(category.Id))
+                    .ToListAsync();
+                var categoryLookup = categories.ToDictionary(category => category.Id);
+
+                var rows = counts
+                    .Where(row => categoryLookup.ContainsKey(row.Key))
+                    .Select(row => new BooksByCategoryReport
                     {
-                        Category = categories.FirstOrDefault(c => c.Id == g.Key),
-                        Count = g.Count()
+                        Category = categoryLookup[row.Key],
+                        Count = row.Count
                     })
-                    .Where(x => x.Category != null)
-                    .OrderByDescending(x => x.Count)
                     .ToList();
                 return Result.Success(rows);
             }
@@ -180,18 +160,22 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             try
             {
-                var books = await AllAsync(_serviceBook.GetAllAsync());
-                var authors = await AllAsync(_serviceAuthor.GetAllAsync());
-                var rows = books
-                    .Where(b => b.AuthorId != Guid.Empty)
-                    .GroupBy(b => b.AuthorId)
-                    .Select(g => new BooksByAuthorReport
+                var counts = await DashboardReportQueries.BooksByAuthorCounts(_context)
+                    .OrderByDescending(row => row.Count)
+                    .ToListAsync();
+                var authorIds = counts.Select(row => row.Key).ToList();
+                var authors = await DashboardReportQueries.ActiveAuthors(_context)
+                    .Where(author => authorIds.Contains(author.Id))
+                    .ToListAsync();
+                var authorLookup = authors.ToDictionary(author => author.Id);
+
+                var rows = counts
+                    .Where(row => authorLookup.ContainsKey(row.Key))
+                    .Select(row => new BooksByAuthorReport
                     {
-                        Author = authors.FirstOrDefault(a => a.Id == g.Key),
-                        Count = g.Count()
+                        Author = authorLookup[row.Key],
+                        Count = row.Count
                     })
-                    .Where(x => x.Author != null)
-                    .OrderByDescending(x => x.Count)
                     .ToList();
                 return Result.Success(rows);
             }
@@ -206,36 +190,18 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             try
             {
-                var books = await AllAsync(_serviceBook.GetAllAsync());
-                var copies = await AllAsync(_serviceBookCopy.GetAllAsync());
-                var rentals = await AllAsync(_serviceRental.GetAllAsync());
-                var authors = await AllAsync(_serviceAuthor.GetAllAsync());
-                var categories = await AllAsync(_serviceCategory.GetAllAsync());
-
-                var copyCounts = copies.GroupBy(c => c.BookId).ToDictionary(g => g.Key, g => g.Count());
-                var availableCounts = copies.Where(c => c.IsAvailableForRental)
-                    .GroupBy(c => c.BookId).ToDictionary(g => g.Key, g => g.Count());
-                var rentalCounts = rentals.SelectMany(r => r.RentalCopies)
-                    .Where(rc => rc.BookCopy != null)
-                    .GroupBy(rc => rc.BookCopy!.BookId)
-                    .ToDictionary(g => g.Key, g => g.Count());
-
-                var rows = books
-                    .Where(b => !query.AuthorId.HasValue || b.AuthorId == query.AuthorId.Value)
-                    .Where(b => !query.CategoryId.HasValue || b.CategoryId == query.CategoryId.Value)
-                    .Where(b => !query.AvailableOnly || b.IsAvailableForRental)
-                    .Select(b => new BookInventoryReport
-                    {
-                        Book = b,
-                        AuthorName = b.Author?.Name,
-                        CategoryName = b.Category?.Name,
-                        SubCategoryName = b.SubCategory?.Name,
-                        CopyCount = copyCounts.TryGetValue(b.Id, out var copyCount) ? copyCount : 0,
-                        AvailableCopyCount = availableCounts.TryGetValue(b.Id, out var availableCount) ? availableCount : 0,
-                        RentalCount = rentalCounts.TryGetValue(b.Id, out var rentalCount) ? rentalCount : 0
-                    })
-                    .OrderBy(x => x.Book.Name, StringComparer.Ordinal)
+                var rows = await DashboardReportQueries.BookInventoryRows(_context, query)
+                    .ToListAsync();
+                rows = rows
+                    .OrderBy(row => row.Book.Name, StringComparer.Ordinal)
                     .ToList();
+
+                var authors = await DashboardReportQueries.ActiveAuthors(_context)
+                    .OrderBy(author => author.Name)
+                    .ToListAsync();
+                var categories = await DashboardReportQueries.ActiveCategories(_context)
+                    .OrderBy(category => category.Name)
+                    .ToListAsync();
 
                 var data = new BookInventoryReportData
                 {
@@ -245,8 +211,8 @@ namespace Infrastructure.IRepository.ServiceRepository
                         AuthorId = query.AuthorId,
                         CategoryId = query.CategoryId,
                         AvailableOnly = query.AvailableOnly,
-                        Authors = authors.OrderBy(a => a.Name, StringComparer.Ordinal).ToList(),
-                        Categories = categories.OrderBy(c => c.Name, StringComparer.Ordinal).ToList()
+                        Authors = authors.OrderBy(author => author.Name, StringComparer.Ordinal).ToList(),
+                        Categories = categories.OrderBy(category => category.Name, StringComparer.Ordinal).ToList()
                     }
                 };
 
@@ -257,12 +223,6 @@ namespace Infrastructure.IRepository.ServiceRepository
                 _logger.LogError(ex, "Error building the books report");
                 return Result.Failure<BookInventoryReportData>("REPORT_ERROR", "Failed to build the books report", ex.Message);
             }
-        }
-
-        private static async Task<List<T>> AllAsync<T>(Task<Result<List<T>>> task)
-        {
-            var result = await task;
-            return result.IsSuccess ? result.Value ?? new List<T>() : new List<T>();
         }
     }
 }

@@ -7,6 +7,19 @@ namespace Infrastructure.IRepository.ServiceRepository
         internal const int DefaultChartMonths = 6;
         internal const int MaxChartMonths = 12;
 
+        internal sealed class MonthCount
+        {
+            public int Year { get; set; }
+            public int Month { get; set; }
+            public int Count { get; set; }
+        }
+
+        internal sealed class GroupCount<TKey>
+        {
+            public TKey Key { get; set; } = default!;
+            public int Count { get; set; }
+        }
+
         internal static (DateTime From, DateTime To) NormalizeRange(DateTime? from, DateTime? to)
         {
             var today = DateTime.UtcNow.Date;
@@ -16,9 +29,9 @@ namespace Infrastructure.IRepository.ServiceRepository
             return rangeFrom > rangeTo ? (rangeTo, rangeFrom) : (rangeFrom, rangeTo);
         }
 
-        internal static List<NamedCount> MonthlyBuckets(IEnumerable<DateTime> dates, DateTime from, DateTime to)
+        internal static List<NamedCount> MonthlyBuckets(IEnumerable<MonthCount> counts, DateTime from, DateTime to)
         {
-            var rows = dates.ToList();
+            var lookup = counts.ToDictionary(count => (count.Year, count.Month), count => count.Count);
             var firstMonth = new DateTime(from.Year, from.Month, 1);
             var lastMonth = new DateTime(to.Year, to.Month, 1);
             var monthCount = (lastMonth.Year - firstMonth.Year) * 12 + lastMonth.Month - firstMonth.Month + 1;
@@ -35,7 +48,7 @@ namespace Infrastructure.IRepository.ServiceRepository
                     return new NamedCount
                     {
                         Name = month.ToString("MMM yyyy"),
-                        Count = rows.Count(date => date.Year == month.Year && date.Month == month.Month)
+                        Count = lookup.TryGetValue((month.Year, month.Month), out var count) ? count : 0
                     };
                 })
                 .ToList();

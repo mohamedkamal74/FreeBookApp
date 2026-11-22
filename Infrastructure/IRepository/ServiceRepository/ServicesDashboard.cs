@@ -1,7 +1,9 @@
 using Domin.Entity;
 using Infrastructure.Common;
+using Infrastructure.Data;
 using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.IRepository.ServiceRepository
@@ -10,35 +12,12 @@ namespace Infrastructure.IRepository.ServiceRepository
     {
         private const int ExpiryWarningDays = 30;
 
-        private readonly IServiceRepository<Book> _serviceBook;
-        private readonly IServiceRepository<BookCopy> _serviceBookCopy;
-        private readonly IServiceRepository<Subscriber> _serviceSubscriber;
-        private readonly IServiceRepository<Subscription> _serviceSubscription;
-        private readonly IServiceRepository<Rental> _serviceRental;
-        private readonly IServiceRepository<Author> _serviceAuthor;
-        private readonly IServiceRepository<Category> _serviceCategory;
-        private readonly IServiceRepository<Governorate> _serviceGovernorate;
+        private readonly FreeBookDbContext _context;
         private readonly ILogger<ServicesDashboard> _logger;
 
-        public ServicesDashboard(
-            IServiceRepository<Book> serviceBook,
-            IServiceRepository<BookCopy> serviceBookCopy,
-            IServiceRepository<Subscriber> serviceSubscriber,
-            IServiceRepository<Subscription> serviceSubscription,
-            IServiceRepository<Rental> serviceRental,
-            IServiceRepository<Author> serviceAuthor,
-            IServiceRepository<Category> serviceCategory,
-            IServiceRepository<Governorate> serviceGovernorate,
-            ILogger<ServicesDashboard> logger)
+        public ServicesDashboard(FreeBookDbContext context, ILogger<ServicesDashboard> logger)
         {
-            _serviceBook = serviceBook;
-            _serviceBookCopy = serviceBookCopy;
-            _serviceSubscriber = serviceSubscriber;
-            _serviceSubscription = serviceSubscription;
-            _serviceRental = serviceRental;
-            _serviceAuthor = serviceAuthor;
-            _serviceCategory = serviceCategory;
-            _serviceGovernorate = serviceGovernorate;
+            _context = context;
             _logger = logger;
         }
 
@@ -46,61 +25,99 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             try
             {
-                var books = await AllAsync(_serviceBook.GetAllAsync());
-                var copies = await AllAsync(_serviceBookCopy.GetAllAsync());
-                var subscribers = await AllAsync(_serviceSubscriber.GetAllAsync());
-                var subscriptions = await AllAsync(_serviceSubscription.GetAllAsync());
-                var rentals = await AllAsync(_serviceRental.GetAllAsync());
-                var authors = await AllAsync(_serviceAuthor.GetAllAsync());
-                var categories = await AllAsync(_serviceCategory.GetAllAsync());
-
                 var (rangeFrom, rangeTo) = ReportQueryHelpers.NormalizeRange(query.From, query.To);
+                var toExclusive = rangeTo.AddDays(1);
                 var now = DateTime.UtcNow;
+                var warningTo = now.AddDays(ExpiryWarningDays);
 
-                var filteredRentals = rentals
-                    .Where(r => r.StartDate.Date >= rangeFrom && r.StartDate.Date <= rangeTo)
-                    .Where(r => !query.AuthorId.HasValue || r.RentalCopies.Any(rc => rc.BookCopy?.Book?.AuthorId == query.AuthorId.Value))
-                    .Where(r => !query.CategoryId.HasValue || r.RentalCopies.Any(rc => rc.BookCopy?.Book?.CategoryId == query.CategoryId.Value))
-                    .ToList();
+                var rentals = DashboardReportQueries.Rentals(_context);
+                var subscribers = DashboardReportQueries.Subscribers(_context);
+                var subscriptions = DashboardReportQueries.Subscriptions(_context);
 
-                var activeRentals = rentals.Where(r => r.RentalCopies.Any(rc => rc.ReturnDate == null)).ToList();
-                var overdueRentals = activeRentals
-                    .Where(r => r.RentalCopies.Any(rc => rc.ReturnDate == null && rc.EndDate < now))
-                    .ToList();
-                var expiringSubscriptions = subscriptions
-                    .Where(s => s.EndDate >= now && s.EndDate <= now.AddDays(ExpiryWarningDays))
-                    .ToList();
+                var totalBooks = await DashboardReportQueries.ActiveBooks(_context).CountAsync();
+                var totalCopies = await DashboardReportQueries.BookCopies(_context).CountAsync();
+                var availableCopies = await DashboardReportQueries.BookCopies(_context)
+                    .CountAsync(copy => copy.IsAvailableForRental);
+                var totalSubscribers = await subscribers.CountAsync();
+                var activeSubscriptions = await subscriptions
+                    .CountAsync(subscription => subscription.StartDate <= now && subscription.EndDate >= now);
+                var expiringSubscriptions = await subscriptions
+                    .CountAsync(subscription => subscription.EndDate >= now && subscription.EndDate <= warningTo);
+                var blacklistedSubscribers = await subscribers.CountAsync(subscriber => subscriber.IsBlackListed);
+                var activeRentals = await rentals
+                    .CountAsync(rental => rental.RentalCopies.Any(copy => copy.ReturnDate == null));
+                var overdueRentals = await rentals
+                    .CountAsync(rental => rental.RentalCopies.Any(copy => copy.ReturnDate == null && copy.EndDate < now));
+
+                var recentRentals = await rentals
+                    .OrderByDescending(rental => rental.StartDate)
+                    .Take(5)
+                    .ToListAsync();
+                var recentSubscribers = await subscribers
+                    .OrderByDescending(subscriber => subscriber.CreatedOn)
+                    .ThenBy(subscriber => subscriber.FirstName)
+                    .ThenBy(subscriber => subscriber.LastName)
+                    .Take(5)
+                    .ToListAsync();
+                var overdueList = await rentals
+                    .Where(rental => rental.RentalCopies.Any(copy => copy.ReturnDate == null && copy.EndDate < now))
+                    .OrderByDescending(rental => rental.StartDate)
+                    .Take(10)
+                    .ToListAsync();
+                var expiringSubs = await subscriptions
+                    .Where(subscription => subscription.EndDate >= now && subscription.EndDate <= warningTo)
+                    .OrderByDescending(subscription => subscription.StartDate)
+                    .Take(10)
+                    .ToListAsync();
+
+                var authors = await DashboardReportQueries.ActiveAuthors(_context)
+                    .OrderBy(author => author.Name)
+                    .ToListAsync();
+                var categories = await DashboardReportQueries.ActiveCategories(_context)
+                    .OrderBy(category => category.Name)
+                    .ToListAsync();
+
+                var topRentedBooks = await DashboardReportQueries.TopRentedBooks(_context).ToListAsync();
+                var topRenters = await DashboardReportQueries.TopRenters(_context).ToListAsync();
+                var booksByCategory = await DashboardReportQueries.BooksByCategory(_context, query.AuthorId, query.CategoryId)
+                    .ToListAsync();
+                var rentalMonths = await DashboardReportQueries
+                    .RentalMonths(_context, rangeFrom, toExclusive, query.AuthorId, query.CategoryId)
+                    .ToListAsync();
 
                 var data = new GeneralDashboardData
                 {
-                    TotalBooks = books.Count,
-                    TotalCopies = copies.Count,
-                    AvailableCopies = copies.Count(c => c.IsAvailableForRental),
-                    TotalSubscribers = subscribers.Count,
-                    ActiveSubscriptions = subscriptions.Count(s => s.StartDate <= now && s.EndDate >= now),
-                    ActiveRentals = activeRentals.Count,
-                    OverdueRentals = overdueRentals.Count,
-                    ExpiringSubscriptions = expiringSubscriptions.Count,
-                    BlacklistedSubscribers = subscribers.Count(s => s.IsBlackListed),
-                    RecentRentals = rentals.OrderByDescending(r => r.StartDate).Take(5).ToList(),
-                    RecentSubscribers = subscribers
-                        .OrderByDescending(s => s.CreatedOn)
-                        .ThenBy(s => s.FirstName)
-                        .ThenBy(s => s.LastName)
-                        .Take(5)
-                        .ToList(),
-                    OverdueList = overdueRentals.Take(10).ToList(),
-                    ExpiringSubs = expiringSubscriptions.Take(10).ToList(),
+                    TotalBooks = totalBooks,
+                    TotalCopies = totalCopies,
+                    AvailableCopies = availableCopies,
+                    TotalSubscribers = totalSubscribers,
+                    ActiveSubscriptions = activeSubscriptions,
+                    ActiveRentals = activeRentals,
+                    OverdueRentals = overdueRentals,
+                    ExpiringSubscriptions = expiringSubscriptions,
+                    BlacklistedSubscribers = blacklistedSubscribers,
+                    RecentRentals = recentRentals,
+                    RecentSubscribers = recentSubscribers,
+                    OverdueList = overdueList,
+                    ExpiringSubs = expiringSubs,
                     Filter = new DashboardFilterViewModel
                     {
                         From = rangeFrom,
                         To = rangeTo,
                         AuthorId = query.AuthorId,
                         CategoryId = query.CategoryId,
-                        Authors = authors.OrderBy(a => a.Name, StringComparer.Ordinal).ToList(),
-                        Categories = categories.OrderBy(c => c.Name, StringComparer.Ordinal).ToList()
+                        Authors = authors.OrderBy(author => author.Name, StringComparer.Ordinal).ToList(),
+                        Categories = categories.OrderBy(category => category.Name, StringComparer.Ordinal).ToList()
                     },
-                    Charts = BuildGeneralCharts(filteredRentals, books, copies, rangeFrom, rangeTo)
+                    Charts = BuildGeneralCharts(
+                        availableCopies,
+                        totalCopies - availableCopies,
+                        topRentedBooks,
+                        topRenters,
+                        booksByCategory,
+                        rentalMonths,
+                        rangeFrom,
+                        rangeTo)
                 };
 
                 return Result.Success(data);
@@ -116,65 +133,70 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             try
             {
-                var subscribers = await AllAsync(_serviceSubscriber.GetAllAsync());
-                var subscriptions = await AllAsync(_serviceSubscription.GetAllAsync());
-                var rentals = await AllAsync(_serviceRental.GetAllAsync());
-                var governorates = await AllAsync(_serviceGovernorate.GetAllAsync());
-
                 var (rangeFrom, rangeTo) = ReportQueryHelpers.NormalizeRange(query.From, query.To);
+                var toExclusive = rangeTo.AddDays(1);
                 var now = DateTime.UtcNow;
+                var warningTo = now.AddDays(ExpiryWarningDays);
+                var governorateId = query.GovernorateId;
 
-                var scopedSubscribers = query.GovernorateId.HasValue
-                    ? subscribers.Where(s => s.GovernorateId == query.GovernorateId.Value).ToList()
-                    : subscribers;
-                var scopedIds = scopedSubscribers.Select(s => s.Id).ToHashSet();
-                var scopedSubscriptions = subscriptions.Where(s => scopedIds.Contains(s.SubscriberId)).ToList();
-                var scopedRentals = rentals.Where(r => scopedIds.Contains(r.SubscriberId)).ToList();
+                var scopedSubscribers = _context.Subscribers.AsNoTracking()
+                    .Where(subscriber => !governorateId.HasValue || subscriber.GovernorateId == governorateId.Value);
+                var scopedSubscriptions = _context.Subscriptions.AsNoTracking()
+                    .Where(subscription => !governorateId.HasValue
+                        || subscription.Subscriber.GovernorateId == governorateId.Value);
+
+                var totalSubscribers = await scopedSubscribers.CountAsync();
+                var blacklisted = await scopedSubscribers.CountAsync(subscriber => subscriber.IsBlackListed);
+                var whatsAppEnabled = await scopedSubscribers.CountAsync(subscriber => subscriber.HasWhatsApp);
+                var birthDates = await scopedSubscribers
+                    .Select(subscriber => subscriber.DateOfBirth)
+                    .ToListAsync();
+
+                var activeSubscriptions = await scopedSubscriptions
+                    .CountAsync(subscription => subscription.StartDate <= now && subscription.EndDate >= now);
+                var expiredSubscriptions = await scopedSubscriptions
+                    .CountAsync(subscription => subscription.EndDate < now);
+                var expiringSoon = await scopedSubscriptions
+                    .CountAsync(subscription => subscription.EndDate >= now && subscription.EndDate <= warningTo);
+
+                var byGovernorate = await DashboardReportQueries.SubscribersByGovernorate(_context, governorateId)
+                    .ToListAsync();
+                var subscriptionsPerMonth = await DashboardReportQueries
+                    .SubscriptionMonths(_context, rangeFrom, toExclusive, governorateId)
+                    .ToListAsync();
+                var topRenters = await DashboardReportQueries
+                    .TopSubscriberRenters(_context, rangeFrom, toExclusive, governorateId)
+                    .ToListAsync();
+                var governorates = await DashboardReportQueries.Governorates(_context)
+                    .OrderBy(governorate => governorate.Name)
+                    .ToListAsync();
 
                 var dashboard = new SubscribersDashboardViewModel
                 {
-                    TotalSubscribers = scopedSubscribers.Count,
-                    ActiveSubscriptions = scopedSubscriptions.Count(s => s.StartDate <= now && s.EndDate >= now),
-                    ExpiredSubscriptions = scopedSubscriptions.Count(s => s.EndDate < now),
-                    ExpiringSoon = scopedSubscriptions.Count(s => s.EndDate >= now && s.EndDate <= now.AddDays(ExpiryWarningDays)),
-                    Blacklisted = scopedSubscribers.Count(s => s.IsBlackListed),
-                    WhatsAppEnabled = scopedSubscribers.Count(s => s.HasWhatsApp)
-                };
-
-                dashboard.ByGovernorate = scopedSubscribers
-                    .GroupBy(s => s.Governorate?.Name ?? "—")
-                    .Select(g => new NamedCount { Name = g.Key, Count = g.Count() })
-                    .OrderByDescending(x => x.Count)
-                    .ThenBy(x => x.Name, StringComparer.Ordinal)
-                    .ToList();
-
-                dashboard.AgeGroups = BuildAgeGroups(scopedSubscribers, now);
-                dashboard.SubscriptionStatus = new List<NamedCount>
-                {
-                    new() { Name = "lbActive", Count = dashboard.ActiveSubscriptions },
-                    new() { Name = "lbExpired", Count = dashboard.ExpiredSubscriptions }
-                };
-                dashboard.SubscriptionsPerMonth = ReportQueryHelpers.MonthlyBuckets(
-                    scopedSubscriptions
-                        .Where(s => s.StartDate.Date >= rangeFrom && s.StartDate.Date <= rangeTo)
-                        .Select(s => s.StartDate),
-                    rangeFrom,
-                    rangeTo);
-
-                var subscriberNames = subscribers.ToDictionary(s => s.Id, s => s.FullName);
-                dashboard.TopRenters = scopedRentals
-                    .Where(r => r.StartDate.Date >= rangeFrom && r.StartDate.Date <= rangeTo)
-                    .GroupBy(r => r.SubscriberId)
-                    .Select(g => new NamedCount
+                    TotalSubscribers = totalSubscribers,
+                    ActiveSubscriptions = activeSubscriptions,
+                    ExpiredSubscriptions = expiredSubscriptions,
+                    ExpiringSoon = expiringSoon,
+                    Blacklisted = blacklisted,
+                    WhatsAppEnabled = whatsAppEnabled,
+                    ByGovernorate = byGovernorate
+                        .OrderByDescending(row => row.Count)
+                        .ThenBy(row => row.Name, StringComparer.Ordinal)
+                        .ToList(),
+                    AgeGroups = BuildAgeGroups(birthDates, now),
+                    SubscriptionStatus = new List<NamedCount>
                     {
-                        Name = subscriberNames.TryGetValue(g.Key, out var name) ? name : string.Empty,
-                        Count = g.Count()
-                    })
-                    .Where(x => !string.IsNullOrWhiteSpace(x.Name))
-                    .OrderByDescending(x => x.Count)
-                    .ThenBy(x => x.Name)
-                    .Take(10)
-                    .ToList();
+                        new() { Name = "lbActive", Count = activeSubscriptions },
+                        new() { Name = "lbExpired", Count = expiredSubscriptions }
+                    },
+                    SubscriptionsPerMonth = ReportQueryHelpers.MonthlyBuckets(subscriptionsPerMonth, rangeFrom, rangeTo),
+                    TopRenters = topRenters
+                        .Where(row => !string.IsNullOrWhiteSpace(row.Name))
+                        .OrderByDescending(row => row.Count)
+                        .ThenBy(row => row.Name)
+                        .Take(10)
+                        .ToList()
+                };
 
                 var data = new SubscribersDashboardData
                 {
@@ -183,8 +205,10 @@ namespace Infrastructure.IRepository.ServiceRepository
                     {
                         From = rangeFrom,
                         To = rangeTo,
-                        GovernorateId = query.GovernorateId,
-                        Governorates = governorates.OrderBy(g => g.Name, StringComparer.Ordinal).ToList()
+                        GovernorateId = governorateId,
+                        Governorates = governorates
+                            .OrderBy(governorate => governorate.Name, StringComparer.Ordinal)
+                            .ToList()
                     }
                 };
 
@@ -201,76 +225,73 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             try
             {
-                var books = await AllAsync(_serviceBook.GetAllAsync());
-                var copies = await AllAsync(_serviceBookCopy.GetAllAsync());
-                var rentals = await AllAsync(_serviceRental.GetAllAsync());
-                var authors = await AllAsync(_serviceAuthor.GetAllAsync());
-                var categories = await AllAsync(_serviceCategory.GetAllAsync());
-
                 var (rangeFrom, rangeTo) = ReportQueryHelpers.NormalizeRange(query.From, query.To);
+                var toExclusive = rangeTo.AddDays(1);
+                var authorId = query.AuthorId;
+                var categoryId = query.CategoryId;
 
-                var scopedBooks = books
-                    .Where(b => !query.AuthorId.HasValue || b.AuthorId == query.AuthorId.Value)
-                    .Where(b => !query.CategoryId.HasValue || b.CategoryId == query.CategoryId.Value)
-                    .ToList();
-                var bookIds = scopedBooks.Select(b => b.Id).ToHashSet();
-                var scopedCopies = copies.Where(c => bookIds.Contains(c.BookId)).ToList();
-                var copyBookIds = scopedCopies.Select(c => c.BookId).ToHashSet();
-                var rangedRentals = rentals
-                    .Where(r => r.StartDate.Date >= rangeFrom && r.StartDate.Date <= rangeTo)
-                    .Where(r => r.RentalCopies.Any(rc => rc.BookCopy != null && bookIds.Contains(rc.BookCopy.BookId)))
-                    .ToList();
+                var bookIds = await DashboardReportQueries.ActiveBooks(_context)
+                    .Where(book => !authorId.HasValue || book.AuthorId == authorId.Value)
+                    .Where(book => !categoryId.HasValue || book.CategoryId == categoryId.Value)
+                    .Select(book => book.Id)
+                    .ToListAsync();
+                var copyBookIds = await DashboardReportQueries.BookCopies(_context)
+                    .Where(copy => bookIds.Contains(copy.BookId))
+                    .Select(copy => copy.BookId)
+                    .Distinct()
+                    .ToListAsync();
+                var totalCopies = await DashboardReportQueries.BookCopies(_context)
+                    .CountAsync(copy => bookIds.Contains(copy.BookId));
+                var availableCopies = await DashboardReportQueries.BookCopies(_context)
+                    .CountAsync(copy => bookIds.Contains(copy.BookId) && copy.IsAvailableForRental);
 
-                var availableCopies = scopedCopies.Count(c => c.IsAvailableForRental);
-                var rentedCopies = scopedCopies.Count - availableCopies;
+                var byCategory = await DashboardReportQueries.BooksByCategory(_context, authorId, categoryId)
+                    .ToListAsync();
+                var byAuthor = await DashboardReportQueries.BooksByAuthor(_context, authorId, categoryId)
+                    .ToListAsync();
+                var topRentedBooks = await DashboardReportQueries
+                    .TopRentedBooksForBooks(_context, rangeFrom, toExclusive, bookIds)
+                    .ToListAsync();
+                var rentalsPerMonth = await DashboardReportQueries
+                    .RentalMonthsForBooks(_context, rangeFrom, toExclusive, bookIds)
+                    .ToListAsync();
 
+                var authors = await DashboardReportQueries.ActiveAuthors(_context)
+                    .OrderBy(author => author.Name)
+                    .ToListAsync();
+                var categories = await DashboardReportQueries.ActiveCategories(_context)
+                    .OrderBy(category => category.Name)
+                    .ToListAsync();
+
+                var copyLookup = copyBookIds.ToHashSet();
                 var dashboard = new BooksDashboardViewModel
                 {
-                    TotalBooks = scopedBooks.Count,
-                    TotalCopies = scopedCopies.Count,
+                    TotalBooks = bookIds.Count,
+                    TotalCopies = totalCopies,
                     AvailableCopies = availableCopies,
-                    RentedCopies = rentedCopies,
-                    BooksWithoutCopies = scopedBooks.Count(b => !copyBookIds.Contains(b.Id))
-                };
-
-                dashboard.ByCategory = scopedBooks
-                    .GroupBy(b => b.Category?.Name ?? "—")
-                    .Select(g => new NamedCount { Name = g.Key, Count = g.Count() })
-                    .OrderByDescending(x => x.Count)
-                    .ThenBy(x => x.Name, StringComparer.Ordinal)
-                    .ToList();
-
-                dashboard.ByAuthor = scopedBooks
-                    .GroupBy(b => b.Author?.Name ?? "—")
-                    .Select(g => new NamedCount { Name = g.Key, Count = g.Count() })
-                    .OrderByDescending(x => x.Count)
-                    .ThenBy(x => x.Name, StringComparer.Ordinal)
-                    .Take(10)
-                    .ToList();
-
-                dashboard.TopRentedBooks = rangedRentals
-                    .SelectMany(r => r.RentalCopies)
-                    .Where(rc => rc.BookCopy != null && bookIds.Contains(rc.BookCopy.BookId))
-                    .GroupBy(rc => rc.BookCopy!.BookId)
-                    .Select(g => new NamedCount
+                    RentedCopies = totalCopies - availableCopies,
+                    BooksWithoutCopies = bookIds.Count(id => !copyLookup.Contains(id)),
+                    ByCategory = byCategory
+                        .OrderByDescending(row => row.Count)
+                        .ThenBy(row => row.Name, StringComparer.Ordinal)
+                        .ToList(),
+                    ByAuthor = byAuthor
+                        .OrderByDescending(row => row.Count)
+                        .ThenBy(row => row.Name, StringComparer.Ordinal)
+                        .Take(10)
+                        .ToList(),
+                    TopRentedBooks = topRentedBooks
+                        .Where(row => !string.IsNullOrWhiteSpace(row.Name))
+                        .OrderByDescending(row => row.Count)
+                        .ThenBy(row => row.Name)
+                        .Take(10)
+                        .ToList(),
+                    RentalsPerMonth = ReportQueryHelpers.MonthlyBuckets(rentalsPerMonth, rangeFrom, rangeTo),
+                    Availability = new List<NamedCount>
                     {
-                        Name = g.First().BookCopy!.Book?.Name ?? string.Empty,
-                        Count = g.Count()
-                    })
-                    .Where(x => !string.IsNullOrWhiteSpace(x.Name))
-                    .OrderByDescending(x => x.Count)
-                    .ThenBy(x => x.Name, StringComparer.Ordinal)
-                    .Take(10)
-                    .ToList();
-
-                dashboard.RentalsPerMonth = ReportQueryHelpers.MonthlyBuckets(
-                    rangedRentals.Select(r => r.StartDate),
-                    rangeFrom,
-                    rangeTo);
-                dashboard.Availability = new List<NamedCount>
-                {
-                    new() { Name = "lbAvailable", Count = availableCopies },
-                    new() { Name = "lbRented", Count = rentedCopies }
+                        new() { Name = "lbAvailable", Count = availableCopies },
+                        new() { Name = "lbRented", Count = totalCopies - availableCopies }
+                    }
                 };
 
                 var data = new BooksDashboardData
@@ -280,10 +301,10 @@ namespace Infrastructure.IRepository.ServiceRepository
                     {
                         From = rangeFrom,
                         To = rangeTo,
-                        AuthorId = query.AuthorId,
-                        CategoryId = query.CategoryId,
-                        Authors = authors.OrderBy(a => a.Name, StringComparer.Ordinal).ToList(),
-                        Categories = categories.OrderBy(c => c.Name, StringComparer.Ordinal).ToList()
+                        AuthorId = authorId,
+                        CategoryId = categoryId,
+                        Authors = authors.OrderBy(author => author.Name, StringComparer.Ordinal).ToList(),
+                        Categories = categories.OrderBy(category => category.Name, StringComparer.Ordinal).ToList()
                     }
                 };
 
@@ -296,69 +317,43 @@ namespace Infrastructure.IRepository.ServiceRepository
             }
         }
 
-        private static async Task<List<T>> AllAsync<T>(Task<Result<List<T>>> task)
-        {
-            var result = await task;
-            return result.IsSuccess ? result.Value ?? new List<T>() : new List<T>();
-        }
-
         private static DashboardChartsViewModel BuildGeneralCharts(
-            List<Rental> rentals,
-            List<Book> books,
-            List<BookCopy> copies,
+            int availableCopies,
+            int rentedCopies,
+            List<NamedCount> topRentedBooks,
+            List<NamedCount> topRenters,
+            List<NamedCount> booksByCategory,
+            List<ReportQueryHelpers.MonthCount> rentalMonths,
             DateTime from,
             DateTime to)
         {
             var charts = new DashboardChartsViewModel
             {
-                AvailableCopies = copies.Count(c => c.IsAvailableForRental),
-                RentedCopies = copies.Count(c => !c.IsAvailableForRental)
+                AvailableCopies = availableCopies,
+                RentedCopies = rentedCopies,
+                TopRentedBooks = topRentedBooks
+                    .Where(row => !string.IsNullOrWhiteSpace(row.Name))
+                    .OrderByDescending(row => row.Count)
+                    .ThenBy(row => row.Name)
+                    .Take(5)
+                    .ToList(),
+                TopRenters = topRenters
+                    .Where(row => !string.IsNullOrWhiteSpace(row.Name))
+                    .OrderByDescending(row => row.Count)
+                    .ThenBy(row => row.Name)
+                    .Take(5)
+                    .ToList(),
+                BooksByCategory = booksByCategory
+                    .OrderByDescending(row => row.Count)
+                    .ThenBy(row => row.Name)
+                    .ToList(),
+                RentalsPerMonth = ReportQueryHelpers.MonthlyBuckets(rentalMonths, from, to)
             };
-
-            charts.TopRentedBooks = rentals
-                .SelectMany(r => r.RentalCopies)
-                .Where(rc => rc.BookCopy != null)
-                .GroupBy(rc => rc.BookCopy!.BookId)
-                .Select(g => new NamedCount
-                {
-                    Name = g.First().BookCopy!.Book?.Name ?? string.Empty,
-                    Count = g.Count()
-                })
-                .Where(x => !string.IsNullOrWhiteSpace(x.Name))
-                .OrderByDescending(x => x.Count)
-                .ThenBy(x => x.Name)
-                .Take(5)
-                .ToList();
-
-            charts.TopRenters = rentals
-                .GroupBy(r => r.SubscriberId)
-                .Select(g => new NamedCount
-                {
-                    Name = g.First().Subscriber?.FullName ?? string.Empty,
-                    Count = g.Count()
-                })
-                .Where(x => !string.IsNullOrWhiteSpace(x.Name))
-                .OrderByDescending(x => x.Count)
-                .ThenBy(x => x.Name)
-                .Take(5)
-                .ToList();
-
-            charts.BooksByCategory = books
-                .GroupBy(b => b.Category?.Name ?? "—")
-                .Select(g => new NamedCount { Name = g.Key, Count = g.Count() })
-                .OrderByDescending(x => x.Count)
-                .ThenBy(x => x.Name)
-                .ToList();
-
-            charts.RentalsPerMonth = ReportQueryHelpers.MonthlyBuckets(
-                rentals.Select(r => r.StartDate),
-                from,
-                to);
 
             return charts;
         }
 
-        private static List<NamedCount> BuildAgeGroups(List<Subscriber> subscribers, DateTime now)
+        private static List<NamedCount> BuildAgeGroups(List<DateTime> birthDates, DateTime now)
         {
             string[] keys =
             {
@@ -370,9 +365,9 @@ namespace Infrastructure.IRepository.ServiceRepository
             };
 
             var counts = new int[keys.Length];
-            foreach (var subscriber in subscribers)
+            foreach (var birthDate in birthDates)
             {
-                var age = ReportQueryHelpers.AgeOn(subscriber.DateOfBirth, now);
+                var age = ReportQueryHelpers.AgeOn(birthDate, now);
                 var bucket = age < 18 ? 0 : age <= 25 ? 1 : age <= 35 ? 2 : age <= 50 ? 3 : 4;
                 counts[bucket]++;
             }
