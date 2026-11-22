@@ -6,6 +6,7 @@ using Domin.Entity;
 using Infrastructure.Common;
 using Infrastructure.Data;
 using Infrastructure.IRepository;
+using Infrastructure.ViewModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -26,11 +27,12 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             try
             {
-                var result = await FindByIdAsync(id);
-                if (!result.IsSuccess || result.Value is null)
+                var rental = await _context.Rentals
+                    .FirstOrDefaultAsync(x => x.Id == id);
+                if (rental is null)
                     return Result.Failure<bool>("NOT_FOUND", $"Rental with id {id} not found");
 
-                _context.Rentals.Remove(result.Value);
+                _context.Rentals.Remove(rental);
                 await _context.SaveChangesAsync();
                 return Result.Success(true);
             }
@@ -41,13 +43,13 @@ namespace Infrastructure.IRepository.ServiceRepository
             }
         }
 
-        public async Task<Result<Rental?>> FindByAsync(string name)
+        public async Task<Result<RentalDto?>> FindByAsync(string name)
         {
             // Not applicable for rentals, return null
-            return Result.Success<Rental?>(null);
+            return await Task.FromResult(Result.Success<RentalDto?>(null));
         }
 
-        public async Task<Result<Rental?>> FindByIdAsync(Guid id)
+        public async Task<Result<RentalDto?>> FindByIdAsync(Guid id)
         {
             try
             {
@@ -57,16 +59,16 @@ namespace Infrastructure.IRepository.ServiceRepository
                         .ThenInclude(rc => rc.BookCopy)
                             .ThenInclude(bc => bc.Book)
                     .FirstOrDefaultAsync(x => x.Id == id);
-                return Result.Success(rental);
+                return Result.Success<RentalDto?>(rental is null ? null : CrudMapping.ToDto(rental));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error finding rental by id {Id}", id);
-                return Result.Failure<Rental?>("FIND_ERROR", "Failed to find rental", ex.Message);
+                return Result.Failure<RentalDto?>("FIND_ERROR", "Failed to find rental", ex.Message);
             }
         }
 
-        public async Task<Result<List<Rental>>> GetAllAsync()
+        public async Task<Result<List<RentalDto>>> GetAllAsync()
         {
             try
             {
@@ -77,35 +79,79 @@ namespace Infrastructure.IRepository.ServiceRepository
                             .ThenInclude(bc => bc.Book)
                     .OrderByDescending(x => x.StartDate)
                     .ToListAsync();
-                return Result.Success(rentals);
+                return Result.Success(rentals.Select(CrudMapping.ToDto).ToList());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting all rentals");
-                return Result.Failure<List<Rental>>("GET_ALL_ERROR", "Failed to get rentals", ex.Message);
+                return Result.Failure<List<RentalDto>>("GET_ALL_ERROR", "Failed to get rentals", ex.Message);
             }
         }
 
-        public async Task<Result<bool>> SaveAsync(Rental model)
+        public async Task<Result<bool>> SaveAsync(RentalCommand command, Guid? id = null)
         {
             try
             {
-                var result = await FindByIdAsync(model.Id);
-                if (!result.IsSuccess)
-                    return Result.Failure<bool>("FIND_ERROR", "Failed to check existing rental");
-
-                if (result.Value is null)
+                if (id is null || id == Guid.Empty)
                 {
-                    model.Id = Guid.NewGuid();
-                    model.StartDate = DateTime.UtcNow;
-                    _context.Rentals.Add(model);
+                    var rentalId = Guid.NewGuid();
+                    var rental = new Rental
+                    {
+                        Id = rentalId,
+                        SubscriberId = command.SubscriberId,
+                        StartDate = DateTime.UtcNow,
+                        PenaltyPaid = command.PenaltyPaid,
+                        TotalFine = command.TotalFine,
+                        RentalCopies = command.RentalCopies.Select(copy => new RentalCopy
+                        {
+                            RentalId = rentalId,
+                            BookCopyId = copy.BookCopyId,
+                            RentalDate = copy.RentalDate,
+                            EndDate = copy.EndDate,
+                            ReturnDate = copy.ReturnDate,
+                            ExtendedOn = copy.ExtendedOn
+                        }).ToList()
+                    };
+
+                    _context.Rentals.Add(rental);
                 }
                 else
                 {
-                    result.Value.SubscriberId = model.SubscriberId;
-                    result.Value.PenaltyPaid = model.PenaltyPaid;
-                    result.Value.TotalFine = model.TotalFine;
-                    _context.Rentals.Update(result.Value);
+                    var rental = await _context.Rentals
+                        .Include(x => x.RentalCopies)
+                        .FirstOrDefaultAsync(x => x.Id == id.Value);
+                    if (rental is null)
+                        return Result.Failure<bool>("NOT_FOUND", $"Rental with id {id} not found");
+
+                    rental.SubscriberId = command.SubscriberId;
+                    rental.PenaltyPaid = command.PenaltyPaid;
+                    rental.TotalFine = command.TotalFine;
+
+                    foreach (var copy in command.RentalCopies)
+                    {
+                        var existing = rental.RentalCopies
+                            .FirstOrDefault(rc => rc.BookCopyId == copy.BookCopyId);
+                        if (existing is null)
+                        {
+                            var added = new RentalCopy
+                            {
+                                RentalId = rental.Id,
+                                BookCopyId = copy.BookCopyId,
+                                RentalDate = copy.RentalDate,
+                                EndDate = copy.EndDate,
+                                ReturnDate = copy.ReturnDate,
+                                ExtendedOn = copy.ExtendedOn
+                            };
+                            rental.RentalCopies.Add(added);
+                            _context.RentalCopies.Add(added);
+                        }
+                        else
+                        {
+                            existing.ReturnDate = copy.ReturnDate;
+                            existing.EndDate = copy.EndDate;
+                            existing.ExtendedOn = copy.ExtendedOn;
+                        }
+                    }
                 }
 
                 await _context.SaveChangesAsync();
@@ -113,30 +159,32 @@ namespace Infrastructure.IRepository.ServiceRepository
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error saving rental {Id}", model.Id);
+                _logger.LogError(ex, "Error saving rental {Id}", id);
                 return Result.Failure<bool>("SAVE_ERROR", "Failed to save rental", ex.Message);
             }
         }
 
-        public async Task<Result<Rental?>> GetActiveRentalBySubscriberAsync(Guid subscriberId)
+        public async Task<Result<RentalDto?>> GetActiveRentalBySubscriberAsync(Guid subscriberId)
         {
             try
             {
                 var rental = await _context.Rentals
+                    .Include(x => x.Subscriber)
                     .Include(x => x.RentalCopies)
                         .ThenInclude(rc => rc.BookCopy)
+                            .ThenInclude(bc => bc.Book)
                     .FirstOrDefaultAsync(x => x.SubscriberId == subscriberId &&
                         x.RentalCopies.Any(rc => rc.ReturnDate == null));
-                return Result.Success(rental);
+                return Result.Success<RentalDto?>(rental is null ? null : CrudMapping.ToDto(rental));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting active rental for subscriber {SubscriberId}", subscriberId);
-                return Result.Failure<Rental?>("FIND_ERROR", "Failed to get active rental", ex.Message);
+                return Result.Failure<RentalDto?>("FIND_ERROR", "Failed to get active rental", ex.Message);
             }
         }
 
-        public async Task<Result<List<Rental>>> GetOverdueRentalsAsync()
+        public async Task<Result<List<RentalDto>>> GetOverdueRentalsAsync()
         {
             try
             {
@@ -149,12 +197,12 @@ namespace Infrastructure.IRepository.ServiceRepository
                     .Where(x => x.RentalCopies.Any(rc => rc.ReturnDate == null && rc.EndDate < now))
                     .OrderBy(x => x.StartDate)
                     .ToListAsync();
-                return Result.Success(rentals);
+                return Result.Success(rentals.Select(CrudMapping.ToDto).ToList());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting overdue rentals");
-                return Result.Failure<List<Rental>>("GET_OVERDUE_ERROR", "Failed to get overdue rentals", ex.Message);
+                return Result.Failure<List<RentalDto>>("GET_OVERDUE_ERROR", "Failed to get overdue rentals", ex.Message);
             }
         }
     }

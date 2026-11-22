@@ -90,26 +90,26 @@ try
         options.Password.RequiredUniqueChars = 1;
     });
 
-    builder.Services.AddScoped<IServiceRepository<Category>, ServicesCategory>();
-    builder.Services.AddScoped<IServiceRepository<SubCategory>, ServicesSubCategory>();
-    builder.Services.AddScoped<IServiceRepositoryLog<LogCategory>, ServiceLogCategory>();
+    builder.Services.AddScoped<IServiceRepository<CategoryDto, CategoryCommand>, ServicesCategory>();
+    builder.Services.AddScoped<IServiceRepository<SubCategoryDto, SubCategoryCommand>, ServicesSubCategory>();
+    builder.Services.AddScoped<IServiceRepositoryLog<LogCategoryDto>, ServiceLogCategory>();
 
-    builder.Services.AddScoped<Infrastructure.IRepository.IAuthorRepository, Infrastructure.IRepository.ServiceRepository.ServicesAuthor>();
-    builder.Services.AddScoped<IServiceRepository<Author>, Infrastructure.IRepository.ServiceRepository.ServicesAuthor>();
-    builder.Services.AddScoped<IServiceRepository<Book>, Infrastructure.IRepository.ServiceRepository.ServicesBook>();
-    builder.Services.AddScoped<IServiceRepository<BookCopy>, Infrastructure.IRepository.ServiceRepository.ServicesBookCopy>();
-    builder.Services.AddScoped<Infrastructure.IRepository.IRentalRepository, Infrastructure.IRepository.ServiceRepository.ServicesRental>();
-    builder.Services.AddScoped<IServiceRepository<Rental>, Infrastructure.IRepository.ServiceRepository.ServicesRental>();
-    builder.Services.AddScoped<IServiceRepository<Subscriber>, Infrastructure.IRepository.ServiceRepository.ServicesSubscriber>();
-    builder.Services.AddScoped<Infrastructure.IRepository.ISubscriptionRepository, Infrastructure.IRepository.ServiceRepository.ServicesSubscription>();
-    builder.Services.AddScoped<IServiceRepository<Subscription>, Infrastructure.IRepository.ServiceRepository.ServicesSubscription>();
-    builder.Services.AddScoped<IServiceRepository<Governorate>, Infrastructure.IRepository.ServiceRepository.ServicesGovernorate>();
-    builder.Services.AddScoped<IServiceRepository<Area>, Infrastructure.IRepository.ServiceRepository.ServicesArea>();
-    builder.Services.AddScoped<Infrastructure.IRepository.INotificationRepository, Infrastructure.IRepository.ServiceRepository.ServicesNotification>();
+    builder.Services.AddScoped<IAuthorRepository, ServicesAuthor>();
+    builder.Services.AddScoped<IServiceRepository<AuthorDto, AuthorCommand>, ServicesAuthor>();
+    builder.Services.AddScoped<IServiceRepository<BookDto, BookCommand>, ServicesBook>();
+    builder.Services.AddScoped<IServiceRepository<BookCopyDto, BookCopyCommand>, ServicesBookCopy>();
+    builder.Services.AddScoped<IRentalRepository, ServicesRental>();
+    builder.Services.AddScoped<IServiceRepository<SubscriberDto, SubscriberCommand>, ServicesSubscriber>();
+    builder.Services.AddScoped<ISubscriptionRepository, ServicesSubscription>();
+    builder.Services.AddScoped<IServiceRepository<GovernorateDto, GovernorateCommand>, ServicesGovernorate>();
+    builder.Services.AddScoped<IServiceRepository<AreaDto, AreaCommand>, ServicesArea>();
+    builder.Services.AddScoped<INotificationRepository, ServicesNotification>();
     builder.Services.AddScoped<IDashboardRepository, ServicesDashboard>();
     builder.Services.AddScoped<IReportRepository, ServicesReports>();
 
     // Core services
+    builder.Services.AddHttpContextAccessor();
+    builder.Services.AddScoped<Infrastructure.Common.Interfaces.IFlashMessageService, FreeBook.Services.FlashMessageService>();
     builder.Services.AddScoped<Infrastructure.Common.Interfaces.IEmailService, Infrastructure.Services.EmailService>();
     builder.Services.AddScoped<Infrastructure.Common.Interfaces.IImageService, Infrastructure.Services.CloudinaryImageService>();
     builder.Services.AddScoped<Infrastructure.Common.Interfaces.ISmsService, Infrastructure.Services.TwilioSmsService>();

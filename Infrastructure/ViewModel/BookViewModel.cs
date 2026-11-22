@@ -1,6 +1,5 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using Domin.Entity;
 using Domin.Resources;
 using Microsoft.AspNetCore.Http;
 
@@ -8,10 +7,10 @@ namespace Infrastructure.ViewModel
 {
     public class BookViewModel
     {
-        public List<Book> Books { get; set; } = new();
-        public List<Author> Authors { get; set; } = new();
-        public List<Category> Categories { get; set; } = new();
-        public List<SubCategory> SubCategories { get; set; } = new();
+        public List<BookDto> Books { get; set; } = new();
+        public List<AuthorDto> Authors { get; set; } = new();
+        public List<CategoryDto> Categories { get; set; } = new();
+        public List<SubCategoryDto> SubCategories { get; set; } = new();
         public NewBook NewBook { get; set; } = new();
     }
 

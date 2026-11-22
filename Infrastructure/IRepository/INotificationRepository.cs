@@ -1,23 +1,22 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Domin.Entity;
 using Infrastructure.Common;
+using Infrastructure.ViewModel;
 
 namespace Infrastructure.IRepository
 {
     public interface INotificationRepository
     {
-        Task<Result<List<Notification>>> GetRecentAsync(int take = 50);
+        Task<Result<List<NotificationDto>>> GetRecentAsync(int take = 50);
 
         Task<Result<int>> GetUnreadCountAsync();
 
         /// <summary>
         /// Inserts the notification or refreshes the mutable fields of the row
-        /// with the same <see cref="Notification.DedupeKey"/>. Returns true when
-        /// a new row was inserted, false when an existing row was updated.
+        /// with the same dedupe key. Returns true when a new row was inserted.
         /// </summary>
-        Task<Result<bool>> UpsertAsync(Notification notification);
+        Task<Result<bool>> UpsertAsync(NotificationCommand command);
 
         Task<Result<bool>> MarkReadAsync(Guid id);
 

@@ -5,12 +5,14 @@ using System.Threading.Tasks;
 using Domin.Entity;
 using Infrastructure.Common;
 using Infrastructure.Data;
+using Infrastructure.IRepository;
+using Infrastructure.ViewModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.IRepository.ServiceRepository
 {
-    public class ServicesArea : IServiceRepository<Area>
+    public class ServicesArea : IServiceRepository<AreaDto, AreaCommand>
     {
         private readonly FreeBookDbContext _context;
         private readonly ILogger<ServicesArea> _logger;
@@ -25,8 +27,9 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             try
             {
-                var result = await FindByIdAsync(id);
-                if (!result.IsSuccess || result.Value is null)
+                var area = await _context.Areas
+                    .FirstOrDefaultAsync(x => x.Id == id);
+                if (area is null)
                     return Result.Failure<bool>("NOT_FOUND", $"Area with id {id} not found");
 
                 // Check if area has subscribers
@@ -35,7 +38,7 @@ namespace Infrastructure.IRepository.ServiceRepository
                 if (hasSubscribers)
                     return Result.Failure<bool>("REFERENCE_EXISTS", "Cannot delete area with associated subscribers");
 
-                _context.Areas.Remove(result.Value);
+                _context.Areas.Remove(area);
                 await _context.SaveChangesAsync();
                 return Result.Success(true);
             }
@@ -46,7 +49,7 @@ namespace Infrastructure.IRepository.ServiceRepository
             }
         }
 
-        public async Task<Result<Area?>> FindByAsync(string name)
+        public async Task<Result<AreaDto?>> FindByAsync(string name)
         {
             try
             {
@@ -54,32 +57,32 @@ namespace Infrastructure.IRepository.ServiceRepository
                 var area = await _context.Areas
                     .Include(x => x.Governorate)
                     .FirstOrDefaultAsync(x => x.Name.Equals(trimmed));
-                return Result.Success(area);
+                return Result.Success<AreaDto?>(area is null ? null : CrudMapping.ToDto(area));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error finding area by name {Name}", name);
-                return Result.Failure<Area?>("FIND_ERROR", "Failed to find area", ex.Message);
+                return Result.Failure<AreaDto?>("FIND_ERROR", "Failed to find area", ex.Message);
             }
         }
 
-        public async Task<Result<Area?>> FindByIdAsync(Guid id)
+        public async Task<Result<AreaDto?>> FindByIdAsync(Guid id)
         {
             try
             {
                 var area = await _context.Areas
                     .Include(x => x.Governorate)
                     .FirstOrDefaultAsync(x => x.Id == id);
-                return Result.Success(area);
+                return Result.Success<AreaDto?>(area is null ? null : CrudMapping.ToDto(area));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error finding area by id {Id}", id);
-                return Result.Failure<Area?>("FIND_ERROR", "Failed to find area", ex.Message);
+                return Result.Failure<AreaDto?>("FIND_ERROR", "Failed to find area", ex.Message);
             }
         }
 
-        public async Task<Result<List<Area>>> GetAllAsync()
+        public async Task<Result<List<AreaDto>>> GetAllAsync()
         {
             try
             {
@@ -88,33 +91,39 @@ namespace Infrastructure.IRepository.ServiceRepository
                     .OrderBy(x => x.Governorate != null ? x.Governorate.Name : "")
                     .ThenBy(x => x.Name)
                     .ToListAsync();
-                return Result.Success(areas);
+                return Result.Success(areas.Select(CrudMapping.ToDto).ToList());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting all areas");
-                return Result.Failure<List<Area>>("GET_ALL_ERROR", "Failed to get areas", ex.Message);
+                return Result.Failure<List<AreaDto>>("GET_ALL_ERROR", "Failed to get areas", ex.Message);
             }
         }
 
-        public async Task<Result<bool>> SaveAsync(Area model)
+        public async Task<Result<bool>> SaveAsync(AreaCommand command, Guid? id = null)
         {
             try
             {
-                var result = await FindByIdAsync(model.Id);
-                if (!result.IsSuccess)
-                    return Result.Failure<bool>("FIND_ERROR", "Failed to check existing area");
-
-                if (result.Value is null)
+                if (id is null || id == Guid.Empty)
                 {
-                    model.Id = Guid.NewGuid();
-                    _context.Areas.Add(model);
+                    var area = new Area
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = command.Name,
+                        GovernorateId = command.GovernorateId
+                    };
+                    _context.Areas.Add(area);
                 }
                 else
                 {
-                    result.Value.Name = model.Name;
-                    result.Value.GovernorateId = model.GovernorateId;
-                    _context.Areas.Update(result.Value);
+                    var area = await _context.Areas
+                        .FirstOrDefaultAsync(x => x.Id == id.Value);
+                    if (area is null)
+                        return Result.Failure<bool>("NOT_FOUND", $"Area with id {id} not found");
+
+                    area.Name = command.Name;
+                    area.GovernorateId = command.GovernorateId;
+                    _context.Areas.Update(area);
                 }
 
                 await _context.SaveChangesAsync();
@@ -122,7 +131,7 @@ namespace Infrastructure.IRepository.ServiceRepository
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error saving area {Id}", model.Id);
+                _logger.LogError(ex, "Error saving area {Id}", id);
                 return Result.Failure<bool>("SAVE_ERROR", "Failed to save area", ex.Message);
             }
         }

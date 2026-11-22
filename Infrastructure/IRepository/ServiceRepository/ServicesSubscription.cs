@@ -6,6 +6,7 @@ using Domin.Entity;
 using Infrastructure.Common;
 using Infrastructure.Data;
 using Infrastructure.IRepository;
+using Infrastructure.ViewModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -26,11 +27,12 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             try
             {
-                var result = await FindByIdAsync(id);
-                if (!result.IsSuccess || result.Value is null)
+                var subscription = await _context.Subscriptions
+                    .FirstOrDefaultAsync(x => x.Id == id);
+                if (subscription is null)
                     return Result.Failure<bool>("NOT_FOUND", $"Subscription with id {id} not found");
 
-                _context.Subscriptions.Remove(result.Value);
+                _context.Subscriptions.Remove(subscription);
                 await _context.SaveChangesAsync();
                 return Result.Success(true);
             }
@@ -41,29 +43,29 @@ namespace Infrastructure.IRepository.ServiceRepository
             }
         }
 
-        public async Task<Result<Subscription?>> FindByAsync(string name)
+        public async Task<Result<SubscriptionDto?>> FindByAsync(string name)
         {
             // Not applicable for subscriptions
-            return Result.Success<Subscription?>(null);
+            return await Task.FromResult(Result.Success<SubscriptionDto?>(null));
         }
 
-        public async Task<Result<Subscription?>> FindByIdAsync(Guid id)
+        public async Task<Result<SubscriptionDto?>> FindByIdAsync(Guid id)
         {
             try
             {
                 var subscription = await _context.Subscriptions
                     .Include(x => x.Subscriber)
                     .FirstOrDefaultAsync(x => x.Id == id);
-                return Result.Success(subscription);
+                return Result.Success<SubscriptionDto?>(subscription is null ? null : CrudMapping.ToDto(subscription));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error finding subscription by id {Id}", id);
-                return Result.Failure<Subscription?>("FIND_ERROR", "Failed to find subscription", ex.Message);
+                return Result.Failure<SubscriptionDto?>("FIND_ERROR", "Failed to find subscription", ex.Message);
             }
         }
 
-        public async Task<Result<List<Subscription>>> GetAllAsync()
+        public async Task<Result<List<SubscriptionDto>>> GetAllAsync()
         {
             try
             {
@@ -71,36 +73,44 @@ namespace Infrastructure.IRepository.ServiceRepository
                     .Include(x => x.Subscriber)
                     .OrderByDescending(x => x.StartDate)
                     .ToListAsync();
-                return Result.Success(subscriptions);
+                return Result.Success(subscriptions.Select(s => CrudMapping.ToDto(s)).ToList());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting all subscriptions");
-                return Result.Failure<List<Subscription>>("GET_ALL_ERROR", "Failed to get subscriptions", ex.Message);
+                return Result.Failure<List<SubscriptionDto>>("GET_ALL_ERROR", "Failed to get subscriptions", ex.Message);
             }
         }
 
-        public async Task<Result<bool>> SaveAsync(Subscription model)
+        public async Task<Result<bool>> SaveAsync(SubscriptionCommand command, Guid? id = null)
         {
             try
             {
-                var result = await FindByIdAsync(model.Id);
-                if (!result.IsSuccess)
-                    return Result.Failure<bool>("FIND_ERROR", "Failed to check existing subscription");
-
-                if (result.Value is null)
+                if (id is null || id == Guid.Empty)
                 {
-                    model.Id = Guid.NewGuid();
-                    model.CreatedOn = DateTime.UtcNow;
-                    _context.Subscriptions.Add(model);
+                    var subscription = new Subscription
+                    {
+                        Id = Guid.NewGuid(),
+                        SubscriberId = command.SubscriberId,
+                        StartDate = command.StartDate,
+                        EndDate = command.EndDate,
+                        CreatedById = command.CreatedById,
+                        CreatedOn = DateTime.UtcNow
+                    };
+                    _context.Subscriptions.Add(subscription);
                 }
                 else
                 {
-                    result.Value.SubscriberId = model.SubscriberId;
-                    result.Value.StartDate = model.StartDate;
-                    result.Value.EndDate = model.EndDate;
-                    result.Value.CreatedById = model.CreatedById;
-                    _context.Subscriptions.Update(result.Value);
+                    var subscription = await _context.Subscriptions
+                        .FirstOrDefaultAsync(x => x.Id == id.Value);
+                    if (subscription is null)
+                        return Result.Failure<bool>("NOT_FOUND", $"Subscription with id {id} not found");
+
+                    subscription.SubscriberId = command.SubscriberId;
+                    subscription.StartDate = command.StartDate;
+                    subscription.EndDate = command.EndDate;
+                    subscription.CreatedById = command.CreatedById;
+                    _context.Subscriptions.Update(subscription);
                 }
 
                 await _context.SaveChangesAsync();
@@ -108,29 +118,30 @@ namespace Infrastructure.IRepository.ServiceRepository
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error saving subscription {Id}", model.Id);
+                _logger.LogError(ex, "Error saving subscription {Id}", id);
                 return Result.Failure<bool>("SAVE_ERROR", "Failed to save subscription", ex.Message);
             }
         }
 
-        public async Task<Result<List<Subscription>>> GetBySubscriberAsync(Guid subscriberId)
+        public async Task<Result<List<SubscriptionDto>>> GetBySubscriberAsync(Guid subscriberId)
         {
             try
             {
                 var subscriptions = await _context.Subscriptions
+                    .Include(x => x.Subscriber)
                     .Where(x => x.SubscriberId == subscriberId)
                     .OrderByDescending(x => x.StartDate)
                     .ToListAsync();
-                return Result.Success(subscriptions);
+                return Result.Success(subscriptions.Select(s => CrudMapping.ToDto(s)).ToList());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting subscriptions for subscriber {SubscriberId}", subscriberId);
-                return Result.Failure<List<Subscription>>("GET_BY_SUBSCRIBER_ERROR", "Failed to get subscriptions", ex.Message);
+                return Result.Failure<List<SubscriptionDto>>("GET_BY_SUBSCRIBER_ERROR", "Failed to get subscriptions", ex.Message);
             }
         }
 
-        public async Task<Result<List<Subscription>>> GetActiveSubscriptionsAsync()
+        public async Task<Result<List<SubscriptionDto>>> GetActiveSubscriptionsAsync()
         {
             try
             {
@@ -140,16 +151,16 @@ namespace Infrastructure.IRepository.ServiceRepository
                     .Where(x => x.StartDate <= now && x.EndDate >= now)
                     .OrderBy(x => x.EndDate)
                     .ToListAsync();
-                return Result.Success(subscriptions);
+                return Result.Success(subscriptions.Select(s => CrudMapping.ToDto(s)).ToList());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting active subscriptions");
-                return Result.Failure<List<Subscription>>("GET_ACTIVE_ERROR", "Failed to get active subscriptions", ex.Message);
+                return Result.Failure<List<SubscriptionDto>>("GET_ACTIVE_ERROR", "Failed to get active subscriptions", ex.Message);
             }
         }
 
-        public async Task<Result<List<Subscription>>> GetExpiringSubscriptionsAsync(int days = 30)
+        public async Task<Result<List<SubscriptionDto>>> GetExpiringSubscriptionsAsync(int days = 30)
         {
             try
             {
@@ -160,12 +171,12 @@ namespace Infrastructure.IRepository.ServiceRepository
                     .Where(x => x.EndDate >= now && x.EndDate <= future)
                     .OrderBy(x => x.EndDate)
                     .ToListAsync();
-                return Result.Success(subscriptions);
+                return Result.Success(subscriptions.Select(s => CrudMapping.ToDto(s)).ToList());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting expiring subscriptions for {Days} days", days);
-                return Result.Failure<List<Subscription>>("GET_EXPIRING_ERROR", "Failed to get expiring subscriptions", ex.Message);
+                return Result.Failure<List<SubscriptionDto>>("GET_EXPIRING_ERROR", "Failed to get expiring subscriptions", ex.Message);
             }
         }
     }

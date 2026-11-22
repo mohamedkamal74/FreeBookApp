@@ -5,12 +5,14 @@ using System.Threading.Tasks;
 using Domin.Entity;
 using Infrastructure.Common;
 using Infrastructure.Data;
+using Infrastructure.IRepository;
+using Infrastructure.ViewModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.IRepository.ServiceRepository
 {
-    public class ServicesBook : IServiceRepository<Book>
+    public class ServicesBook : IServiceRepository<BookDto, BookCommand>
     {
         private readonly FreeBookDbContext _context;
         private readonly ILogger<ServicesBook> _logger;
@@ -25,12 +27,13 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             try
             {
-                var result = await FindByIdAsync(id);
-                if (!result.IsSuccess || result.Value is null)
+                var book = await _context.books
+                    .FirstOrDefaultAsync(x => x.Id == id && x.CurrentState > 0);
+                if (book is null)
                     return Result.Failure<bool>("NOT_FOUND", $"Book with id {id} not found");
 
-                result.Value.CurrentState = (int)Helper.ECurrentState.Delete;
-                _context.books.Update(result.Value);
+                book.CurrentState = (int)Helper.ECurrentState.Delete;
+                _context.books.Update(book);
                 await _context.SaveChangesAsync();
                 return Result.Success(true);
             }
@@ -41,7 +44,7 @@ namespace Infrastructure.IRepository.ServiceRepository
             }
         }
 
-        public async Task<Result<Book?>> FindByAsync(string name)
+        public async Task<Result<BookDto?>> FindByAsync(string name)
         {
             try
             {
@@ -49,17 +52,18 @@ namespace Infrastructure.IRepository.ServiceRepository
                 var book = await _context.books
                     .Include(x => x.Author)
                     .Include(x => x.Category)
+                    .Include(x => x.SubCategory)
                     .FirstOrDefaultAsync(x => x.Name.Equals(trimmed) && x.CurrentState > 0);
-                return Result.Success(book);
+                return Result.Success<BookDto?>(book is null ? null : CrudMapping.ToDto(book));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error finding book by name {Name}", name);
-                return Result.Failure<Book?>("FIND_ERROR", "Failed to find book", ex.Message);
+                return Result.Failure<BookDto?>("FIND_ERROR", "Failed to find book", ex.Message);
             }
         }
 
-        public async Task<Result<Book?>> FindByIdAsync(Guid id)
+        public async Task<Result<BookDto?>> FindByIdAsync(Guid id)
         {
             try
             {
@@ -68,64 +72,81 @@ namespace Infrastructure.IRepository.ServiceRepository
                     .Include(x => x.Category)
                     .Include(x => x.SubCategory)
                     .FirstOrDefaultAsync(x => x.Id == id && x.CurrentState > 0);
-                return Result.Success(book);
+                return Result.Success<BookDto?>(book is null ? null : CrudMapping.ToDto(book));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error finding book by id {Id}", id);
-                return Result.Failure<Book?>("FIND_ERROR", "Failed to find book", ex.Message);
+                return Result.Failure<BookDto?>("FIND_ERROR", "Failed to find book", ex.Message);
             }
         }
 
-        public async Task<Result<List<Book>>> GetAllAsync()
+        public async Task<Result<List<BookDto>>> GetAllAsync()
         {
             try
             {
                 var books = await _context.books
                     .Include(x => x.Author)
                     .Include(x => x.Category)
+                    .Include(x => x.SubCategory)
                     .Where(x => x.CurrentState > 0)
                     .OrderBy(x => x.Name)
                     .ToListAsync();
-                return Result.Success(books);
+                return Result.Success(books.Select(CrudMapping.ToDto).ToList());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting all books");
-                return Result.Failure<List<Book>>("GET_ALL_ERROR", "Failed to get books", ex.Message);
+                return Result.Failure<List<BookDto>>("GET_ALL_ERROR", "Failed to get books", ex.Message);
             }
         }
 
-        public async Task<Result<bool>> SaveAsync(Book model)
+        public async Task<Result<bool>> SaveAsync(BookCommand command, Guid? id = null)
         {
             try
             {
-                var result = await FindByIdAsync(model.Id);
-                if (!result.IsSuccess)
-                    return Result.Failure<bool>("FIND_ERROR", "Failed to check existing book");
-
-                if (result.Value is null)
+                if (id is null || id == Guid.Empty)
                 {
-                    model.Id = Guid.NewGuid();
-                    model.CurrentState = (int)Helper.ECurrentState.Active;
-                    _context.books.Add(model);
+                    var book = new Book
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = command.Name,
+                        AuthorId = command.AuthorId,
+                        Publisher = command.Publisher,
+                        PublishingDate = command.PublishingDate,
+                        ImageUrl = command.ImageUrl,
+                        ImageThumbnailUrl = command.ImageThumbnailUrl,
+                        ImagePublicId = command.ImagePublicId,
+                        Hall = command.Hall,
+                        IsAvailableForRental = command.IsAvailableForRental,
+                        Description = command.Description,
+                        CategoryId = command.CategoryId,
+                        SubCategoryId = command.SubCategoryId,
+                        CurrentState = (int)Helper.ECurrentState.Active
+                    };
+                    _context.books.Add(book);
                 }
                 else
                 {
-                    result.Value.Name = model.Name;
-                    result.Value.AuthorId = model.AuthorId;
-                    result.Value.Publisher = model.Publisher;
-                    result.Value.PublishingDate = model.PublishingDate;
-                    result.Value.ImageUrl = model.ImageUrl;
-                    result.Value.ImageThumbnailUrl = model.ImageThumbnailUrl;
-                    result.Value.ImagePublicId = model.ImagePublicId;
-                    result.Value.Hall = model.Hall;
-                    result.Value.IsAvailableForRental = model.IsAvailableForRental;
-                    result.Value.Description = model.Description;
-                    result.Value.CategoryId = model.CategoryId;
-                    result.Value.SubCategoryId = model.SubCategoryId;
-                    result.Value.CurrentState = (int)Helper.ECurrentState.Active;
-                    _context.books.Update(result.Value);
+                    var book = await _context.books
+                        .FirstOrDefaultAsync(x => x.Id == id.Value && x.CurrentState > 0);
+                    if (book is null)
+                        return Result.Failure<bool>("NOT_FOUND", $"Book with id {id} not found");
+
+                    book.Name = command.Name;
+                    book.AuthorId = command.AuthorId;
+                    book.Publisher = command.Publisher;
+                    book.PublishingDate = command.PublishingDate;
+                    book.ImageUrl = command.ImageUrl;
+                    book.ImageThumbnailUrl = command.ImageThumbnailUrl;
+                    book.ImagePublicId = command.ImagePublicId;
+                    book.Hall = command.Hall;
+                    book.IsAvailableForRental = command.IsAvailableForRental;
+                    book.Description = command.Description;
+                    book.CategoryId = command.CategoryId;
+                    book.SubCategoryId = command.SubCategoryId;
+                    book.CurrentState = (int)Helper.ECurrentState.Active;
+                    _context.books.Update(book);
                 }
 
                 await _context.SaveChangesAsync();
@@ -133,7 +154,7 @@ namespace Infrastructure.IRepository.ServiceRepository
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error saving book {Id}", model.Id);
+                _logger.LogError(ex, "Error saving book {Id}", id);
                 return Result.Failure<bool>("SAVE_ERROR", "Failed to save book", ex.Message);
             }
         }

@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Domin.Entity;
 using Domin.Resources;
 using Infrastructure.ViewModel;
 
@@ -12,9 +11,9 @@ namespace Infrastructure.ViewModel
 {
     public class RentalViewModel
     {
-        public List<Rental> Rentals { get; set; } = new();
-        public List<Subscriber> Subscribers { get; set; } = new();
-        public List<BookCopy> AvailableCopies { get; set; } = new();
+        public List<RentalDto> Rentals { get; set; } = new();
+        public List<SubscriberDto> Subscribers { get; set; } = new();
+        public List<BookCopyDto> AvailableCopies { get; set; } = new();
         public NewRental NewRental { get; set; } = new();
         public Guid[] SelectedCopyIds { get; set; } = Array.Empty<Guid>();
 

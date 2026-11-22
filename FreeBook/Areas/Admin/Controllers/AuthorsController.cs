@@ -1,5 +1,5 @@
-using Domin.Entity;
 using Infrastructure.Common;
+using Infrastructure.Common.Interfaces;
 using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Authorization;
@@ -8,17 +8,22 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FreeBook.Areas.Admin.Controllers
 {
-    [Area(Helper.Admin)]
+    [Area(Domin.Entity.Helper.Admin)]
     [Authorize(Roles = "Admin")]
     public class AuthorsController : Controller
     {
         private readonly IAuthorRepository _serviceAuthor;
         private readonly UserManager<ApplicationUser> _userManager;
+        private IFlashMessageService Flash { get; }
 
-        public AuthorsController(IAuthorRepository serviceAuthor, UserManager<ApplicationUser> userManager)
+        public AuthorsController(
+            IAuthorRepository serviceAuthor,
+            UserManager<ApplicationUser> userManager,
+            IFlashMessageService flash)
         {
             _serviceAuthor = serviceAuthor;
             _userManager = userManager;
+            Flash = flash;
         }
 
         public async Task<IActionResult> Authors(AuthorViewModel model)
@@ -26,7 +31,7 @@ namespace FreeBook.Areas.Admin.Controllers
             var authorsResult = await _serviceAuthor.GetAllActiveAsync();
             return View(new AuthorViewModel
             {
-                Authors = authorsResult.IsSuccess ? authorsResult.Value ?? new List<Author>() : new List<Author>(),
+                Authors = authorsResult.IsSuccess ? authorsResult.Value ?? new List<AuthorDto>() : new List<AuthorDto>(),
                 NewAuthor = new NewAuthor()
             });
         }
@@ -58,19 +63,15 @@ namespace FreeBook.Areas.Admin.Controllers
                 // create
                 var findResult = await _serviceAuthor.FindByNameAsync(model.NewAuthor.Name);
                 if (findResult.IsSuccess && findResult.Value != null)
-                    SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDuplicateName);
+                    Flash.Error(Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDuplicateName);
                 else
                 {
-                    var newAuthor = new Author
-                    {
-                        Id = Guid.NewGuid(),
-                        Name = model.NewAuthor.Name
-                    };
-                    var saveResult = await _serviceAuthor.SaveAsync(newAuthor);
+                    var command = new AuthorCommand { Name = model.NewAuthor.Name };
+                    var saveResult = await _serviceAuthor.SaveAsync(command);
                     if (saveResult.IsSuccess)
-                        SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbMsgSavedOk);
+                        Flash.Success(Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbMsgSavedOk);
                     else
-                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSavedOk);
+                        Flash.Error(Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSavedOk);
                 }
             }
             else
@@ -83,28 +84,21 @@ namespace FreeBook.Areas.Admin.Controllers
                     var findResult = await _serviceAuthor.FindByNameAsync(model.NewAuthor.Name);
                     if (findResult.IsSuccess && findResult.Value != null && findResult.Value.Id != existingAuthorResult.Value.Id)
                     {
-                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDuplicateName);
+                        Flash.Error(Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDuplicateName);
                     }
                     else
                     {
-                        existingAuthorResult.Value.Name = model.NewAuthor.Name;
-                        var saveResult = await _serviceAuthor.SaveAsync(existingAuthorResult.Value);
+                        var command = new AuthorCommand { Name = model.NewAuthor.Name };
+                        var saveResult = await _serviceAuthor.SaveAsync(command, existingAuthorResult.Value.Id);
                         if (saveResult.IsSuccess)
-                            SessionMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbMsgUpdatedOk);
+                            Flash.Success(Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbMsgUpdatedOk);
                         else
-                            SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbMsgNotUpdatedOk);
+                            Flash.Error(Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbMsgNotUpdatedOk);
                     }
                 }
             }
 
             return RedirectToAction(nameof(Authors));
-        }
-
-        private void SessionMsg(string MsgType, string Title, string Msg)
-        {
-            HttpContext.Session.SetString(Helper.MsgType, MsgType);
-            HttpContext.Session.SetString(Helper.Title, Title);
-            HttpContext.Session.SetString(Helper.Msg, Msg);
         }
     }
 }

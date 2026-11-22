@@ -2,6 +2,7 @@ using Domin.Entity;
 using Infrastructure.Common;
 using Infrastructure.Data;
 using Infrastructure.IRepository.ServiceRepository;
+using Infrastructure.ViewModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -30,16 +31,16 @@ public class RepositoryTests
     {
         using var context = CreateContext();
         var service = new ServicesCategory(context, CreateLogger<ServicesCategory>());
-        var category = new Category { Name = "Fiction", Description = "Novels" };
 
-        var saveResult = await service.SaveAsync(category);
+        var saveResult = await service.SaveAsync(new CategoryCommand { Name = "Fiction", Description = "Novels" });
         Assert.True(saveResult.IsSuccess);
 
-        var findResult = await service.FindByIdAsync(category.Id);
+        var findResult = await service.FindByAsync("Fiction");
         Assert.True(findResult.IsSuccess);
         var saved = findResult.Value;
         Assert.NotNull(saved);
         Assert.Equal("Fiction", saved!.Name);
+        Assert.Equal("Novels", saved.Description);
         Assert.Equal((int)Helper.ECurrentState.Active, saved.Currentstste);
     }
 
@@ -48,17 +49,17 @@ public class RepositoryTests
     {
         using var context = CreateContext();
         var service = new ServicesCategory(context, CreateLogger<ServicesCategory>());
-        var category = new Category { Name = "Fiction" };
-        var saveResult1 = await service.SaveAsync(category);
-        Assert.True(saveResult1.IsSuccess);
+        Assert.True((await service.SaveAsync(new CategoryCommand { Name = "Fiction" })).IsSuccess);
+        var id = (await service.FindByAsync("Fiction")).Value!.Id;
 
-        category.Name = "Science";
-        var saveResult2 = await service.SaveAsync(category);
-        Assert.True(saveResult2.IsSuccess);
+        var saveResult = await service.SaveAsync(
+            new CategoryCommand { Id = id, Name = "Science", Description = "Physics" }, id);
+        Assert.True(saveResult.IsSuccess);
 
-        var findResult = await service.FindByIdAsync(category.Id);
+        var findResult = await service.FindByIdAsync(id);
         Assert.True(findResult.IsSuccess);
         Assert.Equal("Science", findResult.Value!.Name);
+        Assert.Equal("Physics", findResult.Value.Description);
     }
 
     [Fact]
@@ -66,20 +67,14 @@ public class RepositoryTests
     {
         using var context = CreateContext();
         var service = new ServicesCategory(context, CreateLogger<ServicesCategory>());
-        var category = new Category { Name = "Fiction" };
-        var saveResult = await service.SaveAsync(category);
-        Assert.True(saveResult.IsSuccess);
+        await service.SaveAsync(new CategoryCommand { Name = "Fiction" });
+        var id = (await service.FindByAsync("Fiction")).Value!.Id;
 
-        var deleteResult = await service.DeleteAsync(category.Id);
+        var deleteResult = await service.DeleteAsync(id);
         Assert.True(deleteResult.IsSuccess);
 
-        var findResult = await service.FindByIdAsync(category.Id);
-        Assert.True(findResult.IsSuccess);
-        Assert.Null(findResult.Value);
-
-        var allResult = await service.GetAllAsync();
-        Assert.True(allResult.IsSuccess);
-        Assert.Empty(allResult.Value);
+        Assert.Null((await service.FindByIdAsync(id)).Value);
+        Assert.Empty((await service.GetAllAsync()).Value!);
     }
 
     [Fact]
@@ -87,8 +82,7 @@ public class RepositoryTests
     {
         using var context = CreateContext();
         var service = new ServicesCategory(context, CreateLogger<ServicesCategory>());
-        var saveResult = await service.SaveAsync(new Category { Name = "Fiction" });
-        Assert.True(saveResult.IsSuccess);
+        Assert.True((await service.SaveAsync(new CategoryCommand { Name = "Fiction" })).IsSuccess);
 
         var findResult = await service.FindByAsync("  Fiction  ");
         Assert.True(findResult.IsSuccess);
@@ -101,21 +95,21 @@ public class RepositoryTests
         using var context = CreateContext();
         var categoryService = new ServicesCategory(context, CreateLogger<ServicesCategory>());
         var logService = new ServiceLogCategory(context, CreateLogger<ServiceLogCategory>());
-        var category = new Category { Name = "Fiction" };
-        var saveResult = await categoryService.SaveAsync(category);
-        Assert.True(saveResult.IsSuccess);
+        await categoryService.SaveAsync(new CategoryCommand { Name = "Fiction" });
+        var id = (await categoryService.FindByAsync("Fiction")).Value!.Id;
 
         var userId = Guid.NewGuid();
-        var logSaveResult = await logService.SaveAsync(category.Id, userId);
+        var logSaveResult = await logService.SaveAsync(id, userId);
         Assert.True(logSaveResult.IsSuccess);
 
         var logsResult = await logService.GetAllAsync();
         Assert.True(logsResult.IsSuccess);
-        var logs = logsResult.Value ?? new List<LogCategory>();
-        Assert.Single(logs);
-        Assert.Equal(Helper.Save, logs[0].Action);
-        Assert.Equal(userId, logs[0].UserId);
-        Assert.Equal(category.Id, logs[0].CategoryId);
+        var logs = logsResult.Value ?? new List<LogCategoryDto>();
+        var log = Assert.Single(logs);
+        Assert.Equal(Helper.Save, log.Action);
+        Assert.Equal(userId, log.UserId);
+        Assert.Equal(id, log.CategoryId);
+        Assert.Equal("Fiction", log.category?.Name);
     }
 
     [Fact]
@@ -124,18 +118,13 @@ public class RepositoryTests
         using var context = CreateContext();
         var categoryService = new ServicesCategory(context, CreateLogger<ServicesCategory>());
         var logService = new ServiceLogCategory(context, CreateLogger<ServiceLogCategory>());
-        var category = new Category { Name = "Fiction" };
-        var saveResult = await categoryService.SaveAsync(category);
-        Assert.True(saveResult.IsSuccess);
+        await categoryService.SaveAsync(new CategoryCommand { Name = "Fiction" });
+        var id = (await categoryService.FindByAsync("Fiction")).Value!.Id;
 
-        var logDeleteResult = await logService.DeleteAsync(category.Id, Guid.NewGuid());
-        Assert.True(logDeleteResult.IsSuccess);
+        Assert.True((await logService.DeleteAsync(id, Guid.NewGuid())).IsSuccess);
 
-        var logsResult = await logService.GetAllAsync();
-        Assert.True(logsResult.IsSuccess);
-        var logs = logsResult.Value ?? new List<LogCategory>();
-        Assert.Single(logs);
-        Assert.Equal(Helper.Delete, logs[0].Action);
+        var logs = (await logService.GetAllAsync()).Value ?? new List<LogCategoryDto>();
+        Assert.Equal(Helper.Delete, Assert.Single(logs).Action);
     }
 
     [Fact]
@@ -146,7 +135,8 @@ public class RepositoryTests
         var authorId = Guid.NewGuid();
         await SeedAuthorAsync(context, authorId);
         var categoryId = Guid.NewGuid();
-        var book = new Book
+
+        var saveResult = await service.SaveAsync(new BookCommand
         {
             Name = "Clean Code",
             AuthorId = authorId,
@@ -155,17 +145,13 @@ public class RepositoryTests
             Hall = "A1",
             Description = "A handbook of agile software craftsmanship.",
             CategoryId = categoryId
-        };
-
-        var saveResult = await service.SaveAsync(book);
+        });
         Assert.True(saveResult.IsSuccess);
 
-        var findResult = await service.FindByIdAsync(book.Id);
-        Assert.True(findResult.IsSuccess);
-        var saved = findResult.Value;
+        var saved = (await service.FindByAsync("Clean Code")).Value;
         Assert.NotNull(saved);
-        Assert.Equal("Clean Code", saved!.Name);
-        Assert.Equal(authorId, saved.AuthorId);
+        Assert.Equal(authorId, saved!.AuthorId);
+        Assert.Equal("Test Author", saved.Author?.Name);
         Assert.Equal(categoryId, saved.CategoryId);
         Assert.True(saved.IsAvailableForRental);
         Assert.Equal((int)Helper.ECurrentState.Active, saved.CurrentState);
@@ -178,17 +164,20 @@ public class RepositoryTests
         var service = new ServicesBook(context, CreateLogger<ServicesBook>());
         var authorId = Guid.NewGuid();
         await SeedAuthorAsync(context, authorId);
-        var book = new Book { Name = "Clean Code", AuthorId = authorId };
-        Assert.True((await service.SaveAsync(book)).IsSuccess);
+        Assert.True((await service.SaveAsync(new BookCommand { Name = "Clean Code", AuthorId = authorId })).IsSuccess);
+        var id = (await service.FindByAsync("Clean Code")).Value!.Id;
 
-        book.Name = "Clean Architecture";
-        book.Publisher = "Prentice Hall";
-        book.Hall = "B2";
-        book.IsAvailableForRental = false;
-        Assert.True((await service.SaveAsync(book)).IsSuccess);
+        Assert.True((await service.SaveAsync(new BookCommand
+        {
+            Id = id,
+            Name = "Clean Architecture",
+            AuthorId = authorId,
+            Publisher = "Prentice Hall",
+            Hall = "B2",
+            IsAvailableForRental = false
+        }, id)).IsSuccess);
 
-        var findResult = await service.FindByIdAsync(book.Id);
-        var saved = findResult.Value;
+        var saved = (await service.FindByIdAsync(id)).Value;
         Assert.NotNull(saved);
         Assert.Equal("Clean Architecture", saved!.Name);
         Assert.Equal("Prentice Hall", saved.Publisher);
@@ -203,7 +192,11 @@ public class RepositoryTests
         var service = new ServicesBook(context, CreateLogger<ServicesBook>());
         var authorId = Guid.NewGuid();
         await SeedAuthorAsync(context, authorId);
-        Assert.True((await service.SaveAsync(new Book { Name = "The Pragmatic Programmer", AuthorId = authorId })).IsSuccess);
+        Assert.True((await service.SaveAsync(new BookCommand
+        {
+            Name = "The Pragmatic Programmer",
+            AuthorId = authorId
+        })).IsSuccess);
 
         var findResult = await service.FindByAsync("  The Pragmatic Programmer  ");
         Assert.True(findResult.IsSuccess);
@@ -217,19 +210,13 @@ public class RepositoryTests
         var service = new ServicesBook(context, CreateLogger<ServicesBook>());
         var authorId = Guid.NewGuid();
         await SeedAuthorAsync(context, authorId);
-        var book = new Book { Name = "Refactoring", AuthorId = authorId };
-        Assert.True((await service.SaveAsync(book)).IsSuccess);
+        await service.SaveAsync(new BookCommand { Name = "Refactoring", AuthorId = authorId });
+        var id = (await service.FindByAsync("Refactoring")).Value!.Id;
 
-        var deleteResult = await service.DeleteAsync(book.Id);
-        Assert.True(deleteResult.IsSuccess);
+        Assert.True((await service.DeleteAsync(id)).IsSuccess);
 
-        var findResult = await service.FindByIdAsync(book.Id);
-        Assert.True(findResult.IsSuccess);
-        Assert.Null(findResult.Value);
-
-        var allResult = await service.GetAllAsync();
-        Assert.True(allResult.IsSuccess);
-        Assert.DoesNotContain(allResult.Value!, x => x.Id == book.Id);
+        Assert.Null((await service.FindByIdAsync(id)).Value);
+        Assert.DoesNotContain((await service.GetAllAsync()).Value!, x => x.Id == id);
     }
 
     [Fact]
@@ -238,14 +225,14 @@ public class RepositoryTests
         using var context = CreateContext();
         var service = new ServicesSubCategory(context, CreateLogger<ServicesSubCategory>());
         var categoryId = Guid.NewGuid();
-        var subCategory = new SubCategory { Name = "Software Engineering", CategoryId = categoryId };
 
-        var saveResult = await service.SaveAsync(subCategory);
-        Assert.True(saveResult.IsSuccess);
+        Assert.True((await service.SaveAsync(new SubCategoryCommand
+        {
+            Name = "Software Engineering",
+            CategoryId = categoryId
+        })).IsSuccess);
 
-        var allResult = await service.GetAllAsync();
-        Assert.True(allResult.IsSuccess);
-        var saved = Assert.Single(allResult.Value!);
+        var saved = Assert.Single((await service.GetAllAsync()).Value!);
         Assert.Equal("Software Engineering", saved.Name);
         Assert.Equal(categoryId, saved.CategoryId);
         Assert.Equal((int)Helper.ECurrentState.Active, saved.Currentstate);

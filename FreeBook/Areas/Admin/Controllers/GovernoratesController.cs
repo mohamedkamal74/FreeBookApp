@@ -1,6 +1,6 @@
-using Domin.Entity;
 using FreeBook.Resources;
 using Infrastructure.Common;
+using Infrastructure.Common.Interfaces;
 using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Authorization;
@@ -9,19 +9,22 @@ using Microsoft.Extensions.Localization;
 
 namespace FreeBook.Areas.Admin.Controllers
 {
-    [Area(Helper.Admin)]
+    [Area(Domin.Entity.Helper.Admin)]
     [Authorize(Roles = "Admin")]
     public class GovernoratesController : Controller
     {
-        private readonly IServiceRepository<Governorate> _serviceGovernorate;
+        private readonly IServiceRepository<GovernorateDto, GovernorateCommand> _serviceGovernorate;
         private readonly IStringLocalizer<ResourceWeb> _localizer;
+        private IFlashMessageService Flash { get; }
 
         public GovernoratesController(
-            IServiceRepository<Governorate> serviceGovernorate,
-            IStringLocalizer<ResourceWeb> localizer)
+            IServiceRepository<GovernorateDto, GovernorateCommand> serviceGovernorate,
+            IStringLocalizer<ResourceWeb> localizer,
+            IFlashMessageService flash)
         {
             _serviceGovernorate = serviceGovernorate;
             _localizer = localizer;
+            Flash = flash;
         }
 
         public async Task<IActionResult> Governorates(GovernorateViewModel model)
@@ -29,7 +32,7 @@ namespace FreeBook.Areas.Admin.Controllers
             var result = await _serviceGovernorate.GetAllAsync();
             return View(new GovernorateViewModel
             {
-                Governorates = result.IsSuccess ? result.Value ?? new List<Governorate>() : new List<Governorate>(),
+                Governorates = result.IsSuccess ? result.Value ?? new List<GovernorateDto>() : new List<GovernorateDto>(),
                 NewGovernorate = new NewGovernorate()
             });
         }
@@ -41,7 +44,7 @@ namespace FreeBook.Areas.Admin.Controllers
             var result = await _serviceGovernorate.DeleteAsync(Id);
             if (result.IsSuccess)
                 return RedirectToAction(nameof(Governorates));
-            SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, result.Error?.Message ?? _localizer["msgGovernorateInUse"]);
+            Flash.Error(Resources.ResourceWeb.lbNotSave, result.Error?.Message ?? _localizer["msgGovernorateInUse"]);
             return RedirectToAction(nameof(Governorates));
         }
 
@@ -54,19 +57,15 @@ namespace FreeBook.Areas.Admin.Controllers
                 // create
                 var findResult = await _serviceGovernorate.FindByAsync(model.NewGovernorate.Name);
                 if (findResult.IsSuccess && findResult.Value != null)
-                    SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDuplicateName);
+                    Flash.Error(Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDuplicateName);
                 else
                 {
-                    var newGovernorate = new Governorate
-                    {
-                        Id = Guid.NewGuid(),
-                        Name = model.NewGovernorate.Name
-                    };
-                    var saveResult = await _serviceGovernorate.SaveAsync(newGovernorate);
+                    var command = new GovernorateCommand { Name = model.NewGovernorate.Name };
+                    var saveResult = await _serviceGovernorate.SaveAsync(command);
                     if (saveResult.IsSuccess)
-                        SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbMsgSavedOk);
+                        Flash.Success(Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbMsgSavedOk);
                     else
-                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSavedOk);
+                        Flash.Error(Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSavedOk);
                 }
             }
             else
@@ -79,28 +78,21 @@ namespace FreeBook.Areas.Admin.Controllers
                     var findResult = await _serviceGovernorate.FindByAsync(model.NewGovernorate.Name);
                     if (findResult.IsSuccess && findResult.Value != null && findResult.Value.Id != existingResult.Value.Id)
                     {
-                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDuplicateName);
+                        Flash.Error(Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDuplicateName);
                     }
                     else
                     {
-                        existingResult.Value.Name = model.NewGovernorate.Name;
-                        var saveResult = await _serviceGovernorate.SaveAsync(existingResult.Value);
+                        var command = new GovernorateCommand { Name = model.NewGovernorate.Name };
+                        var saveResult = await _serviceGovernorate.SaveAsync(command, existingResult.Value.Id);
                         if (saveResult.IsSuccess)
-                            SessionMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbMsgUpdatedOk);
+                            Flash.Success(Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbMsgUpdatedOk);
                         else
-                            SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbMsgNotUpdatedOk);
+                            Flash.Error(Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbMsgNotUpdatedOk);
                     }
                 }
             }
 
             return RedirectToAction(nameof(Governorates));
-        }
-
-        private void SessionMsg(string MsgType, string Title, string Msg)
-        {
-            HttpContext.Session.SetString(Helper.MsgType, MsgType);
-            HttpContext.Session.SetString(Helper.Title, Title);
-            HttpContext.Session.SetString(Helper.Msg, Msg);
         }
     }
 }

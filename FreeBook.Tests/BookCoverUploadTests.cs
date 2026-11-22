@@ -1,5 +1,3 @@
-using System.Text;
-using Domin.Entity;
 using FreeBook.Areas.Admin.Controllers;
 using FreeBook.Resources;
 using Infrastructure.Common;
@@ -7,7 +5,6 @@ using Infrastructure.Common.Interfaces;
 using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Moq;
@@ -19,14 +16,15 @@ public class BookCoverUploadTests
     [Fact]
     public async Task Save_WithValidCover_UploadsImageAndStoresCloudinaryFields()
     {
-        var books = new Mock<IServiceRepository<Book>>();
+        var books = new Mock<IServiceRepository<BookDto, BookCommand>>();
         var images = new Mock<IImageService>();
-        Book? saved = null;
+        var flash = new Mock<IFlashMessageService>();
+        BookCommand? saved = null;
 
         books.Setup(x => x.FindByAsync(It.IsAny<string>()))
-            .ReturnsAsync(Result.Success<Book?>(null));
-        books.Setup(x => x.SaveAsync(It.IsAny<Book>()))
-            .Callback<Book>(book => saved = book)
+            .ReturnsAsync(Result.Success<BookDto?>(null));
+        books.Setup(x => x.SaveAsync(It.IsAny<BookCommand>(), It.IsAny<Guid?>()))
+            .Callback<BookCommand, Guid?>((book, _) => saved = book)
             .ReturnsAsync(Result.Success(true));
         images.Setup(x => x.UploadAsync(It.IsAny<IFormFile>(), "books"))
             .ReturnsAsync(new ImageUploadResult
@@ -37,7 +35,7 @@ public class BookCoverUploadTests
                 ThumbnailUrl = "https://res.cloudinary.com/demo/image/upload/c_fill,w_200,h_200/bookify/books/new-cover.jpg"
             });
 
-        var (controller, session) = CreateController(books, images);
+        var controller = CreateController(books, images, flash);
         var model = CreateModel();
         model.NewBook.CoverImage = CreateFile("cover.png");
 
@@ -49,57 +47,58 @@ public class BookCoverUploadTests
         Assert.Equal("bookify/books/new-cover", saved!.ImagePublicId);
         Assert.Equal("https://res.cloudinary.com/demo/image/upload/bookify/books/new-cover.jpg", saved.ImageUrl);
         Assert.Contains("c_fill,w_200,h_200", saved.ImageThumbnailUrl);
-        Assert.Equal(Helper.Success, session.GetString(Helper.MsgType));
+        flash.Verify(x => x.Success(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+        flash.Verify(x => x.Error(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
     }
 
     [Fact]
     public async Task Save_WithInvalidCoverExtension_DoesNotUploadOrSave()
     {
-        var books = new Mock<IServiceRepository<Book>>();
+        var books = new Mock<IServiceRepository<BookDto, BookCommand>>();
         var images = new Mock<IImageService>();
-        var (controller, session) = CreateController(books, images);
+        var flash = new Mock<IFlashMessageService>();
+        var controller = CreateController(books, images, flash);
         var model = CreateModel();
         model.NewBook.CoverImage = CreateFile("cover.txt");
 
         var result = await controller.Save(model);
 
         Assert.IsType<RedirectToActionResult>(result);
-        Assert.Equal(Helper.Error, session.GetString(Helper.MsgType));
-        Assert.Equal("msgCoverImageInvalid", session.GetString(Helper.Msg));
+        flash.Verify(x => x.Error(It.IsAny<string>(), "msgCoverImageInvalid"), Times.Once);
         images.Verify(x => x.UploadAsync(It.IsAny<IFormFile>(), It.IsAny<string>()), Times.Never);
         images.Verify(x => x.DeleteAsync(It.IsAny<string>()), Times.Never);
-        books.Verify(x => x.SaveAsync(It.IsAny<Book>()), Times.Never);
+        books.Verify(x => x.SaveAsync(It.IsAny<BookCommand>(), It.IsAny<Guid?>()), Times.Never);
     }
 
     [Fact]
     public async Task Save_WhenCloudinaryUploadFails_DoesNotSaveBook()
     {
-        var books = new Mock<IServiceRepository<Book>>();
+        var books = new Mock<IServiceRepository<BookDto, BookCommand>>();
         var images = new Mock<IImageService>();
+        var flash = new Mock<IFlashMessageService>();
         books.Setup(x => x.FindByAsync(It.IsAny<string>()))
-            .ReturnsAsync(Result.Success<Book?>(null));
+            .ReturnsAsync(Result.Success<BookDto?>(null));
         images.Setup(x => x.UploadAsync(It.IsAny<IFormFile>(), "books"))
             .ReturnsAsync(new ImageUploadResult { Success = false, Error = "Cloudinary unavailable" });
 
-        var (controller, session) = CreateController(books, images);
+        var controller = CreateController(books, images, flash);
         var model = CreateModel();
         model.NewBook.CoverImage = CreateFile("cover.png");
 
         var result = await controller.Save(model);
 
         Assert.IsType<RedirectToActionResult>(result);
-        Assert.Equal(Helper.Error, session.GetString(Helper.MsgType));
-        Assert.Equal("msgCoverImageUploadFailed", session.GetString(Helper.Msg));
-        books.Verify(x => x.SaveAsync(It.IsAny<Book>()), Times.Never);
+        flash.Verify(x => x.Error(It.IsAny<string>(), "msgCoverImageUploadFailed"), Times.Once);
+        books.Verify(x => x.SaveAsync(It.IsAny<BookCommand>(), It.IsAny<Guid?>()), Times.Never);
     }
 
     [Fact]
     public async Task Save_ReplaceCover_DeletesOldImageOnlyAfterSuccessfulSave()
     {
-        var books = new Mock<IServiceRepository<Book>>();
+        var books = new Mock<IServiceRepository<BookDto, BookCommand>>();
         var images = new Mock<IImageService>();
         var events = new List<string>();
-        var existing = new Book
+        var existing = new BookDto
         {
             Id = Guid.NewGuid(),
             Name = "Clean Code",
@@ -108,12 +107,12 @@ public class BookCoverUploadTests
         };
 
         books.Setup(x => x.FindByAsync(existing.Name))
-            .ReturnsAsync(Result.Success<Book?>(existing));
+            .ReturnsAsync(Result.Success<BookDto?>(existing));
         books.Setup(x => x.FindByIdAsync(existing.Id))
-            .ReturnsAsync(Result.Success<Book?>(existing));
+            .ReturnsAsync(Result.Success<BookDto?>(existing));
         books.Setup(x => x.GetAllAsync())
-            .ReturnsAsync(Result.Success(new List<Book> { existing }));
-        books.Setup(x => x.SaveAsync(It.IsAny<Book>()))
+            .ReturnsAsync(Result.Success(new List<BookDto> { existing }));
+        books.Setup(x => x.SaveAsync(It.IsAny<BookCommand>(), It.IsAny<Guid?>()))
             .Callback(() => events.Add("save"))
             .ReturnsAsync(Result.Success(true));
         images.Setup(x => x.UploadAsync(It.IsAny<IFormFile>(), "books"))
@@ -129,7 +128,7 @@ public class BookCoverUploadTests
             .Callback(() => events.Add("delete-old"))
             .Returns(Task.CompletedTask);
 
-        var (controller, _) = CreateController(books, images);
+        var controller = CreateController(books, images, new Mock<IFlashMessageService>());
         var model = CreateModel(existing.Name);
         model.NewBook.BookId = existing.Id.ToString();
         model.NewBook.AuthorId = existing.AuthorId;
@@ -144,16 +143,16 @@ public class BookCoverUploadTests
     [Fact]
     public async Task Save_ReplaceCover_KeepsOldImageWhenAnotherBookUsesIt()
     {
-        var books = new Mock<IServiceRepository<Book>>();
+        var books = new Mock<IServiceRepository<BookDto, BookCommand>>();
         var images = new Mock<IImageService>();
-        var existing = new Book
+        var existing = new BookDto
         {
             Id = Guid.NewGuid(),
             Name = "Clean Code",
             AuthorId = Guid.NewGuid(),
             ImagePublicId = "bookify/books/shared-cover"
         };
-        var other = new Book
+        var other = new BookDto
         {
             Id = Guid.NewGuid(),
             Name = "Clean Architecture",
@@ -162,12 +161,12 @@ public class BookCoverUploadTests
         };
 
         books.Setup(x => x.FindByAsync(existing.Name))
-            .ReturnsAsync(Result.Success<Book?>(existing));
+            .ReturnsAsync(Result.Success<BookDto?>(existing));
         books.Setup(x => x.FindByIdAsync(existing.Id))
-            .ReturnsAsync(Result.Success<Book?>(existing));
+            .ReturnsAsync(Result.Success<BookDto?>(existing));
         books.Setup(x => x.GetAllAsync())
-            .ReturnsAsync(Result.Success(new List<Book> { existing, other }));
-        books.Setup(x => x.SaveAsync(It.IsAny<Book>()))
+            .ReturnsAsync(Result.Success(new List<BookDto> { existing, other }));
+        books.Setup(x => x.SaveAsync(It.IsAny<BookCommand>(), It.IsAny<Guid?>()))
             .ReturnsAsync(Result.Success(true));
         images.Setup(x => x.UploadAsync(It.IsAny<IFormFile>(), "books"))
             .ReturnsAsync(new ImageUploadResult
@@ -178,7 +177,7 @@ public class BookCoverUploadTests
                 ThumbnailUrl = string.Empty
             });
 
-        var (controller, _) = CreateController(books, images);
+        var controller = CreateController(books, images, new Mock<IFlashMessageService>());
         var model = CreateModel(existing.Name);
         model.NewBook.BookId = existing.Id.ToString();
         model.NewBook.AuthorId = existing.AuthorId;
@@ -192,11 +191,12 @@ public class BookCoverUploadTests
     [Fact]
     public async Task Save_WhenSaveFails_DeletesNewlyUploadedImage()
     {
-        var books = new Mock<IServiceRepository<Book>>();
+        var books = new Mock<IServiceRepository<BookDto, BookCommand>>();
         var images = new Mock<IImageService>();
+        var flash = new Mock<IFlashMessageService>();
         books.Setup(x => x.FindByAsync(It.IsAny<string>()))
-            .ReturnsAsync(Result.Success<Book?>(null));
-        books.Setup(x => x.SaveAsync(It.IsAny<Book>()))
+            .ReturnsAsync(Result.Success<BookDto?>(null));
+        books.Setup(x => x.SaveAsync(It.IsAny<BookCommand>(), It.IsAny<Guid?>()))
             .ReturnsAsync(Result.Failure<bool>("SAVE_ERROR", "Database unavailable"));
         images.Setup(x => x.UploadAsync(It.IsAny<IFormFile>(), "books"))
             .ReturnsAsync(new ImageUploadResult
@@ -207,40 +207,36 @@ public class BookCoverUploadTests
                 ThumbnailUrl = string.Empty
             });
 
-        var (controller, session) = CreateController(books, images);
+        var controller = CreateController(books, images, flash);
         var model = CreateModel();
         model.NewBook.CoverImage = CreateFile("cover.png");
 
         await controller.Save(model);
 
         images.Verify(x => x.DeleteAsync("bookify/books/new-cover"), Times.Once);
-        Assert.Equal(Helper.Error, session.GetString(Helper.MsgType));
+        flash.Verify(x => x.Error(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
     }
 
-    private static (BooksController Controller, TestSession Session) CreateController(
-        Mock<IServiceRepository<Book>> books,
-        Mock<IImageService> images)
+    private static BooksController CreateController(
+        Mock<IServiceRepository<BookDto, BookCommand>> books,
+        Mock<IImageService> images,
+        Mock<IFlashMessageService> flash)
     {
         var localizer = new Mock<IStringLocalizer<ResourceWeb>>();
         localizer.Setup(x => x[It.IsAny<string>()])
             .Returns((string key) => new LocalizedString(key, key));
 
-        var session = new TestSession();
-        var httpContext = new DefaultHttpContext();
-        httpContext.Features.Set<ISessionFeature>(new TestSessionFeature { Session = session });
-
-        var controller = new BooksController(
+        return new BooksController(
             books.Object,
-            Mock.Of<IServiceRepository<Author>>(),
-            Mock.Of<IServiceRepository<Category>>(),
-            Mock.Of<IServiceRepository<SubCategory>>(),
+            Mock.Of<IServiceRepository<AuthorDto, AuthorCommand>>(),
+            Mock.Of<IServiceRepository<CategoryDto, CategoryCommand>>(),
+            Mock.Of<IServiceRepository<SubCategoryDto, SubCategoryCommand>>(),
             images.Object,
-            localizer.Object)
+            localizer.Object,
+            flash.Object)
         {
-            ControllerContext = new ControllerContext { HttpContext = httpContext }
+            ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() }
         };
-
-        return (controller, session);
     }
 
     private static BookViewModel CreateModel(string name = "Clean Code") => new()
@@ -264,34 +260,5 @@ public class BookCoverUploadTests
             Headers = new HeaderDictionary(),
             ContentType = "image/png"
         };
-    }
-
-    private sealed class TestSessionFeature : ISessionFeature
-    {
-        public ISession Session { get; set; } = default!;
-    }
-
-    private sealed class TestSession : ISession
-    {
-        private readonly Dictionary<string, byte[]> _values = new();
-
-        public bool IsAvailable => true;
-        public string Id { get; } = Guid.NewGuid().ToString();
-        public IEnumerable<string> Keys => _values.Keys;
-
-        public void Clear() => _values.Clear();
-
-        public Task CommitAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
-
-        public Task LoadAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
-
-        public void Remove(string key) => _values.Remove(key);
-
-        public void Set(string key, byte[] value) => _values[key] = value;
-
-        public bool TryGetValue(string key, out byte[] value) => _values.TryGetValue(key, out value!);
-
-        public string? GetString(string key) =>
-            _values.TryGetValue(key, out var value) ? Encoding.UTF8.GetString(value) : null;
     }
 }

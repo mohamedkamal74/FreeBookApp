@@ -1,11 +1,12 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using Domin.Entity;
 using Hangfire;
-using Infrastructure.Common;
 using Infrastructure.Common.Configuration;
 using Infrastructure.Common.Interfaces;
 using Infrastructure.IRepository;
+using Infrastructure.ViewModel;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -15,7 +16,7 @@ namespace FreeBook.Jobs
     public class FineCalculationJob
     {
         private readonly IRentalRepository _rentalRepo;
-        private readonly IServiceRepository<Subscriber> _subscriberRepo;
+        private readonly IServiceRepository<SubscriberDto, SubscriberCommand> _subscriberRepo;
         private readonly INotificationRepository _notificationRepo;
         private readonly IEmailService _emailService;
         private readonly ISmsService _smsService;
@@ -24,7 +25,7 @@ namespace FreeBook.Jobs
 
         public FineCalculationJob(
             IRentalRepository rentalRepo,
-            IServiceRepository<Subscriber> subscriberRepo,
+            IServiceRepository<SubscriberDto, SubscriberCommand> subscriberRepo,
             INotificationRepository notificationRepo,
             IEmailService emailService,
             ISmsService smsService,
@@ -53,7 +54,7 @@ namespace FreeBook.Jobs
                     return;
                 }
 
-                var overdueRentals = overdueResult.Value ?? new List<Rental>();
+                var overdueRentals = overdueResult.Value ?? new List<RentalDto>();
                 var now = DateTime.UtcNow;
                 int finesApplied = 0;
 
@@ -68,7 +69,9 @@ namespace FreeBook.Jobs
                         if (fine > _fineSettings.MaxFinePerBook) fine = _fineSettings.MaxFinePerBook;
 
                         rental.TotalFine = (rental.TotalFine ?? 0) + fine;
-                        var saveResult = await _rentalRepo.SaveAsync(rental);
+                        var command = ToCommand(rental);
+                        command.TotalFine = rental.TotalFine;
+                        var saveResult = await _rentalRepo.SaveAsync(command, rental.Id);
                         if (!saveResult.IsSuccess)
                         {
                             _logger.LogWarning("Failed to save rental {RentalId}: {Error}", rental.Id, saveResult.Error?.Message);
@@ -82,9 +85,9 @@ namespace FreeBook.Jobs
                             var subscriber = subscriberResult.Value;
                             var bookTitle = copy.BookCopy?.Book?.Name;
 
-                            var saved = await _notificationRepo.UpsertAsync(new Notification
+                            var saved = await _notificationRepo.UpsertAsync(new NotificationCommand
                             {
-                                Type = NotificationType.FineApplied,
+                                Type = NotificationKindDto.FineApplied,
                                 DedupeKey = $"fine:{rental.Id}:{copy.BookCopyId}",
                                 SubscriberName = subscriber.FullName,
                                 BookTitle = bookTitle,
@@ -111,6 +114,31 @@ namespace FreeBook.Jobs
                 _logger.LogError(ex, "Error in fine calculation job");
                 throw;
             }
+        }
+
+        private static RentalCommand ToCommand(RentalDto rental)
+        {
+            var command = new RentalCommand
+            {
+                SubscriberId = rental.SubscriberId,
+                StartDate = rental.StartDate,
+                PenaltyPaid = rental.PenaltyPaid,
+                TotalFine = rental.TotalFine
+            };
+
+            foreach (var copy in rental.RentalCopies)
+            {
+                command.RentalCopies.Add(new RentalCopyCommand
+                {
+                    BookCopyId = copy.BookCopyId,
+                    RentalDate = copy.RentalDate,
+                    EndDate = copy.EndDate,
+                    ReturnDate = copy.ReturnDate,
+                    ExtendedOn = copy.ExtendedOn
+                });
+            }
+
+            return command;
         }
     }
 }

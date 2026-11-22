@@ -180,47 +180,49 @@ public class BooksDashboardReportTests : IClassFixture<CustomWebApplicationFacto
     private async Task<(Guid Id, string Name, string SubCategoryName)> SeedBookWithCopiesAsync()
     {
         using var scope = _factory.Services.CreateScope();
-        var authors = scope.ServiceProvider.GetRequiredService<IServiceRepository<Author>>();
-        var categories = scope.ServiceProvider.GetRequiredService<IServiceRepository<Category>>();
-        var subCategories = scope.ServiceProvider.GetRequiredService<IServiceRepository<SubCategory>>();
-        var books = scope.ServiceProvider.GetRequiredService<IServiceRepository<Book>>();
-        var copies = scope.ServiceProvider.GetRequiredService<IServiceRepository<BookCopy>>();
+        var authors = scope.ServiceProvider.GetRequiredService<IServiceRepository<AuthorDto, AuthorCommand>>();
+        var categories = scope.ServiceProvider.GetRequiredService<IServiceRepository<CategoryDto, CategoryCommand>>();
+        var subCategories = scope.ServiceProvider.GetRequiredService<IServiceRepository<SubCategoryDto, SubCategoryCommand>>();
+        var books = scope.ServiceProvider.GetRequiredService<IServiceRepository<BookDto, BookCommand>>();
+        var copies = scope.ServiceProvider.GetRequiredService<IServiceRepository<BookCopyDto, BookCopyCommand>>();
 
-        var author = new Author { Name = $"Books Dashboard Author {Guid.NewGuid():N}" };
-        Assert.True((await authors.SaveAsync(author)).IsSuccess);
+        var authorName = $"Books Dashboard Author {Guid.NewGuid():N}";
+        Assert.True((await authors.SaveAsync(new AuthorCommand { Name = authorName })).IsSuccess);
+        var authorId = (await authors.FindByAsync(authorName)).Value!.Id;
 
-        var category = new Category { Name = $"Books Dashboard Category {Guid.NewGuid():N}" };
-        Assert.True((await categories.SaveAsync(category)).IsSuccess);
+        var categoryName = $"Books Dashboard Category {Guid.NewGuid():N}";
+        Assert.True((await categories.SaveAsync(new CategoryCommand { Name = categoryName })).IsSuccess);
+        var categoryId = (await categories.FindByAsync(categoryName)).Value!.Id;
 
         var subCategoryName = $"Books Dashboard Subcategory {Guid.NewGuid():N}";
-        var subCategory = new SubCategory
+        Assert.True((await subCategories.SaveAsync(new SubCategoryCommand
         {
             Name = subCategoryName,
-            CategoryId = category.Id,
-            Currentstate = (int)Helper.ECurrentState.Active
-        };
-        Assert.True((await subCategories.SaveAsync(subCategory)).IsSuccess);
+            CategoryId = categoryId
+        })).IsSuccess);
+        var subCategoryId = (await subCategories.FindByAsync(subCategoryName)).Value!.Id;
 
-        var book = new Book
+        var bookName = $"Books Dashboard Book {Guid.NewGuid():N}";
+        Assert.True((await books.SaveAsync(new BookCommand
         {
-            Name = $"Books Dashboard Book {Guid.NewGuid():N}",
-            AuthorId = author.Id,
-            CategoryId = category.Id,
-            SubCategoryId = subCategory.Id,
+            Name = bookName,
+            AuthorId = authorId,
+            CategoryId = categoryId,
+            SubCategoryId = subCategoryId,
             Publisher = "Test Press",
             Hall = "A1",
             IsAvailableForRental = true
-        };
-        Assert.True((await books.SaveAsync(book)).IsSuccess);
+        })).IsSuccess);
+        var book = (await books.FindByAsync(bookName)).Value!;
 
-        Assert.True((await copies.SaveAsync(new BookCopy
+        Assert.True((await copies.SaveAsync(new BookCopyCommand
         {
             BookId = book.Id,
             EditionNumber = 1,
             SerialNumber = 1,
             IsAvailableForRental = true
         })).IsSuccess);
-        Assert.True((await copies.SaveAsync(new BookCopy
+        Assert.True((await copies.SaveAsync(new BookCopyCommand
         {
             BookId = book.Id,
             EditionNumber = 2,

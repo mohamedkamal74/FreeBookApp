@@ -1,0 +1,18 @@
+@using System.Text.Json
+@using Infrastructure.Common.Interfaces
+@inject IFlashMessageService Flash
+@inject IStringLocalizer<ResourceWeb> Localizer
+@{
+    var message = Flash.Consume();
+}
+@if (message is not null)
+{
+    <script>
+        Swal.fire({
+            icon: '@(message.Type == FlashMessageDto.SuccessType ? "success" : "error")',
+            title: @Html.Raw(JsonSerializer.Serialize(message.Title)),
+            text: @Html.Raw(JsonSerializer.Serialize(message.Text)),
+            confirmButtonText: @Html.Raw(JsonSerializer.Serialize(Localizer["lbOk"].Value))
+        });
+    </script>
+}

@@ -1,6 +1,6 @@
-using Domin.Entity;
 using FreeBook.Resources;
 using Infrastructure.Common;
+using Infrastructure.Common.Interfaces;
 using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Authorization;
@@ -9,22 +9,25 @@ using Microsoft.Extensions.Localization;
 
 namespace FreeBook.Areas.Admin.Controllers
 {
-    [Area(Helper.Admin)]
+    [Area(Domin.Entity.Helper.Admin)]
     [Authorize(Roles = "Admin")]
     public class AreasController : Controller
     {
-        private readonly IServiceRepository<Area> _serviceArea;
-        private readonly IServiceRepository<Governorate> _serviceGovernorate;
+        private readonly IServiceRepository<AreaDto, AreaCommand> _serviceArea;
+        private readonly IServiceRepository<GovernorateDto, GovernorateCommand> _serviceGovernorate;
         private readonly IStringLocalizer<ResourceWeb> _localizer;
+        private IFlashMessageService Flash { get; }
 
         public AreasController(
-            IServiceRepository<Area> serviceArea,
-            IServiceRepository<Governorate> serviceGovernorate,
-            IStringLocalizer<ResourceWeb> localizer)
+            IServiceRepository<AreaDto, AreaCommand> serviceArea,
+            IServiceRepository<GovernorateDto, GovernorateCommand> serviceGovernorate,
+            IStringLocalizer<ResourceWeb> localizer,
+            IFlashMessageService flash)
         {
             _serviceArea = serviceArea;
             _serviceGovernorate = serviceGovernorate;
             _localizer = localizer;
+            Flash = flash;
         }
 
         public async Task<IActionResult> Areas(AreaViewModel model)
@@ -33,8 +36,8 @@ namespace FreeBook.Areas.Admin.Controllers
             var govResult = await _serviceGovernorate.GetAllAsync();
             return View(new AreaViewModel
             {
-                Areas = areasResult.IsSuccess ? areasResult.Value ?? new List<Area>() : new List<Area>(),
-                Governorates = govResult.IsSuccess ? govResult.Value ?? new List<Governorate>() : new List<Governorate>(),
+                Areas = areasResult.IsSuccess ? areasResult.Value ?? new List<AreaDto>() : new List<AreaDto>(),
+                Governorates = govResult.IsSuccess ? govResult.Value ?? new List<GovernorateDto>() : new List<GovernorateDto>(),
                 NewArea = new NewArea()
             });
         }
@@ -46,7 +49,7 @@ namespace FreeBook.Areas.Admin.Controllers
             var result = await _serviceArea.DeleteAsync(Id);
             if (result.IsSuccess)
                 return RedirectToAction(nameof(Areas));
-            SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, result.Error?.Message ?? _localizer["msgAreaHasSubscribers"]);
+            Flash.Error(Resources.ResourceWeb.lbNotSave, result.Error?.Message ?? _localizer["msgAreaHasSubscribers"]);
             return RedirectToAction(nameof(Areas));
         }
 
@@ -57,17 +60,16 @@ namespace FreeBook.Areas.Admin.Controllers
             if (model.NewArea.AreaId == null || model.NewArea.AreaId == Guid.Empty.ToString())
             {
                 // create
-                var newArea = new Area
+                var command = new AreaCommand
                 {
-                    Id = Guid.NewGuid(),
                     Name = model.NewArea.Name,
                     GovernorateId = model.NewArea.GovernorateId
                 };
-                var saveResult = await _serviceArea.SaveAsync(newArea);
+                var saveResult = await _serviceArea.SaveAsync(command);
                 if (saveResult.IsSuccess)
-                    SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbMsgSavedOk);
+                    Flash.Success(Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbMsgSavedOk);
                 else
-                    SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSavedOk);
+                    Flash.Error(Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSavedOk);
             }
             else
             {
@@ -75,24 +77,20 @@ namespace FreeBook.Areas.Admin.Controllers
                 var existingResult = await _serviceArea.FindByIdAsync(Guid.Parse(model.NewArea.AreaId));
                 if (existingResult.IsSuccess && existingResult.Value is not null)
                 {
-                    existingResult.Value.Name = model.NewArea.Name;
-                    existingResult.Value.GovernorateId = model.NewArea.GovernorateId;
-                    var saveResult = await _serviceArea.SaveAsync(existingResult.Value);
+                    var command = new AreaCommand
+                    {
+                        Name = model.NewArea.Name,
+                        GovernorateId = model.NewArea.GovernorateId
+                    };
+                    var saveResult = await _serviceArea.SaveAsync(command, existingResult.Value.Id);
                     if (saveResult.IsSuccess)
-                        SessionMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbMsgUpdatedOk);
+                        Flash.Success(Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbMsgUpdatedOk);
                     else
-                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbMsgNotUpdatedOk);
+                        Flash.Error(Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbMsgNotUpdatedOk);
                 }
             }
 
             return RedirectToAction(nameof(Areas));
-        }
-
-        private void SessionMsg(string MsgType, string Title, string Msg)
-        {
-            HttpContext.Session.SetString(Helper.MsgType, MsgType);
-            HttpContext.Session.SetString(Helper.Title, Title);
-            HttpContext.Session.SetString(Helper.Msg, Msg);
         }
     }
 }

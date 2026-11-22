@@ -1,40 +1,40 @@
-@model List<Notification>
+@model List<Infrastructure.ViewModel.NotificationDto>
 @inject IStringLocalizer<ResourceWeb> Localizer
 @{
-    string TypeLabel(Notification n) => n.Type switch
+    string TypeLabel(Infrastructure.ViewModel.NotificationDto n) => n.Type switch
     {
-        NotificationType.SubscriptionExpiring => Localizer["lbNotificationTypeExpiring"].Value,
-        NotificationType.RentalOverdue => Localizer["lbNotificationTypeOverdue"].Value,
-        NotificationType.FineApplied => Localizer["lbNotificationTypeFine"].Value,
+        Infrastructure.ViewModel.NotificationKindDto.SubscriptionExpiring => Localizer["lbNotificationTypeExpiring"].Value,
+        Infrastructure.ViewModel.NotificationKindDto.RentalOverdue => Localizer["lbNotificationTypeOverdue"].Value,
+        Infrastructure.ViewModel.NotificationKindDto.FineApplied => Localizer["lbNotificationTypeFine"].Value,
         _ => string.Empty
     };
 
-    string TypeIcon(Notification n) => n.Type switch
+    string TypeIcon(Infrastructure.ViewModel.NotificationDto n) => n.Type switch
     {
-        NotificationType.SubscriptionExpiring => "fas fa-clock",
-        NotificationType.RentalOverdue => "fas fa-book",
-        NotificationType.FineApplied => "fas fa-receipt",
+        Infrastructure.ViewModel.NotificationKindDto.SubscriptionExpiring => "fas fa-clock",
+        Infrastructure.ViewModel.NotificationKindDto.RentalOverdue => "fas fa-book",
+        Infrastructure.ViewModel.NotificationKindDto.FineApplied => "fas fa-receipt",
         _ => "fas fa-bell"
     };
 
-    string TypeBadge(Notification n) => n.Type switch
+    string TypeBadge(Infrastructure.ViewModel.NotificationDto n) => n.Type switch
     {
-        NotificationType.SubscriptionExpiring => "badge-primary",
-        NotificationType.RentalOverdue => "badge-warning",
-        NotificationType.FineApplied => "badge-danger",
+        Infrastructure.ViewModel.NotificationKindDto.SubscriptionExpiring => "badge-primary",
+        Infrastructure.ViewModel.NotificationKindDto.RentalOverdue => "badge-warning",
+        Infrastructure.ViewModel.NotificationKindDto.FineApplied => "badge-danger",
         _ => "badge-secondary"
     };
 
-    string MessageFor(Notification n)
+    string MessageFor(Infrastructure.ViewModel.NotificationDto n)
     {
         var amount = n.Amount.HasValue ? $"{n.Amount.Value:F2} USD" : string.Empty;
         return n.Type switch
         {
-            NotificationType.SubscriptionExpiring =>
+            Infrastructure.ViewModel.NotificationKindDto.SubscriptionExpiring =>
                 Localizer["lbNotificationSubscriptionExpiring", n.SubscriberName, n.Days ?? 0].Value,
-            NotificationType.RentalOverdue =>
+            Infrastructure.ViewModel.NotificationKindDto.RentalOverdue =>
                 Localizer["lbNotificationRentalOverdue", n.SubscriberName, n.BookTitle ?? "-", n.Days ?? 0].Value,
-            NotificationType.FineApplied =>
+            Infrastructure.ViewModel.NotificationKindDto.FineApplied =>
                 Localizer["lbNotificationFineApplied", n.SubscriberName, n.BookTitle ?? "-", n.Days ?? 0, amount].Value,
             _ => n.SubscriberName
         };

@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Domin.Entity;
 using Infrastructure.Common;
 using Infrastructure.Data;
+using Infrastructure.IRepository;
+using Infrastructure.ViewModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -21,7 +23,7 @@ namespace Infrastructure.IRepository.ServiceRepository
             _logger = logger;
         }
 
-        public async Task<Result<List<Author>>> GetAllActiveAsync()
+        public async Task<Result<List<AuthorDto>>> GetAllActiveAsync()
         {
             try
             {
@@ -29,28 +31,28 @@ namespace Infrastructure.IRepository.ServiceRepository
                     .Where(x => !x.IsDeleted)
                     .OrderBy(x => x.Name)
                     .ToListAsync();
-                return Result.Success(authors);
+                return Result.Success(authors.Select(CrudMapping.ToDto).ToList());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting all active authors");
-                return Result.Failure<List<Author>>("GET_ALL_ERROR", "Failed to get authors", ex.Message);
+                return Result.Failure<List<AuthorDto>>("GET_ALL_ERROR", "Failed to get authors", ex.Message);
             }
         }
 
-        public async Task<Result<Author?>> FindByNameAsync(string name)
+        public async Task<Result<AuthorDto?>> FindByNameAsync(string name)
         {
             try
             {
                 var trimmed = name.Trim();
                 var author = await _context.Authors
                     .FirstOrDefaultAsync(x => x.Name.Equals(trimmed) && !x.IsDeleted);
-                return Result.Success(author);
+                return Result.Success<AuthorDto?>(author is null ? null : CrudMapping.ToDto(author));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error finding author by name {Name}", name);
-                return Result.Failure<Author?>("FIND_ERROR", "Failed to find author", ex.Message);
+                return Result.Failure<AuthorDto?>("FIND_ERROR", "Failed to find author", ex.Message);
             }
         }
 
@@ -58,12 +60,13 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             try
             {
-                var result = await FindByIdAsync(id);
-                if (!result.IsSuccess || result.Value is null)
+                var author = await _context.Authors
+                    .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
+                if (author is null)
                     return Result.Failure<bool>("NOT_FOUND", $"Author with id {id} not found");
 
-                result.Value.IsDeleted = true;
-                _context.Authors.Update(result.Value);
+                author.IsDeleted = true;
+                _context.Authors.Update(author);
                 await _context.SaveChangesAsync();
                 return Result.Success(true);
             }
@@ -74,27 +77,27 @@ namespace Infrastructure.IRepository.ServiceRepository
             }
         }
 
-        public async Task<Result<Author?>> FindByAsync(string name)
+        public async Task<Result<AuthorDto?>> FindByAsync(string name)
         {
             return await FindByNameAsync(name);
         }
 
-        public async Task<Result<Author?>> FindByIdAsync(Guid id)
+        public async Task<Result<AuthorDto?>> FindByIdAsync(Guid id)
         {
             try
             {
                 var author = await _context.Authors
                     .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
-                return Result.Success(author);
+                return Result.Success<AuthorDto?>(author is null ? null : CrudMapping.ToDto(author));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error finding author by id {Id}", id);
-                return Result.Failure<Author?>("FIND_ERROR", "Failed to find author", ex.Message);
+                return Result.Failure<AuthorDto?>("FIND_ERROR", "Failed to find author", ex.Message);
             }
         }
 
-        public async Task<Result<List<Author>>> GetAllAsync()
+        public async Task<Result<List<AuthorDto>>> GetAllAsync()
         {
             try
             {
@@ -102,34 +105,39 @@ namespace Infrastructure.IRepository.ServiceRepository
                     .Where(x => !x.IsDeleted)
                     .OrderBy(x => x.Name)
                     .ToListAsync();
-                return Result.Success(authors);
+                return Result.Success(authors.Select(CrudMapping.ToDto).ToList());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting all authors");
-                return Result.Failure<List<Author>>("GET_ALL_ERROR", "Failed to get authors", ex.Message);
+                return Result.Failure<List<AuthorDto>>("GET_ALL_ERROR", "Failed to get authors", ex.Message);
             }
         }
 
-        public async Task<Result<bool>> SaveAsync(Author model)
+        public async Task<Result<bool>> SaveAsync(AuthorCommand command, Guid? id = null)
         {
             try
             {
-                var result = await FindByIdAsync(model.Id);
-                if (!result.IsSuccess)
-                    return Result.Failure<bool>("FIND_ERROR", "Failed to check existing author");
-
-                if (result.Value is null)
+                if (id is null || id == Guid.Empty)
                 {
-                    model.Id = Guid.NewGuid();
-                    model.CreatedOn = DateTime.UtcNow;
-                    _context.Authors.Add(model);
+                    var author = new Author
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = command.Name,
+                        CreatedOn = DateTime.UtcNow
+                    };
+                    _context.Authors.Add(author);
                 }
                 else
                 {
-                    result.Value.Name = model.Name;
-                    result.Value.LastUpdatedOn = DateTime.UtcNow;
-                    _context.Authors.Update(result.Value);
+                    var author = await _context.Authors
+                        .FirstOrDefaultAsync(x => x.Id == id.Value && !x.IsDeleted);
+                    if (author is null)
+                        return Result.Failure<bool>("NOT_FOUND", $"Author with id {id} not found");
+
+                    author.Name = command.Name;
+                    author.LastUpdatedOn = DateTime.UtcNow;
+                    _context.Authors.Update(author);
                 }
 
                 await _context.SaveChangesAsync();
@@ -137,7 +145,7 @@ namespace Infrastructure.IRepository.ServiceRepository
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error saving author {Id}", model.Id);
+                _logger.LogError(ex, "Error saving author {Id}", id);
                 return Result.Failure<bool>("SAVE_ERROR", "Failed to save author", ex.Message);
             }
         }

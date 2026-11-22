@@ -5,12 +5,14 @@ using System.Threading.Tasks;
 using Domin.Entity;
 using Infrastructure.Common;
 using Infrastructure.Data;
+using Infrastructure.IRepository;
+using Infrastructure.ViewModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.IRepository.ServiceRepository
 {
-    public class ServicesBookCopy : IServiceRepository<BookCopy>
+    public class ServicesBookCopy : IServiceRepository<BookCopyDto, BookCopyCommand>
     {
         private readonly FreeBookDbContext _context;
         private readonly ILogger<ServicesBookCopy> _logger;
@@ -25,11 +27,12 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             try
             {
-                var result = await FindByIdAsync(id);
-                if (!result.IsSuccess || result.Value is null)
+                var bookCopy = await _context.BookCopies
+                    .FirstOrDefaultAsync(x => x.Id == id);
+                if (bookCopy is null)
                     return Result.Failure<bool>("NOT_FOUND", $"BookCopy with id {id} not found");
 
-                _context.BookCopies.Remove(result.Value);
+                _context.BookCopies.Remove(bookCopy);
                 await _context.SaveChangesAsync();
                 return Result.Success(true);
             }
@@ -40,7 +43,7 @@ namespace Infrastructure.IRepository.ServiceRepository
             }
         }
 
-        public async Task<Result<BookCopy?>> FindByAsync(string name)
+        public async Task<Result<BookCopyDto?>> FindByAsync(string name)
         {
             try
             {
@@ -48,32 +51,32 @@ namespace Infrastructure.IRepository.ServiceRepository
                 var bookCopy = await _context.BookCopies
                     .Include(x => x.Book)
                     .FirstOrDefaultAsync(x => x.Book != null && x.Book.Name.Equals(trimmed));
-                return Result.Success(bookCopy);
+                return Result.Success<BookCopyDto?>(bookCopy is null ? null : CrudMapping.ToDto(bookCopy));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error finding book copy by name {Name}", name);
-                return Result.Failure<BookCopy?>("FIND_ERROR", "Failed to find book copy", ex.Message);
+                return Result.Failure<BookCopyDto?>("FIND_ERROR", "Failed to find book copy", ex.Message);
             }
         }
 
-        public async Task<Result<BookCopy?>> FindByIdAsync(Guid id)
+        public async Task<Result<BookCopyDto?>> FindByIdAsync(Guid id)
         {
             try
             {
                 var bookCopy = await _context.BookCopies
                     .Include(x => x.Book)
                     .FirstOrDefaultAsync(x => x.Id == id);
-                return Result.Success(bookCopy);
+                return Result.Success<BookCopyDto?>(bookCopy is null ? null : CrudMapping.ToDto(bookCopy));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error finding book copy by id {Id}", id);
-                return Result.Failure<BookCopy?>("FIND_ERROR", "Failed to find book copy", ex.Message);
+                return Result.Failure<BookCopyDto?>("FIND_ERROR", "Failed to find book copy", ex.Message);
             }
         }
 
-        public async Task<Result<List<BookCopy>>> GetAllAsync()
+        public async Task<Result<List<BookCopyDto>>> GetAllAsync()
         {
             try
             {
@@ -81,35 +84,43 @@ namespace Infrastructure.IRepository.ServiceRepository
                     .Include(x => x.Book)
                     .OrderBy(x => x.Book != null ? x.Book.Name : "")
                     .ToListAsync();
-                return Result.Success(bookCopies);
+                return Result.Success(bookCopies.Select(CrudMapping.ToDto).ToList());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting all book copies");
-                return Result.Failure<List<BookCopy>>("GET_ALL_ERROR", "Failed to get book copies", ex.Message);
+                return Result.Failure<List<BookCopyDto>>("GET_ALL_ERROR", "Failed to get book copies", ex.Message);
             }
         }
 
-        public async Task<Result<bool>> SaveAsync(BookCopy model)
+        public async Task<Result<bool>> SaveAsync(BookCopyCommand command, Guid? id = null)
         {
             try
             {
-                var result = await FindByIdAsync(model.Id);
-                if (!result.IsSuccess)
-                    return Result.Failure<bool>("FIND_ERROR", "Failed to check existing book copy");
-
-                if (result.Value is null)
+                if (id is null || id == Guid.Empty)
                 {
-                    model.Id = Guid.NewGuid();
-                    _context.BookCopies.Add(model);
+                    var bookCopy = new BookCopy
+                    {
+                        Id = Guid.NewGuid(),
+                        BookId = command.BookId,
+                        IsAvailableForRental = command.IsAvailableForRental,
+                        EditionNumber = command.EditionNumber,
+                        SerialNumber = command.SerialNumber
+                    };
+                    _context.BookCopies.Add(bookCopy);
                 }
                 else
                 {
-                    result.Value.BookId = model.BookId;
-                    result.Value.EditionNumber = model.EditionNumber;
-                    result.Value.SerialNumber = model.SerialNumber;
-                    result.Value.IsAvailableForRental = model.IsAvailableForRental;
-                    _context.BookCopies.Update(result.Value);
+                    var bookCopy = await _context.BookCopies
+                        .FirstOrDefaultAsync(x => x.Id == id.Value);
+                    if (bookCopy is null)
+                        return Result.Failure<bool>("NOT_FOUND", $"BookCopy with id {id} not found");
+
+                    bookCopy.BookId = command.BookId;
+                    bookCopy.IsAvailableForRental = command.IsAvailableForRental;
+                    bookCopy.EditionNumber = command.EditionNumber;
+                    bookCopy.SerialNumber = command.SerialNumber;
+                    _context.BookCopies.Update(bookCopy);
                 }
 
                 await _context.SaveChangesAsync();
@@ -117,7 +128,7 @@ namespace Infrastructure.IRepository.ServiceRepository
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error saving book copy {Id}", model.Id);
+                _logger.LogError(ex, "Error saving book copy {Id}", id);
                 return Result.Failure<bool>("SAVE_ERROR", "Failed to save book copy", ex.Message);
             }
         }

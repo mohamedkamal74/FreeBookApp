@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Domin.Entity;
 using Domin.Resources;
 using Infrastructure.ViewModel;
 
@@ -12,7 +11,7 @@ namespace Infrastructure.ViewModel
 {
     public class AuthorViewModel
     {
-        public List<Author> Authors { get; set; } = new();
+        public List<AuthorDto> Authors { get; set; } = new();
         public NewAuthor NewAuthor { get; set; } = new();
     }
 

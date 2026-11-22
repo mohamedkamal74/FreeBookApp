@@ -1,5 +1,5 @@
-using Domin.Entity;
 using Infrastructure.Common;
+using Infrastructure.Common.Interfaces;
 using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Authorization;
@@ -8,22 +8,25 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FreeBook.Areas.Admin.Controllers
 {
-    [Area(Helper.Admin)]
+    [Area(Domin.Entity.Helper.Admin)]
     [Authorize(Roles = "Admin")]
     public class SubscriptionsController : Controller
     {
-        private readonly IServiceRepository<Subscription> _serviceSubscription;
-        private readonly IServiceRepository<Subscriber> _serviceSubscriber;
+        private readonly ISubscriptionRepository _serviceSubscription;
+        private readonly IServiceRepository<SubscriberDto, SubscriberCommand> _serviceSubscriber;
         private readonly UserManager<ApplicationUser> _userManager;
+        private IFlashMessageService Flash { get; }
 
         public SubscriptionsController(
-            IServiceRepository<Subscription> serviceSubscription,
-            IServiceRepository<Subscriber> serviceSubscriber,
-            UserManager<ApplicationUser> userManager)
+            ISubscriptionRepository serviceSubscription,
+            IServiceRepository<SubscriberDto, SubscriberCommand> serviceSubscriber,
+            UserManager<ApplicationUser> userManager,
+            IFlashMessageService flash)
         {
             _serviceSubscription = serviceSubscription;
             _serviceSubscriber = serviceSubscriber;
             _userManager = userManager;
+            Flash = flash;
         }
 
         public async Task<IActionResult> Subscriptions(SubscriptionViewModel model)
@@ -32,8 +35,8 @@ namespace FreeBook.Areas.Admin.Controllers
             var subsResult2 = await _serviceSubscriber.GetAllAsync();
             return View(new SubscriptionViewModel
             {
-                Subscriptions = subsResult.IsSuccess ? subsResult.Value ?? new List<Subscription>() : new List<Subscription>(),
-                Subscribers = subsResult2.IsSuccess ? subsResult2.Value ?? new List<Subscriber>() : new List<Subscriber>(),
+                Subscriptions = subsResult.IsSuccess ? subsResult.Value ?? new List<SubscriptionDto>() : new List<SubscriptionDto>(),
+                Subscribers = subsResult2.IsSuccess ? subsResult2.Value ?? new List<SubscriberDto>() : new List<SubscriberDto>(),
                 NewSubscription = new NewSubscription()
             });
         }
@@ -59,20 +62,18 @@ namespace FreeBook.Areas.Admin.Controllers
             if (model.NewSubscription.SubscriptionId == null || model.NewSubscription.SubscriptionId == Guid.Empty.ToString())
             {
                 // create
-                var newSubscription = new Subscription
+                var command = new SubscriptionCommand
                 {
-                    Id = Guid.NewGuid(),
                     SubscriberId = model.NewSubscription.SubscriberId,
                     StartDate = model.NewSubscription.StartDate,
                     EndDate = model.NewSubscription.EndDate,
-                    CreatedById = userId,
-                    CreatedOn = DateTime.UtcNow
+                    CreatedById = userId
                 };
-                var saveResult = await _serviceSubscription.SaveAsync(newSubscription);
+                var saveResult = await _serviceSubscription.SaveAsync(command);
                 if (saveResult.IsSuccess)
-                    SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbMsgSavedOk);
+                    Flash.Success(Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbMsgSavedOk);
                 else
-                    SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSavedOk);
+                    Flash.Error(Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSavedOk);
             }
             else
             {
@@ -80,26 +81,22 @@ namespace FreeBook.Areas.Admin.Controllers
                 var existingResult = await _serviceSubscription.FindByIdAsync(Guid.Parse(model.NewSubscription.SubscriptionId));
                 if (existingResult.IsSuccess && existingResult.Value is not null)
                 {
-                    existingResult.Value.SubscriberId = model.NewSubscription.SubscriberId;
-                    existingResult.Value.StartDate = model.NewSubscription.StartDate;
-                    existingResult.Value.EndDate = model.NewSubscription.EndDate;
-                    existingResult.Value.CreatedById = userId;
-                    var saveResult = await _serviceSubscription.SaveAsync(existingResult.Value);
+                    var command = new SubscriptionCommand
+                    {
+                        SubscriberId = model.NewSubscription.SubscriberId,
+                        StartDate = model.NewSubscription.StartDate,
+                        EndDate = model.NewSubscription.EndDate,
+                        CreatedById = userId
+                    };
+                    var saveResult = await _serviceSubscription.SaveAsync(command, existingResult.Value.Id);
                     if (saveResult.IsSuccess)
-                        SessionMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbMsgUpdatedOk);
+                        Flash.Success(Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbMsgUpdatedOk);
                     else
-                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbMsgNotUpdatedOk);
+                        Flash.Error(Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbMsgNotUpdatedOk);
                 }
             }
 
             return RedirectToAction(nameof(Subscriptions));
-        }
-
-        private void SessionMsg(string MsgType, string Title, string Msg)
-        {
-            HttpContext.Session.SetString(Helper.MsgType, MsgType);
-            HttpContext.Session.SetString(Helper.Title, Title);
-            HttpContext.Session.SetString(Helper.Msg, Msg);
         }
     }
 }

@@ -316,6 +316,8 @@
     <script src="~/Admin/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
     <!-- Sweetalert -->
     <script src="~/Admin/plugins/sweetalert2/sweetalert2.all.min.js"></script>
+    <!-- One-shot CRUD feedback rendered from a FlashMessageDto in TempData -->
+    @await Html.PartialAsync("_FlashMessage")
     <!-- Include a polyfill for ES6 Promises (optional) for IE11 -->
     <!-- filter -->
     <script src="~/Admin/plugins/isotope/isotope.pkgd.min.js"></script>

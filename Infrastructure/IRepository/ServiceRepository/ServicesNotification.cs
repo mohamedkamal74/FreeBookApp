@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Domin.Entity;
 using Infrastructure.Common;
 using Infrastructure.Data;
+using Infrastructure.IRepository;
+using Infrastructure.ViewModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -21,7 +23,7 @@ namespace Infrastructure.IRepository.ServiceRepository
             _logger = logger;
         }
 
-        public async Task<Result<List<Notification>>> GetRecentAsync(int take = 50)
+        public async Task<Result<List<NotificationDto>>> GetRecentAsync(int take = 50)
         {
             try
             {
@@ -31,12 +33,12 @@ namespace Infrastructure.IRepository.ServiceRepository
                     .ThenByDescending(x => x.CreatedOn)
                     .Take(take)
                     .ToListAsync();
-                return Result.Success(notifications);
+                return Result.Success(notifications.Select(CrudMapping.ToDto).ToList());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting recent notifications");
-                return Result.Failure<List<Notification>>("GET_NOTIFICATIONS_ERROR", "Failed to get notifications", ex.Message);
+                return Result.Failure<List<NotificationDto>>("GET_NOTIFICATIONS_ERROR", "Failed to get notifications", ex.Message);
             }
         }
 
@@ -54,34 +56,45 @@ namespace Infrastructure.IRepository.ServiceRepository
             }
         }
 
-        public async Task<Result<bool>> UpsertAsync(Notification notification)
+        public async Task<Result<bool>> UpsertAsync(NotificationCommand command)
         {
             try
             {
                 var existing = await _context.Notifications
-                    .SingleOrDefaultAsync(x => x.DedupeKey == notification.DedupeKey);
+                    .SingleOrDefaultAsync(x => x.DedupeKey == command.DedupeKey);
 
                 if (existing is null)
                 {
-                    _context.Notifications.Add(notification);
+                    _context.Notifications.Add(new Notification
+                    {
+                        Id = Guid.NewGuid(),
+                        Type = CrudMapping.ToEntity(command.Type),
+                        DedupeKey = command.DedupeKey,
+                        SubscriberName = command.SubscriberName,
+                        BookTitle = command.BookTitle,
+                        Days = command.Days,
+                        Amount = command.Amount,
+                        TargetUrl = command.TargetUrl,
+                        CreatedOn = DateTime.UtcNow
+                    });
                     await _context.SaveChangesAsync();
                     return Result.Success(true);
                 }
 
                 // Keep the original CreatedOn and read state; only refresh the
                 // mutable event details so a re-run never floods the list.
-                existing.Type = notification.Type;
-                existing.SubscriberName = notification.SubscriberName;
-                existing.BookTitle = notification.BookTitle;
-                existing.Days = notification.Days;
-                existing.Amount = notification.Amount;
-                existing.TargetUrl = notification.TargetUrl;
+                existing.Type = CrudMapping.ToEntity(command.Type);
+                existing.SubscriberName = command.SubscriberName;
+                existing.BookTitle = command.BookTitle;
+                existing.Days = command.Days;
+                existing.Amount = command.Amount;
+                existing.TargetUrl = command.TargetUrl;
                 await _context.SaveChangesAsync();
                 return Result.Success(false);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error saving notification {Key}", notification.DedupeKey);
+                _logger.LogError(ex, "Error saving notification {Key}", command.DedupeKey);
                 return Result.Failure<bool>("SAVE_NOTIFICATION_ERROR", "Failed to save notification", ex.Message);
             }
         }

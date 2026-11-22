@@ -5,12 +5,14 @@ using System.Threading.Tasks;
 using Domin.Entity;
 using Infrastructure.Common;
 using Infrastructure.Data;
+using Infrastructure.IRepository;
+using Infrastructure.ViewModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.IRepository.ServiceRepository
 {
-    public class ServiceLogCategory : IServiceRepositoryLog<LogCategory>
+    public class ServiceLogCategory : IServiceRepositoryLog<LogCategoryDto>
     {
         private readonly FreeBookDbContext _context;
         private readonly ILogger<ServiceLogCategory> _logger;
@@ -30,11 +32,12 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             try
             {
-                var result = await FindByIdAsync(id);
-                if (!result.IsSuccess || result.Value is null)
+                var logCategory = await _context.Logcategories
+                    .FirstOrDefaultAsync(x => x.Id == id);
+                if (logCategory is null)
                     return Result.Failure<bool>("NOT_FOUND", $"LogCategory with id {id} not found");
 
-                _context.Logcategories.Remove(result.Value);
+                _context.Logcategories.Remove(logCategory);
                 await _context.SaveChangesAsync();
                 return Result.Success(true);
             }
@@ -45,23 +48,23 @@ namespace Infrastructure.IRepository.ServiceRepository
             }
         }
 
-        public async Task<Result<LogCategory?>> FindByIdAsync(Guid id)
+        public async Task<Result<LogCategoryDto?>> FindByIdAsync(Guid id)
         {
             try
             {
                 var logCategory = await _context.Logcategories
                     .Include(x => x.category)
                     .FirstOrDefaultAsync(x => x.Id == id);
-                return Result.Success(logCategory);
+                return Result.Success<LogCategoryDto?>(logCategory is null ? null : CrudMapping.ToDto(logCategory));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error finding log category by id {Id}", id);
-                return Result.Failure<LogCategory?>("FIND_ERROR", "Failed to find log category", ex.Message);
+                return Result.Failure<LogCategoryDto?>("FIND_ERROR", "Failed to find log category", ex.Message);
             }
         }
 
-        public async Task<Result<List<LogCategory>>> GetAllAsync()
+        public async Task<Result<List<LogCategoryDto>>> GetAllAsync()
         {
             try
             {
@@ -69,12 +72,12 @@ namespace Infrastructure.IRepository.ServiceRepository
                     .Include(x => x.category)
                     .OrderByDescending(x => x.Date)
                     .ToListAsync();
-                return Result.Success(logCategories);
+                return Result.Success(logCategories.Select(CrudMapping.ToDto).ToList());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting all log categories");
-                return Result.Failure<List<LogCategory>>("GET_ALL_ERROR", "Failed to get log categories", ex.Message);
+                return Result.Failure<List<LogCategoryDto>>("GET_ALL_ERROR", "Failed to get log categories", ex.Message);
             }
         }
 

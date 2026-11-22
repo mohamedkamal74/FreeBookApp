@@ -153,10 +153,10 @@ public class WebAppTests : IClassFixture<CustomWebApplicationFactory>
         Guid authorId;
         using (var scope = _factory.Services.CreateScope())
         {
-            var authors = scope.ServiceProvider.GetRequiredService<IServiceRepository<Author>>();
-            var author = new Author { Name = $"Test Author {Guid.NewGuid():N}" };
-            Assert.True((await authors.SaveAsync(author)).IsSuccess);
-            authorId = author.Id;
+            var authors = scope.ServiceProvider.GetRequiredService<IServiceRepository<AuthorDto, AuthorCommand>>();
+            var authorName = $"Test Author {Guid.NewGuid():N}";
+            Assert.True((await authors.SaveAsync(new AuthorCommand { Name = authorName })).IsSuccess);
+            authorId = (await authors.FindByAsync(authorName)).Value!.Id;
         }
 
         var client = _factory.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
@@ -207,10 +207,10 @@ public class WebAppTests : IClassFixture<CustomWebApplicationFactory>
         Guid authorId;
         using (var scope = _factory.Services.CreateScope())
         {
-            var authors = scope.ServiceProvider.GetRequiredService<IServiceRepository<Author>>();
-            var author = new Author { Name = $"Test Author {Guid.NewGuid():N}" };
-            Assert.True((await authors.SaveAsync(author)).IsSuccess);
-            authorId = author.Id;
+            var authors = scope.ServiceProvider.GetRequiredService<IServiceRepository<AuthorDto, AuthorCommand>>();
+            var authorName = $"Test Author {Guid.NewGuid():N}";
+            Assert.True((await authors.SaveAsync(new AuthorCommand { Name = authorName })).IsSuccess);
+            authorId = (await authors.FindByAsync(authorName)).Value!.Id;
         }
 
         var client = _factory.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
@@ -250,6 +250,9 @@ public class WebAppTests : IClassFixture<CustomWebApplicationFactory>
 
         var afterDuplicate = await client.GetStringAsync("/Admin/Books/Books?culture=en");
         Assert.Contains("This name already exists!", afterDuplicate);
+
+        var afterFlashConsumed = await client.GetStringAsync("/Admin/Books/Books?culture=en");
+        Assert.DoesNotContain("This name already exists!", afterFlashConsumed);
     }
 
     private async Task LoginAsync(HttpClient client)

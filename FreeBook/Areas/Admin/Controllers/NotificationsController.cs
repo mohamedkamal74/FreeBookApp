@@ -1,14 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Domin.Entity;
+using Infrastructure.Common;
 using Infrastructure.IRepository;
+using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FreeBook.Areas.Admin.Controllers
 {
-    [Area(Helper.Admin)]
+    [Area(Domin.Entity.Helper.Admin)]
     [Authorize(Roles = "Admin")]
     public class NotificationsController : Controller
     {
@@ -26,9 +27,9 @@ namespace FreeBook.Areas.Admin.Controllers
             if (!result.IsSuccess)
             {
                 TempData["NotificationError"] = result.Error?.Message;
-                return View(new List<Notification>());
+                return View(new List<NotificationDto>());
             }
-            return View(result.Value ?? new List<Notification>());
+            return View(result.Value ?? new List<NotificationDto>());
         }
 
         [HttpPost]

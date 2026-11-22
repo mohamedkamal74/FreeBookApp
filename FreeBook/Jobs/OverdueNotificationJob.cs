@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Domin.Entity;
 using Hangfire;
-using Infrastructure.Common;
 using Infrastructure.Common.Interfaces;
 using Infrastructure.IRepository;
+using Infrastructure.ViewModel;
 using Microsoft.Extensions.Logging;
 
 namespace FreeBook.Jobs
@@ -15,7 +14,7 @@ namespace FreeBook.Jobs
     public class OverdueNotificationJob
     {
         private readonly IRentalRepository _rentalRepo;
-        private readonly IServiceRepository<Subscriber> _subscriberRepo;
+        private readonly IServiceRepository<SubscriberDto, SubscriberCommand> _subscriberRepo;
         private readonly INotificationRepository _notificationRepo;
         private readonly IEmailService _emailService;
         private readonly ISmsService _smsService;
@@ -23,7 +22,7 @@ namespace FreeBook.Jobs
 
         public OverdueNotificationJob(
             IRentalRepository rentalRepo,
-            IServiceRepository<Subscriber> subscriberRepo,
+            IServiceRepository<SubscriberDto, SubscriberCommand> subscriberRepo,
             INotificationRepository notificationRepo,
             IEmailService emailService,
             ISmsService smsService,
@@ -50,7 +49,7 @@ namespace FreeBook.Jobs
                     return;
                 }
 
-                var overdue = overdueResult.Value ?? new List<Rental>();
+                var overdue = overdueResult.Value ?? new List<RentalDto>();
                 int notificationsSent = 0;
 
                 foreach (var rental in overdue)
@@ -66,9 +65,9 @@ namespace FreeBook.Jobs
                         _logger.LogInformation("Overdue notification for {Subscriber}: {BookTitle} ({Days} days overdue)",
                             subscriber.FullName, bookTitle, daysOverdue);
 
-                        var saved = await _notificationRepo.UpsertAsync(new Notification
+                        var saved = await _notificationRepo.UpsertAsync(new NotificationCommand
                         {
-                            Type = NotificationType.RentalOverdue,
+                            Type = NotificationKindDto.RentalOverdue,
                             DedupeKey = $"overdue:{rental.Id}:{copy.BookCopyId}",
                             SubscriberName = subscriber.FullName,
                             BookTitle = bookTitle,

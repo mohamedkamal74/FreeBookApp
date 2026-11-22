@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Domin.Entity;
 using Hangfire;
-using Infrastructure.Common;
 using Infrastructure.Common.Interfaces;
 using Infrastructure.IRepository;
+using Infrastructure.ViewModel;
 using Microsoft.Extensions.Logging;
 
 namespace FreeBook.Jobs
@@ -15,7 +13,7 @@ namespace FreeBook.Jobs
     public class ExpiryCheckJob
     {
         private readonly ISubscriptionRepository _subRepo;
-        private readonly IServiceRepository<Subscriber> _subscriberRepo;
+        private readonly IServiceRepository<SubscriberDto, SubscriberCommand> _subscriberRepo;
         private readonly INotificationRepository _notificationRepo;
         private readonly IEmailService _emailService;
         private readonly ISmsService _smsService;
@@ -23,7 +21,7 @@ namespace FreeBook.Jobs
 
         public ExpiryCheckJob(
             ISubscriptionRepository subRepo,
-            IServiceRepository<Subscriber> subscriberRepo,
+            IServiceRepository<SubscriberDto, SubscriberCommand> subscriberRepo,
             INotificationRepository notificationRepo,
             IEmailService emailService,
             ISmsService smsService,
@@ -55,7 +53,7 @@ namespace FreeBook.Jobs
                 var now = DateTime.UtcNow;
                 int notificationsSent = 0;
 
-                foreach (var sub in expiringResult.Value ?? new List<Subscription>())
+                foreach (var sub in expiringResult.Value ?? new List<SubscriptionDto>())
                 {
                     var daysLeft = Math.Max(0, (sub.EndDate.Date - now.Date).Days);
                     if (daysLeft > 7) continue;
@@ -68,9 +66,9 @@ namespace FreeBook.Jobs
                     var subscriber = subscriberResult.Value;
                     _logger.LogInformation("Subscription expiring for {Subscriber} in {Days} days", subscriber.FullName, daysLeft);
 
-                    var saved = await _notificationRepo.UpsertAsync(new Notification
+                    var saved = await _notificationRepo.UpsertAsync(new NotificationCommand
                     {
-                        Type = NotificationType.SubscriptionExpiring,
+                        Type = NotificationKindDto.SubscriptionExpiring,
                         DedupeKey = $"sub:{sub.Id}:{stage}",
                         SubscriberName = subscriber.FullName,
                         Days = stage,

@@ -5,12 +5,14 @@ using System.Threading.Tasks;
 using Domin.Entity;
 using Infrastructure.Common;
 using Infrastructure.Data;
+using Infrastructure.IRepository;
+using Infrastructure.ViewModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.IRepository.ServiceRepository
 {
-    public class ServicesCategory : IServiceRepository<Category>
+    public class ServicesCategory : IServiceRepository<CategoryDto, CategoryCommand>
     {
         private readonly FreeBookDbContext _context;
         private readonly ILogger<ServicesCategory> _logger;
@@ -25,12 +27,13 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             try
             {
-                var result = await FindByIdAsync(id);
-                if (!result.IsSuccess || result.Value is null)
+                var category = await _context.categories
+                    .FirstOrDefaultAsync(x => x.Id == id && x.Currentstste > 0);
+                if (category is null)
                     return Result.Failure<bool>("NOT_FOUND", $"Category with id {id} not found");
 
-                result.Value.Currentstste = (int)Helper.ECurrentState.Delete;
-                _context.categories.Update(result.Value);
+                category.Currentstste = (int)Helper.ECurrentState.Delete;
+                _context.categories.Update(category);
                 await _context.SaveChangesAsync();
                 return Result.Success(true);
             }
@@ -41,38 +44,38 @@ namespace Infrastructure.IRepository.ServiceRepository
             }
         }
 
-        public async Task<Result<Category?>> FindByAsync(string name)
+        public async Task<Result<CategoryDto?>> FindByAsync(string name)
         {
             try
             {
                 var trimmed = name.Trim();
                 var category = await _context.categories
                     .FirstOrDefaultAsync(x => x.Name.Equals(trimmed) && x.Currentstste > 0);
-                return Result.Success(category);
+                return Result.Success<CategoryDto?>(category is null ? null : CrudMapping.ToDto(category));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error finding category by name {Name}", name);
-                return Result.Failure<Category?>("FIND_ERROR", "Failed to find category", ex.Message);
+                return Result.Failure<CategoryDto?>("FIND_ERROR", "Failed to find category", ex.Message);
             }
         }
 
-        public async Task<Result<Category?>> FindByIdAsync(Guid id)
+        public async Task<Result<CategoryDto?>> FindByIdAsync(Guid id)
         {
             try
             {
                 var category = await _context.categories
                     .FirstOrDefaultAsync(x => x.Id == id && x.Currentstste > 0);
-                return Result.Success(category);
+                return Result.Success<CategoryDto?>(category is null ? null : CrudMapping.ToDto(category));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error finding category by id {Id}", id);
-                return Result.Failure<Category?>("FIND_ERROR", "Failed to find category", ex.Message);
+                return Result.Failure<CategoryDto?>("FIND_ERROR", "Failed to find category", ex.Message);
             }
         }
 
-        public async Task<Result<List<Category>>> GetAllAsync()
+        public async Task<Result<List<CategoryDto>>> GetAllAsync()
         {
             try
             {
@@ -80,35 +83,41 @@ namespace Infrastructure.IRepository.ServiceRepository
                     .OrderBy(x => x.Name)
                     .Where(x => x.Currentstste > 0)
                     .ToListAsync();
-                return Result.Success(categories);
+                return Result.Success(categories.Select(CrudMapping.ToDto).ToList());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting all categories");
-                return Result.Failure<List<Category>>("GET_ALL_ERROR", "Failed to get categories", ex.Message);
+                return Result.Failure<List<CategoryDto>>("GET_ALL_ERROR", "Failed to get categories", ex.Message);
             }
         }
 
-        public async Task<Result<bool>> SaveAsync(Category model)
+        public async Task<Result<bool>> SaveAsync(CategoryCommand command, Guid? id = null)
         {
             try
             {
-                var result = await FindByIdAsync(model.Id);
-                if (!result.IsSuccess)
-                    return Result.Failure<bool>("FIND_ERROR", "Failed to check existing category");
-
-                if (result.Value is null)
+                if (id is null || id == Guid.Empty)
                 {
-                    model.Id = Guid.NewGuid();
-                    model.Currentstste = (int)Helper.ECurrentState.Active;
-                    _context.categories.Add(model);
+                    var category = new Category
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = command.Name,
+                        Description = command.Description,
+                        Currentstste = (int)Helper.ECurrentState.Active
+                    };
+                    _context.categories.Add(category);
                 }
                 else
                 {
-                    result.Value.Name = model.Name;
-                    result.Value.Description = model.Description;
-                    result.Value.Currentstste = (int)Helper.ECurrentState.Active;
-                    _context.categories.Update(result.Value);
+                    var category = await _context.categories
+                        .FirstOrDefaultAsync(x => x.Id == id.Value && x.Currentstste > 0);
+                    if (category is null)
+                        return Result.Failure<bool>("NOT_FOUND", $"Category with id {id} not found");
+
+                    category.Name = command.Name;
+                    category.Description = command.Description;
+                    category.Currentstste = (int)Helper.ECurrentState.Active;
+                    _context.categories.Update(category);
                 }
 
                 await _context.SaveChangesAsync();
@@ -116,7 +125,7 @@ namespace Infrastructure.IRepository.ServiceRepository
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error saving category {Id}", model.Id);
+                _logger.LogError(ex, "Error saving category {Id}", id);
                 return Result.Failure<bool>("SAVE_ERROR", "Failed to save category", ex.Message);
             }
         }

@@ -1,5 +1,5 @@
-using Domin.Entity;
 using Infrastructure.Common;
+using Infrastructure.Common.Interfaces;
 using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Authorization;
@@ -8,22 +8,27 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FreeBook.Areas.Admin.Controllers
 {
-    [Area(Helper.Admin)]
+    [Area(Domin.Entity.Helper.Admin)]
     [Authorize(Roles = "Admin,User")]
     public class CategoriesController : Controller
     {
-        private readonly IServiceRepository<Category> _serviceCategory;
-        private readonly IServiceRepositoryLog<LogCategory> _serviceCategoryLog;
+        private readonly IServiceRepository<CategoryDto, CategoryCommand> _serviceCategory;
+        private readonly IServiceRepositoryLog<LogCategoryDto> _serviceCategoryLog;
         private readonly UserManager<ApplicationUser> _userManager;
+        private IFlashMessageService Flash { get; }
 
-        public CategoriesController(IServiceRepository<Category> serviceCategory,
-          IServiceRepositoryLog<LogCategory> serviceCategoryLog,
-          UserManager<ApplicationUser> userManager)
+        public CategoriesController(
+          IServiceRepository<CategoryDto, CategoryCommand> serviceCategory,
+          IServiceRepositoryLog<LogCategoryDto> serviceCategoryLog,
+          UserManager<ApplicationUser> userManager,
+          IFlashMessageService flash)
         {
             _serviceCategory = serviceCategory;
             _serviceCategoryLog = serviceCategoryLog;
             _userManager = userManager;
+            Flash = flash;
         }
+
         public async Task<IActionResult> Categories(CategoryViewModel model)
         {
             var categoriesResult = await _serviceCategory.GetAllAsync();
@@ -31,9 +36,9 @@ namespace FreeBook.Areas.Admin.Controllers
 
             return View(new CategoryViewModel
             {
-                Categories = categoriesResult.IsSuccess ? categoriesResult.Value ?? new List<Category>() : new List<Category>(),
-                LogCategories = logCategoriesResult.IsSuccess ? logCategoriesResult.Value ?? new List<LogCategory>() : new List<LogCategory>(),
-                NewCategory = new Category()
+                Categories = categoriesResult.IsSuccess ? categoriesResult.Value ?? new List<CategoryDto>() : new List<CategoryDto>(),
+                LogCategories = logCategoriesResult.IsSuccess ? logCategoriesResult.Value ?? new List<LogCategoryDto>() : new List<LogCategoryDto>(),
+                NewCategory = new NewCategory()
             });
         }
 
@@ -80,38 +85,30 @@ namespace FreeBook.Areas.Admin.Controllers
                 // create
                 var findResult = await _serviceCategory.FindByAsync(model.NewCategory.Name);
                 if (findResult.IsSuccess && findResult.Value != null)
-                    SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDupplicateNameCategory);
+                    Flash.Error(Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDupplicateNameCategory);
                 else
                 {
-                    var saveResult = await _serviceCategory.SaveAsync(model.NewCategory);
+                    var saveResult = await _serviceCategory.SaveAsync(model.NewCategory, null);
                     var logResult = await _serviceCategoryLog.SaveAsync(model.NewCategory.Id, Guid.Parse(userId));
                     if (saveResult.IsSuccess && logResult.IsSuccess)
-                        SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbSaveMsgCategory);
+                        Flash.Success(Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbSaveMsgCategory);
                     else
-                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSaveCategory);
+                        Flash.Error(Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSaveCategory);
                 }
-
             }
             else
             {
                 // update
-                var saveResult = await _serviceCategory.SaveAsync(model.NewCategory);
+                Guid? id = model.NewCategory.Id;
+                var saveResult = await _serviceCategory.SaveAsync(model.NewCategory, id);
                 var logResult = await _serviceCategoryLog.UpdateAsync(model.NewCategory.Id, Guid.Parse(userId));
                 if (saveResult.IsSuccess && logResult.IsSuccess)
-                    SessionMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbUpdateMsgCategory);
+                    Flash.Success(Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbUpdateMsgCategory);
                 else
-                    SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbMsgNotUpdateCategory);
+                    Flash.Error(Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbMsgNotUpdateCategory);
             }
 
             return RedirectToAction(nameof(Categories));
-        }
-
-
-        private void SessionMsg(string MsgType, string Title, string Msg)
-        {
-            HttpContext.Session.SetString(Helper.MsgType, MsgType);
-            HttpContext.Session.SetString(Helper.Title, Title);
-            HttpContext.Session.SetString(Helper.Msg, Msg);
         }
     }
 }

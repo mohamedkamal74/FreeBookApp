@@ -6,6 +6,7 @@ using Infrastructure.Common.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.IRepository;
 using Infrastructure.IRepository.ServiceRepository;
+using Infrastructure.ViewModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -20,7 +21,7 @@ public class NotificationJobTests
             .UseInMemoryDatabase($"FreeBookJobNotifications_{Guid.NewGuid():N}")
             .Options);
 
-    private static Subscriber NewSubscriber() => new()
+    private static SubscriberDto NewSubscriber() => new()
     {
         Id = Guid.NewGuid(),
         FirstName = "Ahmed",
@@ -38,7 +39,7 @@ public class NotificationJobTests
         using var context = CreateContext();
         var notificationRepo = new ServicesNotification(context, Mock.Of<ILogger<ServicesNotification>>());
         var subscriber = NewSubscriber();
-        var subscription = new Subscription
+        var subscription = new SubscriptionDto
         {
             Id = Guid.NewGuid(),
             SubscriberId = subscriber.Id,
@@ -47,10 +48,10 @@ public class NotificationJobTests
 
         var subRepo = new Mock<ISubscriptionRepository>();
         subRepo.Setup(x => x.GetExpiringSubscriptionsAsync(7))
-            .ReturnsAsync(Result.Success(new List<Subscription> { subscription }));
-        var subscriberRepo = new Mock<IServiceRepository<Subscriber>>();
+            .ReturnsAsync(Result.Success(new List<SubscriptionDto> { subscription }));
+        var subscriberRepo = new Mock<IServiceRepository<SubscriberDto, SubscriberCommand>>();
         subscriberRepo.Setup(x => x.FindByIdAsync(subscriber.Id))
-            .ReturnsAsync(Result.Success<Subscriber?>(subscriber));
+            .ReturnsAsync(Result.Success<SubscriberDto?>(subscriber));
 
         var job = new ExpiryCheckJob(subRepo.Object, subscriberRepo.Object, notificationRepo,
             Mock.Of<IEmailService>(), Mock.Of<ISmsService>(), Mock.Of<ILogger<ExpiryCheckJob>>());
@@ -71,7 +72,7 @@ public class NotificationJobTests
         using var context = CreateContext();
         var notificationRepo = new ServicesNotification(context, Mock.Of<ILogger<ServicesNotification>>());
         var subscriber = NewSubscriber();
-        var subscription = new Subscription
+        var subscription = new SubscriptionDto
         {
             Id = Guid.NewGuid(),
             SubscriberId = subscriber.Id,
@@ -80,10 +81,10 @@ public class NotificationJobTests
 
         var subRepo = new Mock<ISubscriptionRepository>();
         subRepo.Setup(x => x.GetExpiringSubscriptionsAsync(7))
-            .ReturnsAsync(Result.Success(new List<Subscription> { subscription }));
-        var subscriberRepo = new Mock<IServiceRepository<Subscriber>>();
+            .ReturnsAsync(Result.Success(new List<SubscriptionDto> { subscription }));
+        var subscriberRepo = new Mock<IServiceRepository<SubscriberDto, SubscriberCommand>>();
         subscriberRepo.Setup(x => x.FindByIdAsync(subscriber.Id))
-            .ReturnsAsync(Result.Success<Subscriber?>(subscriber));
+            .ReturnsAsync(Result.Success<SubscriberDto?>(subscriber));
 
         var job = new ExpiryCheckJob(subRepo.Object, subscriberRepo.Object, notificationRepo,
             Mock.Of<IEmailService>(), Mock.Of<ISmsService>(), Mock.Of<ILogger<ExpiryCheckJob>>());
@@ -95,30 +96,25 @@ public class NotificationJobTests
         Assert.Equal(1, stored.Days);
     }
 
-    private static Rental NewOverdueRental(Subscriber subscriber, out Guid copyId)
+    private static RentalDto NewOverdueRental(SubscriberDto subscriber, out Guid copyId)
     {
         copyId = Guid.NewGuid();
-        var book = new Book { Id = Guid.NewGuid(), Name = "Clean Code" };
-        var copy = new BookCopy
-        {
-            Id = copyId,
-            BookId = book.Id,
-            Book = book,
-            EditionNumber = 1,
-            SerialNumber = 1
-        };
-        return new Rental
+        return new RentalDto
         {
             Id = Guid.NewGuid(),
             SubscriberId = subscriber.Id,
             StartDate = DateTime.UtcNow.AddDays(-20),
-            RentalCopies = new List<RentalCopy>
+            RentalCopies = new List<RentalCopyDto>
             {
                 new()
                 {
                     RentalId = Guid.Empty,
                     BookCopyId = copyId,
-                    BookCopy = copy,
+                    BookCopy = new BookCopyDto
+                    {
+                        Id = copyId,
+                        Book = new BookDto { Id = Guid.NewGuid(), Name = "Clean Code" }
+                    },
                     EndDate = DateTime.UtcNow.AddDays(-4)
                 }
             }
@@ -135,10 +131,10 @@ public class NotificationJobTests
 
         var rentalRepo = new Mock<IRentalRepository>();
         rentalRepo.Setup(x => x.GetOverdueRentalsAsync())
-            .ReturnsAsync(Result.Success(new List<Rental> { rental }));
-        var subscriberRepo = new Mock<IServiceRepository<Subscriber>>();
+            .ReturnsAsync(Result.Success(new List<RentalDto> { rental }));
+        var subscriberRepo = new Mock<IServiceRepository<SubscriberDto, SubscriberCommand>>();
         subscriberRepo.Setup(x => x.FindByIdAsync(subscriber.Id))
-            .ReturnsAsync(Result.Success<Subscriber?>(subscriber));
+            .ReturnsAsync(Result.Success<SubscriberDto?>(subscriber));
 
         var job = new OverdueNotificationJob(rentalRepo.Object, subscriberRepo.Object, notificationRepo,
             Mock.Of<IEmailService>(), Mock.Of<ISmsService>(), Mock.Of<ILogger<OverdueNotificationJob>>());
@@ -162,13 +158,16 @@ public class NotificationJobTests
         var rental = NewOverdueRental(subscriber, out var copyId);
         rental.TotalFine = 0;
 
+        RentalCommand? savedCommand = null;
         var rentalRepo = new Mock<IRentalRepository>();
         rentalRepo.Setup(x => x.GetOverdueRentalsAsync())
-            .ReturnsAsync(Result.Success(new List<Rental> { rental }));
-        rentalRepo.Setup(x => x.SaveAsync(rental)).ReturnsAsync(Result.Success(true));
-        var subscriberRepo = new Mock<IServiceRepository<Subscriber>>();
+            .ReturnsAsync(Result.Success(new List<RentalDto> { rental }));
+        rentalRepo.Setup(x => x.SaveAsync(It.IsAny<RentalCommand>(), It.IsAny<Guid?>()))
+            .Callback<RentalCommand, Guid?>((command, _) => savedCommand = command)
+            .ReturnsAsync(Result.Success(true));
+        var subscriberRepo = new Mock<IServiceRepository<SubscriberDto, SubscriberCommand>>();
         subscriberRepo.Setup(x => x.FindByIdAsync(subscriber.Id))
-            .ReturnsAsync(Result.Success<Subscriber?>(subscriber));
+            .ReturnsAsync(Result.Success<SubscriberDto?>(subscriber));
 
         var job = new FineCalculationJob(rentalRepo.Object, subscriberRepo.Object, notificationRepo,
             Mock.Of<IEmailService>(), Mock.Of<ISmsService>(),
@@ -182,6 +181,7 @@ public class NotificationJobTests
         Assert.Equal($"fine:{rental.Id}:{copyId}", stored.DedupeKey);
         Assert.Equal(4m, stored.Amount);
         Assert.Equal("Clean Code", stored.BookTitle);
-        Assert.Equal(8m, rental.TotalFine);
+        Assert.NotNull(savedCommand);
+        Assert.Equal(8m, savedCommand!.TotalFine);
     }
 }

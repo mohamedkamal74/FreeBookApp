@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Domin.Entity;
 using FreeBook.Resources;
 using Infrastructure.Common;
 using Infrastructure.Common.Interfaces;
@@ -14,24 +13,26 @@ using Microsoft.Extensions.Localization;
 
 namespace FreeBook.Areas.Admin.Controllers
 {
-    [Area(Helper.Admin)]
+    [Area(Domin.Entity.Helper.Admin)]
     [Authorize(Roles = "Admin")]
     public class BooksController : Controller
     {
-        private readonly IServiceRepository<Book> _serviceBook;
-        private readonly IServiceRepository<Author> _serviceAuthor;
-        private readonly IServiceRepository<Category> _serviceCategory;
-        private readonly IServiceRepository<SubCategory> _serviceSubCategory;
+        private readonly IServiceRepository<BookDto, BookCommand> _serviceBook;
+        private readonly IServiceRepository<AuthorDto, AuthorCommand> _serviceAuthor;
+        private readonly IServiceRepository<CategoryDto, CategoryCommand> _serviceCategory;
+        private readonly IServiceRepository<SubCategoryDto, SubCategoryCommand> _serviceSubCategory;
         private readonly IImageService _imageService;
         private readonly IStringLocalizer<ResourceWeb> _localizer;
+        private IFlashMessageService Flash { get; }
 
         public BooksController(
-            IServiceRepository<Book> serviceBook,
-            IServiceRepository<Author> serviceAuthor,
-            IServiceRepository<Category> serviceCategory,
-            IServiceRepository<SubCategory> serviceSubCategory,
+            IServiceRepository<BookDto, BookCommand> serviceBook,
+            IServiceRepository<AuthorDto, AuthorCommand> serviceAuthor,
+            IServiceRepository<CategoryDto, CategoryCommand> serviceCategory,
+            IServiceRepository<SubCategoryDto, SubCategoryCommand> serviceSubCategory,
             IImageService imageService,
-            IStringLocalizer<ResourceWeb> localizer)
+            IStringLocalizer<ResourceWeb> localizer,
+            IFlashMessageService flash)
         {
             _serviceBook = serviceBook;
             _serviceAuthor = serviceAuthor;
@@ -39,6 +40,7 @@ namespace FreeBook.Areas.Admin.Controllers
             _serviceSubCategory = serviceSubCategory;
             _imageService = imageService;
             _localizer = localizer;
+            Flash = flash;
         }
 
         public async Task<IActionResult> Books()
@@ -50,10 +52,10 @@ namespace FreeBook.Areas.Admin.Controllers
 
             return View(new BookViewModel
             {
-                Books = booksResult.IsSuccess ? booksResult.Value ?? new List<Book>() : new List<Book>(),
-                Authors = authorsResult.IsSuccess ? authorsResult.Value ?? new List<Author>() : new List<Author>(),
-                Categories = categoriesResult.IsSuccess ? categoriesResult.Value ?? new List<Category>() : new List<Category>(),
-                SubCategories = subCategoriesResult.IsSuccess ? subCategoriesResult.Value ?? new List<SubCategory>() : new List<SubCategory>(),
+                Books = booksResult.IsSuccess ? booksResult.Value ?? new List<BookDto>() : new List<BookDto>(),
+                Authors = authorsResult.IsSuccess ? authorsResult.Value ?? new List<AuthorDto>() : new List<AuthorDto>(),
+                Categories = categoriesResult.IsSuccess ? categoriesResult.Value ?? new List<CategoryDto>() : new List<CategoryDto>(),
+                SubCategories = subCategoriesResult.IsSuccess ? subCategoriesResult.Value ?? new List<SubCategoryDto>() : new List<SubCategoryDto>(),
                 NewBook = new NewBook()
             });
         }
@@ -80,13 +82,13 @@ namespace FreeBook.Areas.Admin.Controllers
                 input.AuthorId is null || input.AuthorId == Guid.Empty ||
                 !ModelState.IsValid)
             {
-                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSavedOk);
+                Flash.Error(Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSavedOk);
                 return RedirectToAction(nameof(Books));
             }
 
             if (hasCover && !IsValidCover(cover!))
             {
-                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, _localizer["msgCoverImageInvalid"]);
+                Flash.Error(Resources.ResourceWeb.lbNotSave, _localizer["msgCoverImageInvalid"]);
                 return RedirectToAction(nameof(Books));
             }
 
@@ -94,27 +96,23 @@ namespace FreeBook.Areas.Admin.Controllers
             var duplicate = duplicateResult.IsSuccess ? duplicateResult.Value : null;
             if (duplicate is not null && (!isEdit || duplicate.Id != bookId))
             {
-                SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDuplicateName);
+                Flash.Error(Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDuplicateName);
                 return RedirectToAction(nameof(Books));
             }
 
-            Book book;
+            var command = new BookCommand();
             string? oldPublicId = null;
             if (isEdit)
             {
                 var existingResult = await _serviceBook.FindByIdAsync(bookId);
                 if (!existingResult.IsSuccess || existingResult.Value is null)
                 {
-                    SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSavedOk);
+                    Flash.Error(Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSavedOk);
                     return RedirectToAction(nameof(Books));
                 }
 
-                book = existingResult.Value;
-                oldPublicId = Clean(book.ImagePublicId);
-            }
-            else
-            {
-                book = new Book { Id = Guid.NewGuid() };
+                command.Id = existingResult.Value.Id;
+                oldPublicId = Clean(existingResult.Value.ImagePublicId);
             }
 
             ImageUploadResult? uploadResult = null;
@@ -125,20 +123,20 @@ namespace FreeBook.Areas.Admin.Controllers
                     string.IsNullOrWhiteSpace(uploadResult.Url) ||
                     string.IsNullOrWhiteSpace(uploadResult.PublicId))
                 {
-                    SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, _localizer["msgCoverImageUploadFailed"]);
+                    Flash.Error(Resources.ResourceWeb.lbNotSave, _localizer["msgCoverImageUploadFailed"]);
                     return RedirectToAction(nameof(Books));
                 }
             }
 
-            ApplyInput(input, book);
+            ApplyInput(input, command);
             if (uploadResult is not null)
             {
-                book.ImageUrl = uploadResult.Url;
-                book.ImageThumbnailUrl = Clean(uploadResult.ThumbnailUrl);
-                book.ImagePublicId = uploadResult.PublicId;
+                command.ImageUrl = uploadResult.Url;
+                command.ImageThumbnailUrl = Clean(uploadResult.ThumbnailUrl);
+                command.ImagePublicId = uploadResult.PublicId;
             }
 
-            var saveResult = await _serviceBook.SaveAsync(book);
+            var saveResult = await _serviceBook.SaveAsync(command, isEdit ? bookId : null);
             if (!saveResult.IsSuccess)
             {
                 if (uploadResult is not null)
@@ -146,8 +144,7 @@ namespace FreeBook.Areas.Admin.Controllers
                     await TryDeleteImageAsync(uploadResult.PublicId);
                 }
 
-                SessionMsg(
-                    Helper.Error,
+                Flash.Error(
                     isEdit ? Resources.ResourceWeb.lbNotUpdate : Resources.ResourceWeb.lbNotSave,
                     isEdit ? Resources.ResourceWeb.lbMsgNotUpdatedOk : Resources.ResourceWeb.lbMsgNotSavedOk);
                 return RedirectToAction(nameof(Books));
@@ -156,11 +153,10 @@ namespace FreeBook.Areas.Admin.Controllers
             if (uploadResult is not null && oldPublicId is not null &&
                 !string.Equals(oldPublicId, uploadResult.PublicId, StringComparison.OrdinalIgnoreCase))
             {
-                await DeleteOldCoverIfUnusedAsync(oldPublicId, book.Id);
+                await DeleteOldCoverIfUnusedAsync(oldPublicId, command.Id);
             }
 
-            SessionMsg(
-                Helper.Success,
+            Flash.Success(
                 isEdit ? Resources.ResourceWeb.lbUpdate : Resources.ResourceWeb.lbSave,
                 isEdit ? Resources.ResourceWeb.lbMsgUpdatedOk : Resources.ResourceWeb.lbMsgSavedOk);
 
@@ -169,8 +165,8 @@ namespace FreeBook.Areas.Admin.Controllers
 
         private static bool IsValidCover(IFormFile cover) =>
             cover.Length > 0 &&
-            cover.Length <= Helper.MaxImageSizeBytes &&
-            Helper.AllowedImageExtensions.Contains(Path.GetExtension(cover.FileName));
+            cover.Length <= Domin.Entity.Helper.MaxImageSizeBytes &&
+            Domin.Entity.Helper.AllowedImageExtensions.Contains(Path.GetExtension(cover.FileName));
 
         private async Task DeleteOldCoverIfUnusedAsync(string oldPublicId, Guid currentBookId)
         {
@@ -202,30 +198,23 @@ namespace FreeBook.Areas.Admin.Controllers
             }
         }
 
-        private static void ApplyInput(NewBook input, Book book)
+        private static void ApplyInput(NewBook input, BookCommand command)
         {
-            book.Name = input.Name.Trim();
-            book.AuthorId = input.AuthorId!.Value;
-            book.Publisher = Clean(input.Publisher);
-            book.PublishingDate = input.PublishingDate;
-            book.ImageUrl = Clean(input.ImageUrl);
-            book.ImageThumbnailUrl = Clean(input.ImageThumbnailUrl);
-            book.ImagePublicId = Clean(input.ImagePublicId);
-            book.Hall = Clean(input.Hall);
-            book.IsAvailableForRental = input.IsAvailableForRental;
-            book.Description = Clean(input.Description);
-            book.CategoryId = input.CategoryId;
-            book.SubCategoryId = input.SubCategoryId;
+            command.Name = input.Name.Trim();
+            command.AuthorId = input.AuthorId!.Value;
+            command.Publisher = Clean(input.Publisher);
+            command.PublishingDate = input.PublishingDate;
+            command.ImageUrl = Clean(input.ImageUrl);
+            command.ImageThumbnailUrl = Clean(input.ImageThumbnailUrl);
+            command.ImagePublicId = Clean(input.ImagePublicId);
+            command.Hall = Clean(input.Hall);
+            command.IsAvailableForRental = input.IsAvailableForRental;
+            command.Description = Clean(input.Description);
+            command.CategoryId = input.CategoryId;
+            command.SubCategoryId = input.SubCategoryId;
         }
 
         private static string? Clean(string? value) =>
             string.IsNullOrWhiteSpace(value) ? null : value.Trim();
-
-        private void SessionMsg(string MsgType, string Title, string Msg)
-        {
-            HttpContext.Session.SetString(Helper.MsgType, MsgType);
-            HttpContext.Session.SetString(Helper.Title, Title);
-            HttpContext.Session.SetString(Helper.Msg, Msg);
-        }
     }
 }

@@ -1,5 +1,5 @@
-using Domin.Entity;
 using Infrastructure.Common;
+using Infrastructure.Common.Interfaces;
 using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Authorization;
@@ -8,25 +8,28 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FreeBook.Areas.Admin.Controllers
 {
-    [Area(Helper.Admin)]
+    [Area(Domin.Entity.Helper.Admin)]
     [Authorize(Roles = "Admin")]
     public class SubscribersController : Controller
     {
-        private readonly IServiceRepository<Subscriber> _serviceSubscriber;
-        private readonly IServiceRepository<Area> _serviceArea;
-        private readonly IServiceRepository<Governorate> _serviceGovernorate;
+        private readonly IServiceRepository<SubscriberDto, SubscriberCommand> _serviceSubscriber;
+        private readonly IServiceRepository<AreaDto, AreaCommand> _serviceArea;
+        private readonly IServiceRepository<GovernorateDto, GovernorateCommand> _serviceGovernorate;
         private readonly UserManager<ApplicationUser> _userManager;
+        private IFlashMessageService Flash { get; }
 
         public SubscribersController(
-            IServiceRepository<Subscriber> serviceSubscriber,
-            IServiceRepository<Area> serviceArea,
-            IServiceRepository<Governorate> serviceGovernorate,
-            UserManager<ApplicationUser> userManager)
+            IServiceRepository<SubscriberDto, SubscriberCommand> serviceSubscriber,
+            IServiceRepository<AreaDto, AreaCommand> serviceArea,
+            IServiceRepository<GovernorateDto, GovernorateCommand> serviceGovernorate,
+            UserManager<ApplicationUser> userManager,
+            IFlashMessageService flash)
         {
             _serviceSubscriber = serviceSubscriber;
             _serviceArea = serviceArea;
             _serviceGovernorate = serviceGovernorate;
             _userManager = userManager;
+            Flash = flash;
         }
 
         public async Task<IActionResult> Subscribers(SubscriberViewModel model)
@@ -36,9 +39,9 @@ namespace FreeBook.Areas.Admin.Controllers
             var govResult = await _serviceGovernorate.GetAllAsync();
             return View(new SubscriberViewModel
             {
-                Subscribers = subsResult.IsSuccess ? subsResult.Value ?? new List<Subscriber>() : new List<Subscriber>(),
-                Areas = areasResult.IsSuccess ? areasResult.Value ?? new List<Area>() : new List<Area>(),
-                Governorates = govResult.IsSuccess ? govResult.Value ?? new List<Governorate>() : new List<Governorate>(),
+                Subscribers = subsResult.IsSuccess ? subsResult.Value ?? new List<SubscriberDto>() : new List<SubscriberDto>(),
+                Areas = areasResult.IsSuccess ? areasResult.Value ?? new List<AreaDto>() : new List<AreaDto>(),
+                Governorates = govResult.IsSuccess ? govResult.Value ?? new List<GovernorateDto>() : new List<GovernorateDto>(),
                 NewSubscriber = new NewSubscriber()
             });
         }
@@ -64,8 +67,10 @@ namespace FreeBook.Areas.Admin.Controllers
             var subscriberResult = await _serviceSubscriber.FindByIdAsync(Id);
             if (subscriberResult.IsSuccess && subscriberResult.Value is not null)
             {
-                subscriberResult.Value.IsBlackListed = !subscriberResult.Value.IsBlackListed;
-                await _serviceSubscriber.SaveAsync(subscriberResult.Value);
+                var subscriber = subscriberResult.Value;
+                var command = ToCommand(subscriber);
+                command.IsBlackListed = !subscriber.IsBlackListed;
+                await _serviceSubscriber.SaveAsync(command, subscriber.Id);
             }
             return RedirectToAction(nameof(Subscribers));
         }
@@ -83,12 +88,11 @@ namespace FreeBook.Areas.Admin.Controllers
                 // create
                 var findResult = await _serviceSubscriber.FindByAsync(model.NewSubscriber.NationalId);
                 if (findResult.IsSuccess && findResult.Value != null)
-                    SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDuplicateName);
+                    Flash.Error(Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDuplicateName);
                 else
                 {
-                    var newSubscriber = new Subscriber
+                    var command = new SubscriberCommand
                     {
-                        Id = Guid.NewGuid(),
                         FirstName = model.NewSubscriber.FirstName,
                         LastName = model.NewSubscriber.LastName,
                         DateOfBirth = model.NewSubscriber.DateOfBirth,
@@ -103,11 +107,11 @@ namespace FreeBook.Areas.Admin.Controllers
                         Address = model.NewSubscriber.Address,
                         IsBlackListed = model.NewSubscriber.IsBlackListed
                     };
-                    var saveResult = await _serviceSubscriber.SaveAsync(newSubscriber);
+                    var saveResult = await _serviceSubscriber.SaveAsync(command);
                     if (saveResult.IsSuccess)
-                        SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbMsgSavedOk);
+                        Flash.Success(Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbMsgSavedOk);
                     else
-                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSavedOk);
+                        Flash.Error(Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSavedOk);
                 }
             }
             else
@@ -120,28 +124,31 @@ namespace FreeBook.Areas.Admin.Controllers
                     var findResult = await _serviceSubscriber.FindByAsync(model.NewSubscriber.NationalId);
                     if (findResult.IsSuccess && findResult.Value != null && findResult.Value.Id != existingResult.Value.Id)
                     {
-                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDuplicateName);
+                        Flash.Error(Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgDuplicateName);
                     }
                     else
                     {
-                        existingResult.Value.FirstName = model.NewSubscriber.FirstName;
-                        existingResult.Value.LastName = model.NewSubscriber.LastName;
-                        existingResult.Value.DateOfBirth = model.NewSubscriber.DateOfBirth;
-                        existingResult.Value.NationalId = model.NewSubscriber.NationalId;
-                        existingResult.Value.MobileNumber = model.NewSubscriber.MobileNumber;
-                        existingResult.Value.HasWhatsApp = model.NewSubscriber.HasWhatsApp;
-                        existingResult.Value.Email = model.NewSubscriber.Email;
-                        existingResult.Value.ImageUrl = model.NewSubscriber.ImageUrl;
-                        existingResult.Value.ImageThumbnailUrl = model.NewSubscriber.ImageThumbnailUrl;
-                        existingResult.Value.AreaId = model.NewSubscriber.AreaId;
-                        existingResult.Value.GovernorateId = model.NewSubscriber.GovernorateId;
-                        existingResult.Value.Address = model.NewSubscriber.Address;
-                        existingResult.Value.IsBlackListed = model.NewSubscriber.IsBlackListed;
-                        var saveResult = await _serviceSubscriber.SaveAsync(existingResult.Value);
+                        var command = new SubscriberCommand
+                        {
+                            FirstName = model.NewSubscriber.FirstName,
+                            LastName = model.NewSubscriber.LastName,
+                            DateOfBirth = model.NewSubscriber.DateOfBirth,
+                            NationalId = model.NewSubscriber.NationalId,
+                            MobileNumber = model.NewSubscriber.MobileNumber,
+                            HasWhatsApp = model.NewSubscriber.HasWhatsApp,
+                            Email = model.NewSubscriber.Email,
+                            ImageUrl = model.NewSubscriber.ImageUrl,
+                            ImageThumbnailUrl = model.NewSubscriber.ImageThumbnailUrl,
+                            AreaId = model.NewSubscriber.AreaId,
+                            GovernorateId = model.NewSubscriber.GovernorateId,
+                            Address = model.NewSubscriber.Address,
+                            IsBlackListed = model.NewSubscriber.IsBlackListed
+                        };
+                        var saveResult = await _serviceSubscriber.SaveAsync(command, existingResult.Value.Id);
                         if (saveResult.IsSuccess)
-                            SessionMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbMsgUpdatedOk);
+                            Flash.Success(Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbMsgUpdatedOk);
                         else
-                            SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbMsgNotUpdatedOk);
+                            Flash.Error(Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbMsgNotUpdatedOk);
                     }
                 }
             }
@@ -149,11 +156,21 @@ namespace FreeBook.Areas.Admin.Controllers
             return RedirectToAction(nameof(Subscribers));
         }
 
-        private void SessionMsg(string MsgType, string Title, string Msg)
+        private static SubscriberCommand ToCommand(SubscriberDto subscriber) => new()
         {
-            HttpContext.Session.SetString(Helper.MsgType, MsgType);
-            HttpContext.Session.SetString(Helper.Title, Title);
-            HttpContext.Session.SetString(Helper.Msg, Msg);
-        }
+            FirstName = subscriber.FirstName,
+            LastName = subscriber.LastName,
+            DateOfBirth = subscriber.DateOfBirth,
+            NationalId = subscriber.NationalId,
+            MobileNumber = subscriber.MobileNumber,
+            HasWhatsApp = subscriber.HasWhatsApp,
+            Email = subscriber.Email,
+            ImageUrl = subscriber.ImageUrl,
+            ImageThumbnailUrl = subscriber.ImageThumbnailUrl,
+            AreaId = subscriber.AreaId,
+            GovernorateId = subscriber.GovernorateId,
+            Address = subscriber.Address,
+            IsBlackListed = subscriber.IsBlackListed
+        };
     }
 }

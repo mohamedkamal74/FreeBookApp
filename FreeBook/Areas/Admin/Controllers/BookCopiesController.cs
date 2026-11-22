@@ -1,5 +1,5 @@
-using Domin.Entity;
 using Infrastructure.Common;
+using Infrastructure.Common.Interfaces;
 using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Authorization;
@@ -7,19 +7,22 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FreeBook.Areas.Admin.Controllers
 {
-    [Area(Helper.Admin)]
+    [Area(Domin.Entity.Helper.Admin)]
     [Authorize(Roles = "Admin")]
     public class BookCopiesController : Controller
     {
-        private readonly IServiceRepository<BookCopy> _serviceBookCopy;
-        private readonly IServiceRepository<Book> _serviceBook;
+        private readonly IServiceRepository<BookCopyDto, BookCopyCommand> _serviceBookCopy;
+        private readonly IServiceRepository<BookDto, BookCommand> _serviceBook;
+        private IFlashMessageService Flash { get; }
 
         public BookCopiesController(
-            IServiceRepository<BookCopy> serviceBookCopy,
-            IServiceRepository<Book> serviceBook)
+            IServiceRepository<BookCopyDto, BookCopyCommand> serviceBookCopy,
+            IServiceRepository<BookDto, BookCommand> serviceBook,
+            IFlashMessageService flash)
         {
             _serviceBookCopy = serviceBookCopy;
             _serviceBook = serviceBook;
+            Flash = flash;
         }
 
         public async Task<IActionResult> BookCopies(BookCopyViewModel model)
@@ -28,8 +31,8 @@ namespace FreeBook.Areas.Admin.Controllers
             var booksResult = await _serviceBook.GetAllAsync();
             return View(new BookCopyViewModel
             {
-                BookCopies = copiesResult.IsSuccess ? copiesResult.Value ?? new List<BookCopy>() : new List<BookCopy>(),
-                Books = booksResult.IsSuccess ? booksResult.Value ?? new List<Book>() : new List<Book>(),
+                BookCopies = copiesResult.IsSuccess ? copiesResult.Value ?? new List<BookCopyDto>() : new List<BookCopyDto>(),
+                Books = booksResult.IsSuccess ? booksResult.Value ?? new List<BookDto>() : new List<BookDto>(),
                 NewBookCopy = new NewBookCopy()
             });
         }
@@ -51,19 +54,18 @@ namespace FreeBook.Areas.Admin.Controllers
             if (model.NewBookCopy.BookCopyId == null || model.NewBookCopy.BookCopyId == Guid.Empty.ToString())
             {
                 // create
-                var newBookCopy = new BookCopy
+                var command = new BookCopyCommand
                 {
-                    Id = Guid.NewGuid(),
                     BookId = model.NewBookCopy.BookId,
                     EditionNumber = model.NewBookCopy.EditionNumber,
                     SerialNumber = model.NewBookCopy.SerialNumber,
                     IsAvailableForRental = model.NewBookCopy.IsAvailableForRental
                 };
-                var saveResult = await _serviceBookCopy.SaveAsync(newBookCopy);
+                var saveResult = await _serviceBookCopy.SaveAsync(command);
                 if (saveResult.IsSuccess)
-                    SessionMsg(Helper.Success, Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbMsgSavedOk);
+                    Flash.Success(Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbMsgSavedOk);
                 else
-                    SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSavedOk);
+                    Flash.Error(Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSavedOk);
             }
             else
             {
@@ -71,26 +73,23 @@ namespace FreeBook.Areas.Admin.Controllers
                 var existingResult = await _serviceBookCopy.FindByIdAsync(Guid.Parse(model.NewBookCopy.BookCopyId));
                 if (existingResult.IsSuccess && existingResult.Value is not null)
                 {
-                    existingResult.Value.BookId = model.NewBookCopy.BookId;
-                    existingResult.Value.EditionNumber = model.NewBookCopy.EditionNumber;
-                    existingResult.Value.SerialNumber = model.NewBookCopy.SerialNumber;
-                    existingResult.Value.IsAvailableForRental = model.NewBookCopy.IsAvailableForRental;
-                    var saveResult = await _serviceBookCopy.SaveAsync(existingResult.Value);
+                    var command = new BookCopyCommand
+                    {
+                        Id = existingResult.Value.Id,
+                        BookId = model.NewBookCopy.BookId,
+                        EditionNumber = model.NewBookCopy.EditionNumber,
+                        SerialNumber = model.NewBookCopy.SerialNumber,
+                        IsAvailableForRental = model.NewBookCopy.IsAvailableForRental
+                    };
+                    var saveResult = await _serviceBookCopy.SaveAsync(command, existingResult.Value.Id);
                     if (saveResult.IsSuccess)
-                        SessionMsg(Helper.Success, Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbMsgUpdatedOk);
+                        Flash.Success(Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbMsgUpdatedOk);
                     else
-                        SessionMsg(Helper.Error, Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbMsgNotUpdatedOk);
+                        Flash.Error(Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbMsgNotUpdatedOk);
                 }
             }
 
             return RedirectToAction(nameof(BookCopies));
-        }
-
-        private void SessionMsg(string MsgType, string Title, string Msg)
-        {
-            HttpContext.Session.SetString(Helper.MsgType, MsgType);
-            HttpContext.Session.SetString(Helper.Title, Title);
-            HttpContext.Session.SetString(Helper.Msg, Msg);
         }
     }
 }

@@ -1,16 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Domin.Entity;
-
 namespace Infrastructure.ViewModel
 {
     public class CategoryViewModel
     {
-        public List<Category> Categories { get; set; } = new List<Category>();
-        public List<LogCategory> LogCategories { get; set; } = new List<LogCategory>();
-        public Category NewCategory { get; set; } = new Category();
+        public List<CategoryDto> Categories { get; set; } = new();
+        public List<LogCategoryDto> LogCategories { get; set; } = new();
+        public NewCategory NewCategory { get; set; } = new();
     }
 }

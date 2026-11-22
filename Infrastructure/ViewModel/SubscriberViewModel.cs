@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Domin.Entity;
 using Domin.Resources;
 using Infrastructure.ViewModel;
 
@@ -12,9 +11,9 @@ namespace Infrastructure.ViewModel
 {
     public class SubscriberViewModel
     {
-        public List<Subscriber> Subscribers { get; set; } = new();
-        public List<Area> Areas { get; set; } = new();
-        public List<Governorate> Governorates { get; set; } = new();
+        public List<SubscriberDto> Subscribers { get; set; } = new();
+        public List<AreaDto> Areas { get; set; } = new();
+        public List<GovernorateDto> Governorates { get; set; } = new();
         public NewSubscriber NewSubscriber { get; set; } = new();
     }
 

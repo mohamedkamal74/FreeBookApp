@@ -1,6 +1,7 @@
 using Domin.Entity;
 using Infrastructure.Data;
 using Infrastructure.IRepository.ServiceRepository;
+using Infrastructure.ViewModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -17,9 +18,9 @@ public class NotificationRepositoryTests
     private static ServicesNotification CreateService(FreeBookDbContext context) =>
         new(context, Mock.Of<ILogger<ServicesNotification>>());
 
-    private static Notification NewNotification(string key, string name = "Ahmed", int? days = 3) => new()
+    private static NotificationCommand NewNotification(string key, string name = "Ahmed", int? days = 3) => new()
     {
-        Type = NotificationType.SubscriptionExpiring,
+        Type = NotificationKindDto.SubscriptionExpiring,
         DedupeKey = key,
         SubscriberName = name,
         Days = days,
@@ -61,13 +62,22 @@ public class NotificationRepositoryTests
         using var context = CreateContext();
         var service = CreateService(context);
 
-        var older = NewNotification("overdue:1:1");
-        older.CreatedOn = DateTime.UtcNow.AddDays(-2);
-        var newer = NewNotification("overdue:1:2");
-        newer.CreatedOn = DateTime.UtcNow.AddDays(-1);
-        newer.IsRead = true;
-        await service.UpsertAsync(older);
-        await service.UpsertAsync(newer);
+        context.Notifications.Add(new Notification
+        {
+            Type = NotificationType.RentalOverdue,
+            DedupeKey = "overdue:1:1",
+            SubscriberName = "Ahmed",
+            CreatedOn = DateTime.UtcNow.AddDays(-2)
+        });
+        context.Notifications.Add(new Notification
+        {
+            Type = NotificationType.RentalOverdue,
+            DedupeKey = "overdue:1:2",
+            SubscriberName = "Ahmed",
+            CreatedOn = DateTime.UtcNow.AddDays(-1),
+            IsRead = true
+        });
+        await context.SaveChangesAsync();
 
         var result = await service.GetRecentAsync(10);
 

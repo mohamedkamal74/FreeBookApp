@@ -1,6 +1,5 @@
 using System.Net;
 using System.Text.RegularExpressions;
-using Domin.Entity;
 using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Identity;
@@ -90,9 +89,9 @@ public class NotificationPageTests : IClassFixture<CustomWebApplicationFactory>
     {
         using var scope = _factory.Services.CreateScope();
         var repo = scope.ServiceProvider.GetRequiredService<INotificationRepository>();
-        await repo.UpsertAsync(new Notification
+        await repo.UpsertAsync(new NotificationCommand
         {
-            Type = NotificationType.RentalOverdue,
+            Type = NotificationKindDto.RentalOverdue,
             DedupeKey = $"overdue:{Guid.NewGuid()}:{Guid.NewGuid()}",
             SubscriberName = "Ahmed Ali",
             BookTitle = "Clean Code",
