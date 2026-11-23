@@ -257,7 +257,7 @@ public class WebAppTests : IClassFixture<CustomWebApplicationFactory>
     }
 
     [Fact]
-    public async Task RolesSave_FlashMessage_IsLocalizedAndConsumedOnce()
+    public async Task AccountsFlashMessages_AreLocalizedAndConsumedOnce()
     {
         await SeedAdminAsync();
         var client = _factory.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
@@ -268,6 +268,10 @@ public class WebAppTests : IClassFixture<CustomWebApplicationFactory>
 
         await CreateRoleAndAssertFlashAsync(client, "en", "User group saved successfully");
         await CreateRoleAndAssertFlashAsync(client, "ar", "تم حفظ مجموعة المستخدم بنجاح");
+        await AssertInvalidImageFlashAsync(client, "en",
+            "Only JPG, JPEG, PNG, GIF, or WEBP images up to 5 MB are allowed.");
+        await AssertInvalidImageFlashAsync(client, "ar",
+            "يُسمح فقط بصور JPG أو JPEG أو PNG أو GIF أو WEBP بحجم لا يتجاوز 5 ميغابايت.");
     }
 
     private static async Task CreateRoleAndAssertFlashAsync(HttpClient client, string culture, string expectedText)
@@ -289,6 +293,33 @@ public class WebAppTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Contains(serializedText, afterSave);
 
         var afterFlashConsumed = await client.GetStringAsync($"/Admin/Accounts/Roles?culture={culture}");
+        Assert.DoesNotContain(serializedText, afterFlashConsumed);
+    }
+
+    private static async Task AssertInvalidImageFlashAsync(HttpClient client, string culture, string expectedText)
+    {
+        var page = await client.GetStringAsync($"/Admin/Accounts/Register?culture={culture}");
+        using var content = new MultipartFormDataContent
+        {
+            { new StringContent(ExtractAntiForgeryToken(page)!), "__RequestVerificationToken" },
+            { new StringContent(string.Empty), "NewRegister.Id" },
+            { new StringContent("Flash Probe"), "NewRegister.Name" },
+            { new StringContent("flash-probe@example.com"), "NewRegister.Email" },
+            { new StringContent("Admin"), "NewRegister.RoleName" },
+            { new StringContent("Test@12345"), "NewRegister.Password" },
+            { new StringContent("Test@12345"), "NewRegister.ConfirmPassword" },
+            { new StringContent("true"), "NewRegister.ActiveUser" }
+        };
+        content.Add(new ByteArrayContent(new byte[] { (byte)'x' }), "NewRegister.ImageUser", "invalid.txt");
+
+        var response = await client.PostAsync($"/Admin/Accounts/Register?culture={culture}", content);
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+
+        var serializedText = JsonSerializer.Serialize(expectedText);
+        var afterPost = await client.GetStringAsync($"/Admin/Accounts/Register?culture={culture}");
+        Assert.Contains(serializedText, afterPost);
+
+        var afterFlashConsumed = await client.GetStringAsync($"/Admin/Accounts/Register?culture={culture}");
         Assert.DoesNotContain(serializedText, afterFlashConsumed);
     }
 

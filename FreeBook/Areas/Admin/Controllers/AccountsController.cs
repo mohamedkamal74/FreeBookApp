@@ -1,5 +1,6 @@
 using System.IO;
 using Domin.Entity;
+using FreeBook.Resources;
 using Infrastructure.Common.Interfaces;
 using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 
 namespace FreeBook.Areas.Admin.Controllers
 {
@@ -20,6 +22,7 @@ namespace FreeBook.Areas.Admin.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IAccountQueryService _accountQueries;
+        private readonly IStringLocalizer<ResourceWeb> _localizer;
         private IFlashMessageService Flash { get; }
 
         #endregion
@@ -27,12 +30,13 @@ namespace FreeBook.Areas.Admin.Controllers
         #region Constructor
         public AccountsController(RoleManager<IdentityRole> roleManager,
            UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager,
-           IAccountQueryService accountQueries, IFlashMessageService flash)
+           IAccountQueryService accountQueries, IStringLocalizer<ResourceWeb> localizer, IFlashMessageService flash)
         {
             _roleManager = roleManager;
             _userManager = userManager;
             _signInManager = signInManager;
             _accountQueries = accountQueries;
+            _localizer = localizer;
             Flash = flash;
         }
         #endregion
@@ -148,8 +152,7 @@ namespace FreeBook.Areas.Admin.Controllers
 
                     if (!Helper.AllowedImageExtensions.Contains(extension) || uploaded.Length > Helper.MaxImageSizeBytes)
                     {
-                        Flash.Error(Resources.ResourceWeb.lbNotSave,
-                            "Only JPG, JPEG, PNG, GIF, or WEBP images up to 5 MB are allowed.");
+                        Flash.Error(Resources.ResourceWeb.lbNotSave, _localizer["msgCoverImageInvalid"]);
                         return RedirectToAction("Register", "Accounts");
                     }
 
