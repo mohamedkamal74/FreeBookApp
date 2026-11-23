@@ -966,4 +966,10 @@
   <data name="lbUnavailable" xml:space="preserve">
     <value>Unavailable</value>
   </data>
+  <data name="msgExternalLoginFailed" xml:space="preserve">
+    <value>Google sign-in failed. Please try again.</value>
+  </data>
+  <data name="msgExternalLoginEmailMissing" xml:space="preserve">
+    <value>Google did not provide an email address.</value>
+  </data>
 </root>

@@ -1,4 +1,5 @@
 using Infrastructure.Data;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -25,7 +26,9 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
             {
                 ["Hangfire:Enabled"] = "false",
                 ["Startup:MigrateOnStartup"] = "false",
-                ["Startup:SeedAdmin"] = "false"
+                ["Startup:SeedAdmin"] = "false",
+                ["Authentication:Google:ClientId"] = "test-client-id",
+                ["Authentication:Google:ClientSecret"] = "test-client-secret"
             }));
         builder.UseSetting("Hangfire:Enabled", "false");
         builder.UseSetting("Startup:MigrateOnStartup", "false");
@@ -38,6 +41,9 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
             services.RemoveAll<FreeBookDbContext>();
             services.AddDbContext<FreeBookDbContext>(options =>
                 options.UseInMemoryDatabase(_databaseName));
+            services.AddAuthentication()
+                .AddScheme<AuthenticationSchemeOptions, FakeGoogleAuthHandler>(
+                    FakeGoogleAuthHandler.SchemeName, _ => { });
         });
     }
 }

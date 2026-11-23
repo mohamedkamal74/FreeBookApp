@@ -1,5 +1,6 @@
 ﻿@model LoginViewModel
 @inject IStringLocalizer<ResourceWeb> Localizer
+@inject IOptions<GoogleAuthSettings> GoogleAuth
 @{
     Layout = null;
 }
@@ -88,9 +89,12 @@
         <a href="#" class="btn btn-block btn-primary">
           <i class="fab fa-facebook mr-2"></i> @Localizer["lbLoginWithFacebook"]
         </a>
-        <a href="#" class="btn btn-block btn-danger">
-          <i class="fab fa-google mr-2"></i> @Localizer["lbLoginWithGoogle"]
-        </a>
+        @if (GoogleAuth.Value.Enabled)
+        {
+          <a id="googleLogin" asp-action="ExternalLogin" asp-controller="Accounts" class="btn btn-block btn-danger">
+            <i class="fab fa-google mr-2"></i> @Localizer["lbLoginWithGoogle"]
+          </a>
+        }
       </div>
       <!-- /.social-auth-links -->
 

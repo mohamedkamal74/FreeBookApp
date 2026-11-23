@@ -5,6 +5,7 @@ using Domin.Entity;
 using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FreeBook.Tests;
@@ -272,6 +273,81 @@ public class WebAppTests : IClassFixture<CustomWebApplicationFactory>
             "Only JPG, JPEG, PNG, GIF, or WEBP images up to 5 MB are allowed.");
         await AssertInvalidImageFlashAsync(client, "ar",
             "يُسمح فقط بصور JPG أو JPEG أو PNG أو GIF أو WEBP بحجم لا يتجاوز 5 ميغابايت.");
+    }
+
+    [Theory]
+    [InlineData("en", "Sign in with Google")]
+    [InlineData("ar", "تسجيل الدخول باستخدام جوجل")]
+    public async Task LoginPage_ShowsLocalizedGoogleButton_WhenConfigured(string culture, string expectedText)
+    {
+        var client = _factory.CreateClient();
+
+        var html = await client.GetStringAsync($"/Admin/Accounts/Login?culture={culture}");
+
+        Assert.Contains("id=\"googleLogin\"", html);
+        Assert.Contains(expectedText, WebUtility.HtmlDecode(html));
+        Assert.Contains("/Admin/Accounts/ExternalLogin", html);
+    }
+
+    [Fact]
+    public async Task GoogleLogin_IsHiddenAndRejected_WithoutCredentials()
+    {
+        using var disabledFactory = _factory.WithWebHostBuilder(builder =>
+            builder.ConfigureAppConfiguration((_, configuration) =>
+                configuration.AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["Authentication:Google:ClientId"] = string.Empty,
+                    ["Authentication:Google:ClientSecret"] = string.Empty
+                })));
+        var client = disabledFactory.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false
+        });
+
+        var html = await client.GetStringAsync("/Admin/Accounts/Login?culture=en");
+        var response = await client.GetAsync("/Admin/Accounts/ExternalLogin?culture=en");
+
+        Assert.DoesNotContain("id=\"googleLogin\"", html);
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.Contains("/Admin", response.Headers.Location!.OriginalString);
+    }
+
+    [Fact]
+    public async Task GoogleLogin_CreatesUserWithUserRoleAndSignsIn()
+    {
+        var client = _factory.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false
+        });
+
+        var challenge = await client.GetAsync(
+            "/Admin/Accounts/ExternalLogin?culture=en&returnUrl=%2FAdmin%2FAccounts%2FRoles");
+        Assert.Equal(HttpStatusCode.Redirect, challenge.StatusCode);
+
+        var callbackUrl = challenge.Headers.Location!.OriginalString;
+        Assert.Contains("/Admin/Accounts/ExternalLoginCallback", callbackUrl);
+
+        var callback = await client.GetAsync(callbackUrl);
+        Assert.Equal(HttpStatusCode.Redirect, callback.StatusCode);
+        Assert.Equal("/Admin/Accounts/Roles", callback.Headers.Location!.OriginalString);
+
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var user = await userManager.FindByEmailAsync(FakeGoogleAuthHandler.Email);
+
+            Assert.NotNull(user);
+            Assert.Equal(FakeGoogleAuthHandler.DisplayName, user!.Name);
+            Assert.True(user.EmailConfirmed);
+            Assert.True(user.ActiveUser);
+            Assert.True(await roleManager.RoleExistsAsync("User"));
+            Assert.True(await userManager.IsInRoleAsync(user, "User"));
+            Assert.False(await userManager.IsInRoleAsync(user, "Admin"));
+        }
+
+        var protectedPage = await client.GetAsync("/Admin/Accounts/Roles");
+        Assert.Equal(HttpStatusCode.OK, protectedPage.StatusCode);
     }
 
     private static async Task CreateRoleAndAssertFlashAsync(HttpClient client, string culture, string expectedText)

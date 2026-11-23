@@ -966,4 +966,10 @@
   <data name="lbUnavailable" xml:space="preserve">
     <value>غير متاح</value>
   </data>
+  <data name="msgExternalLoginFailed" xml:space="preserve">
+    <value>فشل تسجيل الدخول باستخدام جوجل. يرجى المحاولة مرة أخرى.</value>
+  </data>
+  <data name="msgExternalLoginEmailMissing" xml:space="preserve">
+    <value>لم يقدم جوجل عنوان بريد إلكتروني.</value>
+  </data>
 </root>

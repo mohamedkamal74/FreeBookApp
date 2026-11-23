@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Threading.RateLimiting;
 using Domin.Entity;
+using FreeBook.Configuration;
 using FreeBook.Data;
 using FreeBook.Jobs;
 using FreeBook.Middleware;
@@ -10,6 +11,8 @@ using Infrastructure.Data;
 using Infrastructure.IRepository;
 using Infrastructure.IRepository.ServiceRepository;
 using Infrastructure.ViewModel;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
@@ -66,6 +69,25 @@ try
     builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
         .AddEntityFrameworkStores<FreeBookDbContext>()
         .AddDefaultTokenProviders();
+
+    var googleAuthSection = builder.Configuration.GetSection("Authentication:Google");
+    var googleClientId = googleAuthSection["ClientId"];
+    var googleClientSecret = googleAuthSection["ClientSecret"];
+    builder.Services.Configure<GoogleAuthSettings>(googleAuthSection);
+
+    if (!string.IsNullOrWhiteSpace(googleClientId) && !string.IsNullOrWhiteSpace(googleClientSecret))
+    {
+        builder.Services.AddAuthentication()
+            .AddGoogle(GoogleDefaults.AuthenticationScheme, options =>
+            {
+                options.ClientId = googleClientId!;
+                options.ClientSecret = googleClientSecret!;
+                options.CallbackPath = "/signin-google";
+                options.AccessDeniedPath = "/Admin/Accounts/Login";
+                options.SignInScheme = IdentityConstants.ExternalScheme;
+                options.SaveTokens = true;
+            });
+    }
 
     builder.Services.ConfigureApplicationCookie(options =>
     {

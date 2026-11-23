@@ -1,15 +1,19 @@
 using System.IO;
+using System.Security.Claims;
 using Domin.Entity;
+using FreeBook.Configuration;
 using FreeBook.Resources;
 using Infrastructure.Common.Interfaces;
 using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 
 namespace FreeBook.Areas.Admin.Controllers
 {
@@ -17,12 +21,16 @@ namespace FreeBook.Areas.Admin.Controllers
     [Authorize]
     public class AccountsController : Controller
     {
+        private const string DefaultExternalRole = "User";
+        private const string ExternalReturnUrlKey = "externalReturnUrl";
+
         #region Declration
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IAccountQueryService _accountQueries;
         private readonly IStringLocalizer<ResourceWeb> _localizer;
+        private readonly IOptions<GoogleAuthSettings> _googleAuth;
         private IFlashMessageService Flash { get; }
 
         #endregion
@@ -30,13 +38,15 @@ namespace FreeBook.Areas.Admin.Controllers
         #region Constructor
         public AccountsController(RoleManager<IdentityRole> roleManager,
            UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager,
-           IAccountQueryService accountQueries, IStringLocalizer<ResourceWeb> localizer, IFlashMessageService flash)
+           IAccountQueryService accountQueries, IStringLocalizer<ResourceWeb> localizer,
+           IOptions<GoogleAuthSettings> googleAuth, IFlashMessageService flash)
         {
             _roleManager = roleManager;
             _userManager = userManager;
             _signInManager = signInManager;
             _accountQueries = accountQueries;
             _localizer = localizer;
+            _googleAuth = googleAuth;
             Flash = flash;
         }
         #endregion
@@ -311,6 +321,136 @@ namespace FreeBook.Areas.Admin.Controllers
 
             }
             return View(model);
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult ExternalLogin(string? returnUrl = null)
+        {
+            if (!_googleAuth.Value.Enabled)
+                return RedirectToAction(nameof(Login));
+
+            var callbackUrl = Url.Action(nameof(ExternalLoginCallback), "Accounts", new { area = "Admin" })!;
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(
+                GoogleDefaults.AuthenticationScheme, callbackUrl);
+
+            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+                properties.Items[ExternalReturnUrlKey] = returnUrl;
+
+            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> ExternalLoginCallback(string? returnUrl = null)
+        {
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info is null)
+            {
+                Flash.Error(Resources.ResourceWeb.lbNotSave, _localizer["msgExternalLoginFailed"]);
+                return RedirectToAction(nameof(Login));
+            }
+
+            var signInResult = await _signInManager.ExternalLoginSignInAsync(
+                info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: false);
+
+            if (signInResult.Succeeded)
+                return RedirectAfterExternalLogin(ResolveExternalReturnUrl(returnUrl, info));
+
+            if (signInResult.IsLockedOut || signInResult.RequiresTwoFactor)
+            {
+                Flash.Error(Resources.ResourceWeb.lbNotSave, _localizer["msgExternalLoginFailed"]);
+                return RedirectToAction(nameof(Login));
+            }
+
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                Flash.Error(Resources.ResourceWeb.lbNotSave, _localizer["msgExternalLoginEmailMissing"]);
+                return RedirectToAction(nameof(Login));
+            }
+
+            var displayName = info.Principal.FindFirstValue(ClaimTypes.Name);
+            if (string.IsNullOrWhiteSpace(displayName))
+                displayName = email.Split('@')[0];
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user is null)
+            {
+                user = new ApplicationUser
+                {
+                    UserName = email,
+                    Email = email,
+                    Name = displayName,
+                    ActiveUser = true,
+                    EmailConfirmed = true,
+                    ImageUser = string.Empty
+                };
+
+                var created = await _userManager.CreateAsync(user);
+                if (!created.Succeeded)
+                {
+                    Flash.Error(Resources.ResourceWeb.lbNotSave, _localizer["msgExternalLoginFailed"]);
+                    return RedirectToAction(nameof(Login));
+                }
+            }
+            else if (!user.ActiveUser)
+            {
+                Flash.Error(Resources.ResourceWeb.lbNotSave, _localizer["msgExternalLoginFailed"]);
+                return RedirectToAction(nameof(Login));
+            }
+
+            if (!await EnsureExternalRoleExistsAsync())
+            {
+                Flash.Error(Resources.ResourceWeb.lbNotSave, _localizer["msgExternalLoginFailed"]);
+                return RedirectToAction(nameof(Login));
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+            if (roles.Count == 0)
+            {
+                var roleResult = await _userManager.AddToRoleAsync(user, DefaultExternalRole);
+                if (!roleResult.Succeeded)
+                {
+                    Flash.Error(Resources.ResourceWeb.lbNotSave, _localizer["msgExternalLoginFailed"]);
+                    return RedirectToAction(nameof(Login));
+                }
+            }
+
+            var addLogin = await _userManager.AddLoginAsync(user, info);
+            if (!addLogin.Succeeded)
+            {
+                Flash.Error(Resources.ResourceWeb.lbNotSave, _localizer["msgExternalLoginFailed"]);
+                return RedirectToAction(nameof(Login));
+            }
+
+            await _signInManager.SignInAsync(user, isPersistent: false);
+            return RedirectAfterExternalLogin(ResolveExternalReturnUrl(returnUrl, info));
+        }
+
+        private IActionResult RedirectAfterExternalLogin(string? returnUrl)
+        {
+            return !string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl)
+                ? Redirect(returnUrl)
+                : RedirectToAction("Index", "Dashboard", new { area = "Admin" });
+        }
+
+        private static string? ResolveExternalReturnUrl(string? returnUrl, ExternalLoginInfo info)
+        {
+            if (!string.IsNullOrWhiteSpace(returnUrl))
+                return returnUrl;
+
+            return info.AuthenticationProperties?.Items.TryGetValue(ExternalReturnUrlKey, out var saved) == true
+                ? saved
+                : null;
+        }
+
+        private async Task<bool> EnsureExternalRoleExistsAsync()
+        {
+            if (await _roleManager.RoleExistsAsync(DefaultExternalRole))
+                return true;
+
+            return (await _roleManager.CreateAsync(new IdentityRole(DefaultExternalRole))).Succeeded;
         }
 
         [HttpPost]
