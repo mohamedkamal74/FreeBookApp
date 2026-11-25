@@ -81,7 +81,7 @@ Never commit real credentials. For Docker, set `GOOGLE_CLIENT_ID` and `GOOGLE_CL
 
 ### First run
 
-The checked-in `launchSettings.json` profile uses IIS Express. For a plain CLI run:
+Visual Studio and the CLI both use `http://localhost:5128`. For a plain CLI run:
 
 ```powershell
 dotnet run --project FreeBook --no-launch-profile --urls http://localhost:5128
@@ -91,6 +91,7 @@ dotnet run --project FreeBook --no-launch-profile --urls http://localhost:5128
 - Admin login: <http://localhost:5128/Admin>
 - Swagger UI (Development only): <http://localhost:5128/swagger>
 - Health check: <http://localhost:5128/health>
+- Google sign-in callback: <http://localhost:5128/signin-google>
 
 ### Docker
 

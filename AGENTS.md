@@ -15,7 +15,7 @@ dotnet test FreeBook.sln
 dotnet list FreeBook.sln package --vulnerable --include-transitive
 ```
 
-Run locally (the `launchSettings.json` profile uses IIS Express, so bypass it):
+Run locally (Visual Studio and the CLI use the same `http://localhost:5128` URL; the Google callback is `http://localhost:5128/signin-google`):
 
 ```powershell
 dotnet run --project FreeBook --no-launch-profile --urls http://localhost:5128
