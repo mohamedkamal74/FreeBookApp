@@ -61,6 +61,24 @@ already enabled in `FreeBook.csproj`):
 dotnet user-secrets set "ConnectionStrings:BookConnection" "Server=...;Database=...;" --project FreeBook
 ```
 
+For a manual local config file, edit the ignored `FreeBook/appsettings.Local.json`. It loads in Development only and overrides user-secrets/environment variables:
+
+```json
+{
+  "Authentication": {
+    "Google": {
+      "ClientId": "",
+      "ClientSecret": ""
+    }
+  },
+  "Https": {
+    "Redirect": false
+  }
+}
+```
+
+Never commit real credentials. For Docker, set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in untracked `.env`.
+
 ### First run
 
 The checked-in `launchSettings.json` profile uses IIS Express. For a plain CLI run:

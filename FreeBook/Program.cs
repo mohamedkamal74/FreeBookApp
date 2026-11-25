@@ -36,6 +36,13 @@ try
     var builder = WebApplication.CreateBuilder(args);
     builder.Host.UseSerilog();
 
+    // Optional ignored local overrides for Development (for example Google OAuth
+    // credentials). Appended last so this file wins over user-secrets and env vars.
+    if (builder.Environment.IsDevelopment())
+    {
+        builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
+    }
+
     // Add services to the container.
     // NOTE: Do not set ResourcesPath here. The resource class is FreeBook.Resources.ResourceWeb
     // and the files live in Resources/, so the default lookup name already resolves to

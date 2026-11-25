@@ -45,6 +45,24 @@ Override the connection string locally without editing tracked files (user-secre
 dotnet user-secrets set "ConnectionStrings:BookConnection" "Server=...;Database=...;" --project FreeBook
 ```
 
+For local manual configuration that stays out of Git, use `FreeBook/appsettings.Local.json` (ignored). It is loaded only in Development and takes precedence over user-secrets and environment variables:
+
+```json
+{
+  "Authentication": {
+    "Google": {
+      "ClientId": "",
+      "ClientSecret": ""
+    }
+  },
+  "Https": {
+    "Redirect": false
+  }
+}
+```
+
+Never commit real credentials in this file. Docker uses `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` from untracked `.env` instead.
+
 ## Database
 
 - Connection string `BookConnection` in `FreeBook/appsettings.json` points to `(localdb)\MSSQLLocalDB`, DB `BookDb`.

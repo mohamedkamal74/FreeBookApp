@@ -364,3 +364,4 @@ FodyWeavers.xsd
 
 # Local docker/env secrets
 .env
+appsettings.Local.json
