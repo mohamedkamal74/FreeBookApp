@@ -1,6 +1,11 @@
 ﻿@inject IStringLocalizer<ResourceWeb> Localizer
 @using Microsoft.AspNetCore.Identity
 @inject SignInManager<ApplicationUser> SignInManager
+@{
+    var isSignedIn = SignInManager.IsSignedIn(User);
+    var isAdmin = isSignedIn && User.IsInRole("Admin");
+    var isNormalUser = isSignedIn && !isAdmin;
+}
 <!DOCTYPE html>
 <html lang="@CultureInfo.CurrentUICulture.Name" dir="@(CultureInfo.CurrentUICulture.Name == "ar" ? "rtl" : "ltr")">
 <head>
@@ -44,7 +49,7 @@
                 <ul class="main-nav-list">
                     <li class="main-nav-item"><a asp-controller="Home" asp-action="Index">@Localizer["lbHome"]</a></li>
 
-                    @if (SignInManager.IsSignedIn(User))
+                    @if (isAdmin)
                     {
                         <li class="main-nav-item"><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index">@Localizer["lbDashboard"]</a></li>
                         <li class="main-nav-item"><a asp-area="Admin" asp-controller="Categories" asp-action="Categories">@Localizer["lbCategories"]</a></li>
@@ -54,6 +59,16 @@
                         <li class="main-nav-item"><a asp-area="Admin" asp-controller="Subscribers" asp-action="Subscribers">@Localizer["lbSubscribers"]</a></li>
                         <li class="main-nav-item"><a asp-area="Admin" asp-controller="Rentals" asp-action="Rentals">@Localizer["lbRentals"]</a></li>
                         <li class="main-nav-item"><a asp-area="Admin" asp-controller="Reports" asp-action="Index">@Localizer["lbReports"]</a></li>
+                    }
+                    else if (isNormalUser)
+                    {
+                        <li class="main-nav-item"><a asp-controller="Home" asp-action="Index" asp-fragment="availableBooks">@Localizer["lbBooks"]</a></li>
+                        <li class="main-nav-item">
+                            <form asp-area="Admin" asp-controller="Accounts" asp-action="LogOut" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="nav-link btn btn-link p-0">@Localizer["lbLogout"]</button>
+                            </form>
+                        </li>
                     }
                     else
                     {

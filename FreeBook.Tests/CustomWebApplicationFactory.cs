@@ -1,13 +1,17 @@
+using System.Threading.RateLimiting;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 
 namespace FreeBook.Tests;
 
@@ -44,6 +48,22 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
             services.AddAuthentication()
                 .AddScheme<AuthenticationSchemeOptions, FakeGoogleAuthHandler>(
                     FakeGoogleAuthHandler.SchemeName, _ => { });
+
+            // All WebAppTests share one TestServer, so the production 5/minute
+            // login policy would reject later tests. Keep the middleware active
+            // but give the test host a policy that cannot be exhausted.
+            services.RemoveAll<IConfigureOptions<RateLimiterOptions>>();
+            services.Configure<RateLimiterOptions>(options =>
+            {
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+                options.AddFixedWindowLimiter("login", limiter =>
+                {
+                    limiter.PermitLimit = 1000;
+                    limiter.Window = TimeSpan.FromMinutes(1);
+                    limiter.QueueLimit = 0;
+                    limiter.AutoReplenishment = true;
+                });
+            });
         });
     }
 }

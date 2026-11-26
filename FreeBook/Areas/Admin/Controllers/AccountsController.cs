@@ -315,9 +315,14 @@ namespace FreeBook.Areas.Admin.Controllers
             {
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
                 if (result.Succeeded)
-                    return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
-                else
-                    ViewBag.ErrorLogin = false;
+                {
+                    var user = await _userManager.FindByEmailAsync(model.Email!);
+                    return user is null
+                        ? RedirectToAction("Index", "Home", new { area = string.Empty })
+                        : await RedirectAfterLoginAsync(user);
+                }
+
+                ViewBag.ErrorLogin = false;
 
             }
             return View(model);
@@ -355,7 +360,22 @@ namespace FreeBook.Areas.Admin.Controllers
                 info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: false);
 
             if (signInResult.Succeeded)
-                return RedirectAfterExternalLogin(ResolveExternalReturnUrl(returnUrl, info));
+            {
+                var signedInEmail = info.Principal.FindFirstValue(ClaimTypes.Email);
+                var signedInUser = string.IsNullOrWhiteSpace(signedInEmail)
+                    ? null
+                    : await _userManager.FindByEmailAsync(signedInEmail);
+
+                if (signedInUser is null)
+                {
+                    Flash.Error(Resources.ResourceWeb.lbNotSave, _localizer["msgExternalLoginFailed"]);
+                    return RedirectToAction(nameof(Login));
+                }
+
+                return await RedirectAfterLoginAsync(
+                    signedInUser,
+                    ResolveExternalReturnUrl(returnUrl, info));
+            }
 
             if (signInResult.IsLockedOut || signInResult.RequiresTwoFactor)
             {
@@ -425,14 +445,18 @@ namespace FreeBook.Areas.Admin.Controllers
             }
 
             await _signInManager.SignInAsync(user, isPersistent: false);
-            return RedirectAfterExternalLogin(ResolveExternalReturnUrl(returnUrl, info));
+            return await RedirectAfterLoginAsync(user, ResolveExternalReturnUrl(returnUrl, info));
         }
 
-        private IActionResult RedirectAfterExternalLogin(string? returnUrl)
+        private async Task<IActionResult> RedirectAfterLoginAsync(ApplicationUser user, string? returnUrl = null)
         {
-            return !string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl)
-                ? Redirect(returnUrl)
-                : RedirectToAction("Index", "Dashboard", new { area = "Admin" });
+            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+                return Redirect(returnUrl);
+
+            var roles = await _userManager.GetRolesAsync(user);
+            return roles.Contains(Helper.Admin)
+                ? RedirectToAction("Index", "Dashboard", new { area = Helper.Admin })
+                : RedirectToAction("Index", "Home", new { area = string.Empty });
         }
 
         private static string? ResolveExternalReturnUrl(string? returnUrl, ExternalLoginInfo info)

@@ -874,6 +874,31 @@ a, button, .btn, .card, .form-control, .badge, .dropdown-item,
 }
 
 /* ============================================================
+   17b) GOOGLE BUTTON
+   ============================================================ */
+.btn-google-auth {
+  background: #fff !important;
+  border: 1px solid #dadce0 !important;
+  color: #3c4043 !important;
+  font-weight: 600 !important;
+  padding: 0.875rem !important;
+  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.08);
+}
+
+.btn-google-auth:hover,
+.btn-google-auth:focus {
+  background: #f7f8f8 !important;
+  border-color: #d2d3d5 !important;
+  color: #202124 !important;
+}
+
+.btn-google-auth .google-icon {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: -0.15em;
+}
+
+/* ============================================================
    18) RTL SUPPORT (Arabic)
    ============================================================ */
 [dir="rtl"] {

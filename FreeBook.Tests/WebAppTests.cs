@@ -14,6 +14,8 @@ public class WebAppTests : IClassFixture<CustomWebApplicationFactory>
 {
     private const string AdminEmail = "admin@test.local";
     private const string AdminPassword = "Admin@12345";
+    private const string UserEmail = "user@test.local";
+    private const string UserPassword = "User@12345";
     private readonly CustomWebApplicationFactory _factory;
 
     public WebAppTests(CustomWebApplicationFactory factory)
@@ -118,6 +120,55 @@ public class WebAppTests : IClassFixture<CustomWebApplicationFactory>
 
         var registerPage = await client.GetAsync("/Admin/Accounts/Register");
         Assert.Equal(HttpStatusCode.OK, registerPage.StatusCode);
+    }
+
+    [Fact]
+    public async Task PasswordLogin_SendsAdminToDashboard()
+    {
+        await SeedAdminAsync();
+        var client = _factory.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false
+        });
+        var loginPage = await client.GetAsync("/Admin/Accounts/Login?culture=en");
+        var token = ExtractAntiForgeryToken(await loginPage.Content.ReadAsStringAsync());
+
+        var response = await client.PostAsync("/Admin/Accounts/Login?culture=en", new FormUrlEncodedContent(
+            new Dictionary<string, string>
+            {
+                ["Email"] = AdminEmail,
+                ["Password"] = AdminPassword,
+                ["RememberMe"] = "false",
+                ["__RequestVerificationToken"] = token!
+            }));
+
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.Contains("/Admin/Dashboard/Index", response.Headers.Location!.OriginalString);
+    }
+
+    [Fact]
+    public async Task PasswordLogin_SendsUserToPublicHome()
+    {
+        await SeedUserAsync(UserEmail, UserPassword, "User");
+        var client = _factory.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false
+        });
+        var loginPage = await client.GetAsync("/Admin/Accounts/Login?culture=en");
+        var token = ExtractAntiForgeryToken(await loginPage.Content.ReadAsStringAsync());
+
+        var response = await client.PostAsync("/Admin/Accounts/Login?culture=en", new FormUrlEncodedContent(
+            new Dictionary<string, string>
+            {
+                ["Email"] = UserEmail,
+                ["Password"] = UserPassword,
+                ["RememberMe"] = "false",
+                ["__RequestVerificationToken"] = token!
+            }));
+
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        var location = response.Headers.Location!.OriginalString;
+        Assert.True(location is "/" or "/Home" || location.StartsWith("/?", StringComparison.Ordinal), location);
     }
 
     [Fact]
@@ -287,6 +338,10 @@ public class WebAppTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Contains("id=\"googleLogin\"", html);
         Assert.Contains(expectedText, WebUtility.HtmlDecode(html));
         Assert.Contains("/Admin/Accounts/ExternalLogin", html);
+        Assert.Contains("btn-google-auth", html);
+        Assert.Contains("<svg", html);
+        Assert.DoesNotContain("fa-facebook", html);
+        Assert.DoesNotContain("lbLoginWithFacebook", html);
     }
 
     [Fact]
@@ -348,6 +403,24 @@ public class WebAppTests : IClassFixture<CustomWebApplicationFactory>
 
         var protectedPage = await client.GetAsync("/Admin/Accounts/Roles");
         Assert.Equal(HttpStatusCode.OK, protectedPage.StatusCode);
+    }
+
+    [Fact]
+    public async Task GoogleLogin_WithoutReturnUrl_SendsUserHome()
+    {
+        var client = _factory.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false
+        });
+
+        var challenge = await client.GetAsync("/Admin/Accounts/ExternalLogin?culture=en");
+        Assert.Equal(HttpStatusCode.Redirect, challenge.StatusCode);
+
+        var callback = await client.GetAsync(challenge.Headers.Location!.OriginalString);
+        Assert.Equal(HttpStatusCode.Redirect, callback.StatusCode);
+
+        var location = callback.Headers.Location!.OriginalString;
+        Assert.True(location is "/" or "/Home" || location.StartsWith("/?", StringComparison.Ordinal), location);
     }
 
     private static async Task CreateRoleAndAssertFlashAsync(HttpClient client, string culture, string expectedText)
@@ -443,6 +516,39 @@ public class WebAppTests : IClassFixture<CustomWebApplicationFactory>
             var result = await userManager.CreateAsync(admin, AdminPassword);
             Assert.True(result.Succeeded, string.Join("; ", result.Errors.Select(e => e.Description)));
             await userManager.AddToRoleAsync(admin, "Admin");
+        }
+    }
+
+    private async Task SeedUserAsync(string email, string password, string role)
+    {
+        using var scope = _factory.Services.CreateScope();
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+
+        var user = await userManager.FindByEmailAsync(email);
+        if (user is null)
+        {
+            user = new ApplicationUser
+            {
+                UserName = email,
+                Email = email,
+                Name = "Test User",
+                ActiveUser = true,
+                EmailConfirmed = true,
+                ImageUser = string.Empty
+            };
+            var created = await userManager.CreateAsync(user, password);
+            Assert.True(created.Succeeded, string.Join("; ", created.Errors.Select(e => e.Description)));
+        }
+
+        if (!await userManager.IsInRoleAsync(user, role))
+        {
+            await userManager.AddToRoleAsync(user, role);
         }
     }
 
