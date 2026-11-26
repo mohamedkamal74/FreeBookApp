@@ -735,6 +735,54 @@
   <data name="lbRegisterNewMembership" xml:space="preserve">
     <value>Register a new membership</value>
   </data>
+  <data name="lbForgotPasswordDesc" xml:space="preserve">
+    <value>Enter your email address and we will send you a link to reset your password.</value>
+  </data>
+  <data name="lbSendResetLink" xml:space="preserve">
+    <value>Send reset link</value>
+  </data>
+  <data name="lbResetPassword" xml:space="preserve">
+    <value>Reset password</value>
+  </data>
+  <data name="lbResetPasswordDesc" xml:space="preserve">
+    <value>Choose a new password for your account.</value>
+  </data>
+  <data name="lbNewPassword" xml:space="preserve">
+    <value>New password</value>
+  </data>
+  <data name="lbConfirmNewPassword" xml:space="preserve">
+    <value>Confirm new password</value>
+  </data>
+  <data name="lbBackToLogin" xml:space="preserve">
+    <value>Back to sign in</value>
+  </data>
+  <data name="lbOpenLink" xml:space="preserve">
+    <value>Open the link</value>
+  </data>
+  <data name="msgResetLinkSent" xml:space="preserve">
+    <value>If that email address is registered, a password reset link has been sent.</value>
+  </data>
+  <data name="msgPasswordResetSuccess" xml:space="preserve">
+    <value>Your password has been reset. Please sign in with the new password.</value>
+  </data>
+  <data name="msgPasswordResetError" xml:space="preserve">
+    <value>We could not reset your password. The link may be invalid or expired.</value>
+  </data>
+  <data name="msgResetEmailSubject" xml:space="preserve">
+    <value>Reset your Bookify password</value>
+  </data>
+  <data name="msgResetEmailBody" xml:space="preserve">
+    <value>Use the link below to reset your Bookify password. If you did not request this, you can ignore this email.</value>
+  </data>
+  <data name="msgResetCodeEmailBody" xml:space="preserve">
+    <value>Use the code below to reset your Bookify password. If you did not request this, you can ignore this email.</value>
+  </data>
+  <data name="msgConfirmationEmailSubject" xml:space="preserve">
+    <value>Confirm your Bookify email address</value>
+  </data>
+  <data name="msgConfirmationEmailBody" xml:space="preserve">
+    <value>Use the link below to confirm your Bookify email address.</value>
+  </data>
   <data name="lbFeatures" xml:space="preserve">
     <value>Features</value>
   </data>

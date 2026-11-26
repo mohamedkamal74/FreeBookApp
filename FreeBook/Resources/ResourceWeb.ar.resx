@@ -735,6 +735,54 @@
   <data name="lbRegisterNewMembership" xml:space="preserve">
     <value>تسجيل عضوية جديدة</value>
   </data>
+  <data name="lbForgotPasswordDesc" xml:space="preserve">
+    <value>أدخل بريدك الإلكتروني وسنرسل إليك رابطًا لإعادة تعيين كلمة المرور.</value>
+  </data>
+  <data name="lbSendResetLink" xml:space="preserve">
+    <value>إرسال رابط إعادة التعيين</value>
+  </data>
+  <data name="lbResetPassword" xml:space="preserve">
+    <value>إعادة تعيين كلمة المرور</value>
+  </data>
+  <data name="lbResetPasswordDesc" xml:space="preserve">
+    <value>اختر كلمة مرور جديدة لحسابك.</value>
+  </data>
+  <data name="lbNewPassword" xml:space="preserve">
+    <value>كلمة المرور الجديدة</value>
+  </data>
+  <data name="lbConfirmNewPassword" xml:space="preserve">
+    <value>تأكيد كلمة المرور الجديدة</value>
+  </data>
+  <data name="lbBackToLogin" xml:space="preserve">
+    <value>العودة إلى تسجيل الدخول</value>
+  </data>
+  <data name="lbOpenLink" xml:space="preserve">
+    <value>افتح الرابط</value>
+  </data>
+  <data name="msgResetLinkSent" xml:space="preserve">
+    <value>إذا كان هذا البريد مسجلًا لدينا، فقد تم إرسال رابط إعادة تعيين كلمة المرور.</value>
+  </data>
+  <data name="msgPasswordResetSuccess" xml:space="preserve">
+    <value>تمت إعادة تعيين كلمة المرور. سجّل الدخول بكلمة المرور الجديدة.</value>
+  </data>
+  <data name="msgPasswordResetError" xml:space="preserve">
+    <value>تعذّر إعادة تعيين كلمة المرور. قد يكون الرابط غير صالح أو منتهي الصلاحية.</value>
+  </data>
+  <data name="msgResetEmailSubject" xml:space="preserve">
+    <value>إعادة تعيين كلمة مرور Bookify</value>
+  </data>
+  <data name="msgResetEmailBody" xml:space="preserve">
+    <value>استخدم الرابط أدناه لإعادة تعيين كلمة مرور Bookify. إذا لم تطلب ذلك، يمكنك تجاهل هذا البريد.</value>
+  </data>
+  <data name="msgResetCodeEmailBody" xml:space="preserve">
+    <value>استخدم الرمز أدناه لإعادة تعيين كلمة مرور Bookify. إذا لم تطلب ذلك، يمكنك تجاهل هذا البريد.</value>
+  </data>
+  <data name="msgConfirmationEmailSubject" xml:space="preserve">
+    <value>تأكيد بريدك الإلكتروني في Bookify</value>
+  </data>
+  <data name="msgConfirmationEmailBody" xml:space="preserve">
+    <value>استخدم الرابط أدناه لتأكيد بريدك الإلكتروني في Bookify.</value>
+  </data>
   <data name="lbFeatures" xml:space="preserve">
     <value>المميزات</value>
   </data>

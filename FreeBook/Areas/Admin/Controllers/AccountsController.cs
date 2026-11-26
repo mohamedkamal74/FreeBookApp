@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IO;
 using System.Security.Claims;
 using Domin.Entity;
@@ -13,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FreeBook.Areas.Admin.Controllers
@@ -31,6 +33,8 @@ namespace FreeBook.Areas.Admin.Controllers
         private readonly IAccountQueryService _accountQueries;
         private readonly IStringLocalizer<ResourceWeb> _localizer;
         private readonly IOptions<GoogleAuthSettings> _googleAuth;
+        private readonly IEmailSender<ApplicationUser> _emailSender;
+        private readonly ILogger<AccountsController> _logger;
         private IFlashMessageService Flash { get; }
 
         #endregion
@@ -39,7 +43,8 @@ namespace FreeBook.Areas.Admin.Controllers
         public AccountsController(RoleManager<IdentityRole> roleManager,
            UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager,
            IAccountQueryService accountQueries, IStringLocalizer<ResourceWeb> localizer,
-           IOptions<GoogleAuthSettings> googleAuth, IFlashMessageService flash)
+           IOptions<GoogleAuthSettings> googleAuth, IFlashMessageService flash,
+           IEmailSender<ApplicationUser> emailSender, ILogger<AccountsController> logger)
         {
             _roleManager = roleManager;
             _userManager = userManager;
@@ -47,6 +52,8 @@ namespace FreeBook.Areas.Admin.Controllers
             _accountQueries = accountQueries;
             _localizer = localizer;
             _googleAuth = googleAuth;
+            _emailSender = emailSender;
+            _logger = logger;
             Flash = flash;
         }
         #endregion
@@ -325,6 +332,95 @@ namespace FreeBook.Areas.Admin.Controllers
                 ViewBag.ErrorLogin = false;
 
             }
+            return View(model);
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [EnableRateLimiting("forgot-password")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            // Always show the same message so the endpoint cannot be used to
+            // enumerate registered email addresses.
+            var user = await _userManager.FindByEmailAsync(model.Email!);
+            if (user is not null && !string.IsNullOrWhiteSpace(user.Email))
+            {
+                var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var resetUrl = Url.Action(
+                    nameof(ResetPassword),
+                    "Accounts",
+                    new { area = "Admin", userId = user.Id, code, culture = CultureInfo.CurrentUICulture.Name },
+                    Request.Scheme);
+
+                if (!string.IsNullOrWhiteSpace(resetUrl))
+                {
+                    try
+                    {
+                        await _emailSender.SendPasswordResetLinkAsync(user, user.Email, resetUrl);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Failed to send a password reset link to {Email}", user.Email);
+                    }
+                }
+            }
+
+            Flash.Success(_localizer["lbSendResetLink"].Value, _localizer["msgResetLinkSent"].Value);
+            return RedirectToAction(nameof(ForgotPassword));
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult ResetPassword(string? userId, string? code)
+        {
+            if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(code))
+            {
+                Flash.Error(_localizer["lbNotSave"].Value, _localizer["msgPasswordResetError"].Value);
+                return RedirectToAction(nameof(ForgotPassword));
+            }
+
+            return View(new ResetPasswordViewModel { UserId = userId, Code = code });
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [EnableRateLimiting("reset-password")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user is null)
+            {
+                Flash.Error(_localizer["lbNotSave"].Value, _localizer["msgPasswordResetError"].Value);
+                return RedirectToAction(nameof(ForgotPassword));
+            }
+
+            var result = await _userManager.ResetPasswordAsync(user, model.Code, model.NewPassword);
+            if (result.Succeeded)
+            {
+                Flash.Success(_localizer["lbSave"].Value, _localizer["msgPasswordResetSuccess"].Value);
+                return RedirectToAction(nameof(Login), "Accounts", new { area = "Admin" });
+            }
+
+            _logger.LogWarning(
+                "Password reset failed for user {UserId}: {Errors}",
+                user.Id,
+                string.Join("; ", result.Errors.Select(error => error.Code)));
+            ModelState.AddModelError(string.Empty, _localizer["msgPasswordResetError"].Value);
             return View(model);
         }
 

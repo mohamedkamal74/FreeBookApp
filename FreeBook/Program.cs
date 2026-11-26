@@ -5,6 +5,7 @@ using FreeBook.Configuration;
 using FreeBook.Data;
 using FreeBook.Jobs;
 using FreeBook.Middleware;
+using FreeBook.Services;
 using Hangfire;
 using Infrastructure.Common.Configuration;
 using Infrastructure.Data;
@@ -68,6 +69,20 @@ try
             limiter.QueueLimit = 0;
             limiter.AutoReplenishment = true;
         });
+        options.AddFixedWindowLimiter("forgot-password", limiter =>
+        {
+            limiter.PermitLimit = 5;
+            limiter.Window = TimeSpan.FromMinutes(1);
+            limiter.QueueLimit = 0;
+            limiter.AutoReplenishment = true;
+        });
+        options.AddFixedWindowLimiter("reset-password", limiter =>
+        {
+            limiter.PermitLimit = 5;
+            limiter.Window = TimeSpan.FromMinutes(1);
+            limiter.QueueLimit = 0;
+            limiter.AutoReplenishment = true;
+        });
     });
     builder.Services.AddHealthChecks().AddDbContextCheck<FreeBookDbContext>("database");
 
@@ -76,6 +91,7 @@ try
     builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
         .AddEntityFrameworkStores<FreeBookDbContext>()
         .AddDefaultTokenProviders();
+    builder.Services.AddScoped<IEmailSender<ApplicationUser>, IdentityEmailSender>();
 
     var googleAuthSection = builder.Configuration.GetSection("Authentication:Google");
     var googleClientId = googleAuthSection["ClientId"];

@@ -1,4 +1,5 @@
 using System.Threading.RateLimiting;
+using Infrastructure.Common.Interfaces;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
@@ -18,6 +19,8 @@ namespace FreeBook.Tests;
 public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
     private readonly string _databaseName = $"FreeBookTests_{Guid.NewGuid():N}";
+
+    public FakeEmailService EmailService { get; } = new();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -45,24 +48,30 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
             services.RemoveAll<FreeBookDbContext>();
             services.AddDbContext<FreeBookDbContext>(options =>
                 options.UseInMemoryDatabase(_databaseName));
+            services.RemoveAll<IEmailService>();
+            services.AddSingleton<IEmailService>(EmailService);
             services.AddAuthentication()
                 .AddScheme<AuthenticationSchemeOptions, FakeGoogleAuthHandler>(
                     FakeGoogleAuthHandler.SchemeName, _ => { });
 
-            // All WebAppTests share one TestServer, so the production 5/minute
-            // login policy would reject later tests. Keep the middleware active
-            // but give the test host a policy that cannot be exhausted.
+            // All tests share one TestServer, so the production 5/minute policies
+            // would reject later tests. Keep the middleware active but give the
+            // test host policies that cannot be exhausted.
             services.RemoveAll<IConfigureOptions<RateLimiterOptions>>();
             services.Configure<RateLimiterOptions>(options =>
             {
                 options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-                options.AddFixedWindowLimiter("login", limiter =>
+                void AddTestPolicy(string name) => options.AddFixedWindowLimiter(name, limiter =>
                 {
                     limiter.PermitLimit = 1000;
                     limiter.Window = TimeSpan.FromMinutes(1);
                     limiter.QueueLimit = 0;
                     limiter.AutoReplenishment = true;
                 });
+
+                AddTestPolicy("login");
+                AddTestPolicy("forgot-password");
+                AddTestPolicy("reset-password");
             });
         });
     }

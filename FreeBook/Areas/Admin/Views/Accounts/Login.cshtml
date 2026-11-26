@@ -104,7 +104,7 @@
       <!-- /.social-auth-links -->
 
       <p class="mb-1">
-        <a href="#">@Localizer["lbForgotPassword"]</a>
+        <a asp-action="ForgotPassword" asp-controller="Accounts">@Localizer["lbForgotPassword"]</a>
       </p>
       <p class="mb-0">
         <a href="#" class="text-center">@Localizer["lbRegisterNewMembership"]</a>
@@ -119,6 +119,8 @@
 <script src="~/Admin/plugins/jquery/jquery.min.js"></script>
 <!-- Bootstrap 4 -->
 <script src="~/Admin/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="~/Admin/plugins/sweetalert2/sweetalert2.all.min.js"></script>
+@await Html.PartialAsync("_FlashMessage")
 
 </body>
 </html>
