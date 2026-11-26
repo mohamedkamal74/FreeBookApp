@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace FreeBook.Areas.Admin.Controllers
 {
     [Area(Helper.Admin)]
-    [Authorize(Roles = "Admin,User")]
+    [Authorize(Roles = "Admin")]
     public class BooksDashboardController : Controller
     {
         private readonly IDashboardRepository _dashboardRepository;

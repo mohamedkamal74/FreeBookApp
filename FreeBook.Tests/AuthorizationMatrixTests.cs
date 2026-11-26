@@ -32,18 +32,18 @@ public class AuthorizationMatrixTests : IClassFixture<CustomWebApplicationFactor
         "/Admin/Reports/Books?culture=en"
     };
 
-    private static readonly string[] UserAllowedAdminUrls =
+    private static readonly string[] UserStillAllowedAdminUrls =
+    {
+        "/Admin/Accounts/Register?culture=en"
+    };
+
+    private static readonly string[] AdminOnlyUrls =
     {
         "/Admin/Dashboard/Index?culture=en",
         "/Admin/BooksDashboard/Index?culture=en",
         "/Admin/SubscribersDashboard/Index?culture=en",
         "/Admin/Categories/Categories?culture=en",
-        "/Admin/Accounts/Register?culture=en",
-        "/Admin/Accounts/Roles?culture=en"
-    };
-
-    private static readonly string[] AdminOnlyUrls =
-    {
+        "/Admin/Accounts/Roles?culture=en",
         "/Admin/Reports/Books?culture=en",
         "/Admin/Books/Books?culture=en",
         "/Admin/Authors/Authors?culture=en",
@@ -79,12 +79,12 @@ public class AuthorizationMatrixTests : IClassFixture<CustomWebApplicationFactor
     }
 
     [Fact]
-    public async Task NormalUser_CanReachLegacyAdminPages_ButIsDeniedFromAdminOnlyPages()
+    public async Task NormalUser_IsDeniedFromAdminAreaPages()
     {
         var email = await SeedUserAsync("User");
         var client = await CreateLoggedInClientAsync(email);
 
-        foreach (var url in UserAllowedAdminUrls)
+        foreach (var url in UserStillAllowedAdminUrls)
         {
             var response = await client.GetAsync(url);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -104,7 +104,7 @@ public class AuthorizationMatrixTests : IClassFixture<CustomWebApplicationFactor
         var email = await SeedUserAsync("Admin");
         var client = await CreateLoggedInClientAsync(email);
 
-        foreach (var url in UserAllowedAdminUrls.Concat(AdminOnlyUrls))
+        foreach (var url in UserStillAllowedAdminUrls.Concat(AdminOnlyUrls))
         {
             var response = await client.GetAsync(url);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -117,7 +117,7 @@ public class AuthorizationMatrixTests : IClassFixture<CustomWebApplicationFactor
         var email = await SeedUserAsync("User");
         var client = await CreateLoggedInClientAsync(email);
 
-        var adminLayout = await client.GetStringAsync("/Admin/Dashboard/Index?culture=en");
+        var adminLayout = await client.GetStringAsync("/Admin/Accounts/Register?culture=en");
         Assert.Contains("/Admin/Accounts/Register", adminLayout);
         Assert.Contains("/Admin/Categories/Categories", adminLayout);
         Assert.Contains("/Admin/Reports/Index", adminLayout);

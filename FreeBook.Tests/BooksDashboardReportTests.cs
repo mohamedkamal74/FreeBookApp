@@ -145,18 +145,18 @@ public class BooksDashboardReportTests : IClassFixture<CustomWebApplicationFacto
     }
 
     [Fact]
-    public async Task BooksDashboard_AllowsUserRole_ButReportDeniesIt()
+    public async Task BooksDashboard_AndReport_DenyUserRole()
     {
         await SeedUserAsync(UserEmail, "User", "Regular User");
         var client = CreateClient();
         await LoginAsync(client, UserEmail);
 
-        var dashboard = await client.GetAsync("/Admin/BooksDashboard/Index?culture=en");
-        Assert.Equal(HttpStatusCode.OK, dashboard.StatusCode);
-
-        var report = await client.GetAsync("/Admin/Reports/Books?culture=en");
-        Assert.Equal(HttpStatusCode.Redirect, report.StatusCode);
-        Assert.Contains("/Admin/Home/Denied", report.Headers.Location!.OriginalString);
+        foreach (var url in new[] { "/Admin/BooksDashboard/Index?culture=en", "/Admin/Reports/Books?culture=en" })
+        {
+            var response = await client.GetAsync(url);
+            Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+            Assert.Contains("/Admin/Home/Denied", response.Headers.Location!.OriginalString);
+        }
     }
 
     [Fact]

@@ -59,7 +59,7 @@ namespace FreeBook.Areas.Admin.Controllers
         #endregion
 
         #region Methods
-        [Authorize(Roles = "Admin,User")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Roles()
         {
             var model = new RolesViewModel()

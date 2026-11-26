@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace FreeBook.Areas.Admin.Controllers
 {
     [Area(Domin.Entity.Helper.Admin)]
-    [Authorize(Roles = "Admin,User")]
+    [Authorize(Roles = "Admin")]
     public class CategoriesController : Controller
     {
         private readonly IServiceRepository<CategoryDto, CategoryCommand> _serviceCategory;

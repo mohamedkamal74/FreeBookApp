@@ -415,8 +415,11 @@ public class WebAppTests : IClassFixture<CustomWebApplicationFactory>
             Assert.False(await userManager.IsInRoleAsync(user, "Admin"));
         }
 
+        // The safe local return URL is still honored, but a plain User is now
+        // denied on the admin-only Roles page.
         var protectedPage = await client.GetAsync("/Admin/Accounts/Roles");
-        Assert.Equal(HttpStatusCode.OK, protectedPage.StatusCode);
+        Assert.Equal(HttpStatusCode.Redirect, protectedPage.StatusCode);
+        Assert.Contains("/Admin/Home/Denied", protectedPage.Headers.Location!.OriginalString);
     }
 
     [Fact]
