@@ -87,10 +87,13 @@
                 </div>
                 <h3 class="feature-title">@Localizer["lbCategories"]</h3>
                 <p class="feature-description">@Localizer["lbCategoriesDesc"]</p>
-                <a asp-area="Admin" asp-controller="Categories" asp-action="Categories" class="feature-link">
-                    @Localizer["lbLearnMore"]
-                    <i class="fas fa-arrow-right"></i>
-                </a>
+                @if (isAdmin)
+                {
+                    <a asp-area="Admin" asp-controller="Categories" asp-action="Categories" class="feature-link">
+                        @Localizer["lbLearnMore"]
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                }
             </article>
             
             <article class="feature-card animate-fade-in-up animate-delay-2">
@@ -111,10 +114,13 @@
                 </div>
                 <h3 class="feature-title">@Localizer["lbAuthors"]</h3>
                 <p class="feature-description">@Localizer["lbAuthorsDesc"]</p>
-                <a asp-area="Admin" asp-controller="Authors" asp-action="Authors" class="feature-link">
-                    @Localizer["lbLearnMore"]
-                    <i class="fas fa-arrow-right"></i>
-                </a>
+                @if (isAdmin)
+                {
+                    <a asp-area="Admin" asp-controller="Authors" asp-action="Authors" class="feature-link">
+                        @Localizer["lbLearnMore"]
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                }
             </article>
             
             <article class="feature-card animate-fade-in-up animate-delay-4">
@@ -123,10 +129,13 @@
                 </div>
                 <h3 class="feature-title">@Localizer["lbBookCopies"]</h3>
                 <p class="feature-description">@Localizer["lbBookCopiesDesc"]</p>
-                <a asp-area="Admin" asp-controller="BookCopies" asp-action="BookCopies" class="feature-link">
-                    @Localizer["lbLearnMore"]
-                    <i class="fas fa-arrow-right"></i>
-                </a>
+                @if (isAdmin)
+                {
+                    <a asp-area="Admin" asp-controller="BookCopies" asp-action="BookCopies" class="feature-link">
+                        @Localizer["lbLearnMore"]
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                }
             </article>
             
             <article class="feature-card animate-fade-in-up animate-delay-5">
@@ -135,10 +144,13 @@
                 </div>
                 <h3 class="feature-title">@Localizer["lbSubscribers"]</h3>
                 <p class="feature-description">@Localizer["lbSubscribersDesc"]</p>
-                <a asp-area="Admin" asp-controller="Subscribers" asp-action="Subscribers" class="feature-link">
-                    @Localizer["lbLearnMore"]
-                    <i class="fas fa-arrow-right"></i>
-                </a>
+                @if (isAdmin)
+                {
+                    <a asp-area="Admin" asp-controller="Subscribers" asp-action="Subscribers" class="feature-link">
+                        @Localizer["lbLearnMore"]
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                }
             </article>
             
             <article class="feature-card animate-fade-in-up animate-delay-6">
@@ -147,10 +159,13 @@
                 </div>
                 <h3 class="feature-title">@Localizer["lbReports"]</h3>
                 <p class="feature-description">@Localizer["lbReportsDesc"]</p>
-                <a asp-area="Admin" asp-controller="Reports" asp-action="Index" class="feature-link">
-                    @Localizer["lbViewReport"]
-                    <i class="fas fa-arrow-right"></i>
-                </a>
+                @if (isAdmin)
+                {
+                    <a asp-area="Admin" asp-controller="Reports" asp-action="Index" class="feature-link">
+                        @Localizer["lbViewReport"]
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                }
             </article>
         </div>
     </div>

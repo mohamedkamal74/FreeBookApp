@@ -140,8 +140,11 @@
                 <ul class="footer-links">
                     <li><a asp-controller="Home" asp-action="Index">@Localizer["lbHome"]</a></li>
                     <li><a asp-area="Admin" asp-controller="Accounts" asp-action="Login">@Localizer["lbAdminLogin"]</a></li>
-                    <li><a asp-area="Admin" asp-controller="Categories" asp-action="Categories">@Localizer["lbCategories"]</a></li>
-                    <li><a asp-area="Admin" asp-controller="Authors" asp-action="Authors">@Localizer["lbAuthors"]</a></li>
+                    @if (isAdmin)
+                    {
+                        <li><a asp-area="Admin" asp-controller="Categories" asp-action="Categories">@Localizer["lbCategories"]</a></li>
+                        <li><a asp-area="Admin" asp-controller="Authors" asp-action="Authors">@Localizer["lbAuthors"]</a></li>
+                    }
                     @if (showHangfireLink)
                     {
                         <li><a href="/hangfire" target="_blank" rel="noopener">@Localizer["lbHangfire"]</a></li>
@@ -154,19 +157,22 @@
                 </ul>
             </div>
 
-            <!-- Footer Column - Reports -->
-            <div class="footer-column">
-                <h3 class="footer-column-title">@Localizer["lbReports"]</h3>
-                <ul class="footer-links">
-                    <li><a asp-area="Admin" asp-controller="Reports" asp-action="OverdueBooks">@Localizer["lbViewOverdueBooks"]</a></li>
-                    <li><a asp-area="Admin" asp-controller="Reports" asp-action="PopularBooks">@Localizer["lbViewPopularBooks"]</a></li>
-                    <li><a asp-area="Admin" asp-controller="Reports" asp-action="ActiveSubscribers">@Localizer["lbViewActiveSubscribers"]</a></li>
-                    <li><a asp-area="Admin" asp-controller="Reports" asp-action="ExpiringSubscriptions">@Localizer["lbViewExpiringSubscriptions"]</a></li>
-                    <li><a asp-area="Admin" asp-controller="Reports" asp-action="RentalHistory">@Localizer["lbViewRentalHistory"]</a></li>
-                    <li><a asp-area="Admin" asp-controller="Reports" asp-action="BooksByCategory">@Localizer["lbViewBooksByCategory"]</a></li>
-                    <li><a asp-area="Admin" asp-controller="Reports" asp-action="BooksByAuthor">@Localizer["lbViewBooksByAuthor"]</a></li>
-                </ul>
-            </div>
+            @if (isAdmin)
+            {
+                <!-- Footer Column - Reports -->
+                <div class="footer-column">
+                    <h3 class="footer-column-title">@Localizer["lbReports"]</h3>
+                    <ul class="footer-links">
+                        <li><a asp-area="Admin" asp-controller="Reports" asp-action="OverdueBooks">@Localizer["lbViewOverdueBooks"]</a></li>
+                        <li><a asp-area="Admin" asp-controller="Reports" asp-action="PopularBooks">@Localizer["lbViewPopularBooks"]</a></li>
+                        <li><a asp-area="Admin" asp-controller="Reports" asp-action="ActiveSubscribers">@Localizer["lbViewActiveSubscribers"]</a></li>
+                        <li><a asp-area="Admin" asp-controller="Reports" asp-action="ExpiringSubscriptions">@Localizer["lbViewExpiringSubscriptions"]</a></li>
+                        <li><a asp-area="Admin" asp-controller="Reports" asp-action="RentalHistory">@Localizer["lbViewRentalHistory"]</a></li>
+                        <li><a asp-area="Admin" asp-controller="Reports" asp-action="BooksByCategory">@Localizer["lbViewBooksByCategory"]</a></li>
+                        <li><a asp-area="Admin" asp-controller="Reports" asp-action="BooksByAuthor">@Localizer["lbViewBooksByAuthor"]</a></li>
+                    </ul>
+                </div>
+            }
 
             <!-- Footer Column - Contact -->
             <div class="footer-column">

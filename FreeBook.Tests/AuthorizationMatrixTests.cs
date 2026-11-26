@@ -47,6 +47,22 @@ public class AuthorizationMatrixTests : IClassFixture<CustomWebApplicationFactor
         "/Admin/Notifications/Index?culture=en"
     };
 
+    private static readonly string[] PublicSurfaceAdminLinks =
+    {
+        "/Admin/Categories/Categories",
+        "/Admin/Authors/Authors",
+        "/Admin/BookCopies/BookCopies",
+        "/Admin/Subscribers/Subscribers",
+        "/Admin/Reports/Index",
+        "/Admin/Reports/OverdueBooks",
+        "/Admin/Reports/PopularBooks",
+        "/Admin/Reports/ActiveSubscribers",
+        "/Admin/Reports/ExpiringSubscriptions",
+        "/Admin/Reports/RentalHistory",
+        "/Admin/Reports/BooksByCategory",
+        "/Admin/Reports/BooksByAuthor"
+    };
+
     private readonly CustomWebApplicationFactory _factory;
 
     public AuthorizationMatrixTests(CustomWebApplicationFactory factory)
@@ -101,7 +117,7 @@ public class AuthorizationMatrixTests : IClassFixture<CustomWebApplicationFactor
     }
 
     [Fact]
-    public async Task AdminLayout_ShowsAdminLinks_ButPublicNavHidesThemForNormalUser()
+    public async Task AdminLayout_ShowsAdminLinks_ButPublicPagesHideThemForNormalUser()
     {
         var adminEmail = await SeedUserAsync("Admin");
         var adminClient = await CreateLoggedInClientAsync(adminEmail);
@@ -126,8 +142,7 @@ public class AuthorizationMatrixTests : IClassFixture<CustomWebApplicationFactor
         Assert.DoesNotContain("/Admin/Categories", nav);
         Assert.DoesNotContain("/Admin/Accounts/Register", nav);
 
-        // The home page feature cards currently do expose admin links to everyone.
-        Assert.Contains("/Admin/Categories", publicLayout);
+        AssertPublicAdminLinks(publicLayout, expected: false);
     }
 
     [Fact]
@@ -181,6 +196,37 @@ public class AuthorizationMatrixTests : IClassFixture<CustomWebApplicationFactor
     }
 
     [Fact]
+    public async Task AnonymousPublicHome_HidesAllAdminLinks()
+    {
+        var html = await CreateClient().GetStringAsync("/?culture=en");
+
+        AssertPublicAdminLinks(html, expected: false);
+    }
+
+    [Fact]
+    public async Task NormalUserPublicHome_HidesAllAdminLinks()
+    {
+        var email = await SeedUserAsync("User");
+        var client = await CreateLoggedInClientAsync(email);
+
+        var html = await client.GetStringAsync("/?culture=en");
+
+        AssertPublicAdminLinks(html, expected: false);
+        Assert.Contains("/Admin/Accounts/ChangePassword", html);
+    }
+
+    [Fact]
+    public async Task AdminPublicHome_ShowsAdminLinks()
+    {
+        var email = await SeedUserAsync("Admin");
+        var client = await CreateLoggedInClientAsync(email);
+
+        var html = await client.GetStringAsync("/?culture=en");
+
+        AssertPublicAdminLinks(html, expected: true);
+    }
+
+    [Fact]
     public async Task AdminLayoutSidebar_IsAdminOnly()
     {
         var adminEmail = await SeedUserAsync("Admin");
@@ -197,6 +243,21 @@ public class AuthorizationMatrixTests : IClassFixture<CustomWebApplicationFactor
         Assert.DoesNotContain("class=\"mt-2 mr-6\"", userHtml);
         Assert.DoesNotContain("/Admin/Categories/Categories", userHtml);
         Assert.Contains("/Admin/Accounts/ChangePassword", userHtml);
+    }
+
+    private static void AssertPublicAdminLinks(string html, bool expected)
+    {
+        foreach (var url in PublicSurfaceAdminLinks)
+        {
+            if (expected)
+            {
+                Assert.Contains(url, html);
+            }
+            else
+            {
+                Assert.DoesNotContain(url, html);
+            }
+        }
     }
 
     private HttpClient CreateClient() => _factory.CreateClient(new WebApplicationFactoryClientOptions
