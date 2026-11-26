@@ -81,20 +81,20 @@
         </header>
         
         <div class="features-grid">
-            <article class="feature-card animate-fade-in-up animate-delay-1">
-                <div class="feature-icon">
-                    <i class="fas fa-tags"></i>
-                </div>
-                <h3 class="feature-title">@Localizer["lbCategories"]</h3>
-                <p class="feature-description">@Localizer["lbCategoriesDesc"]</p>
-                @if (isAdmin)
-                {
+            @if (isAdmin)
+            {
+                <article class="feature-card animate-fade-in-up animate-delay-1">
+                    <div class="feature-icon">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <h3 class="feature-title">@Localizer["lbCategories"]</h3>
+                    <p class="feature-description">@Localizer["lbCategoriesDesc"]</p>
                     <a asp-area="Admin" asp-controller="Categories" asp-action="Categories" class="feature-link">
                         @Localizer["lbLearnMore"]
                         <i class="fas fa-arrow-right"></i>
                     </a>
-                }
-            </article>
+                </article>
+            }
             
             <article class="feature-card animate-fade-in-up animate-delay-2">
                 <div class="feature-icon">
@@ -108,65 +108,65 @@
                 </a>
             </article>
             
-            <article class="feature-card animate-fade-in-up animate-delay-3">
-                <div class="feature-icon">
-                    <i class="fas fa-user-edit"></i>
-                </div>
-                <h3 class="feature-title">@Localizer["lbAuthors"]</h3>
-                <p class="feature-description">@Localizer["lbAuthorsDesc"]</p>
-                @if (isAdmin)
-                {
+            @if (isAdmin)
+            {
+                <article class="feature-card animate-fade-in-up animate-delay-3">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-edit"></i>
+                    </div>
+                    <h3 class="feature-title">@Localizer["lbAuthors"]</h3>
+                    <p class="feature-description">@Localizer["lbAuthorsDesc"]</p>
                     <a asp-area="Admin" asp-controller="Authors" asp-action="Authors" class="feature-link">
                         @Localizer["lbLearnMore"]
                         <i class="fas fa-arrow-right"></i>
                     </a>
-                }
-            </article>
+                </article>
+            }
             
-            <article class="feature-card animate-fade-in-up animate-delay-4">
-                <div class="feature-icon">
-                    <i class="fas fa-copy"></i>
-                </div>
-                <h3 class="feature-title">@Localizer["lbBookCopies"]</h3>
-                <p class="feature-description">@Localizer["lbBookCopiesDesc"]</p>
-                @if (isAdmin)
-                {
+            @if (isAdmin)
+            {
+                <article class="feature-card animate-fade-in-up animate-delay-4">
+                    <div class="feature-icon">
+                        <i class="fas fa-copy"></i>
+                    </div>
+                    <h3 class="feature-title">@Localizer["lbBookCopies"]</h3>
+                    <p class="feature-description">@Localizer["lbBookCopiesDesc"]</p>
                     <a asp-area="Admin" asp-controller="BookCopies" asp-action="BookCopies" class="feature-link">
                         @Localizer["lbLearnMore"]
                         <i class="fas fa-arrow-right"></i>
                     </a>
-                }
-            </article>
+                </article>
+            }
             
-            <article class="feature-card animate-fade-in-up animate-delay-5">
-                <div class="feature-icon">
-                    <i class="fas fa-users"></i>
-                </div>
-                <h3 class="feature-title">@Localizer["lbSubscribers"]</h3>
-                <p class="feature-description">@Localizer["lbSubscribersDesc"]</p>
-                @if (isAdmin)
-                {
+            @if (isAdmin)
+            {
+                <article class="feature-card animate-fade-in-up animate-delay-5">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="feature-title">@Localizer["lbSubscribers"]</h3>
+                    <p class="feature-description">@Localizer["lbSubscribersDesc"]</p>
                     <a asp-area="Admin" asp-controller="Subscribers" asp-action="Subscribers" class="feature-link">
                         @Localizer["lbLearnMore"]
                         <i class="fas fa-arrow-right"></i>
                     </a>
-                }
-            </article>
+                </article>
+            }
             
-            <article class="feature-card animate-fade-in-up animate-delay-6">
-                <div class="feature-icon">
-                    <i class="fas fa-chart-bar"></i>
-                </div>
-                <h3 class="feature-title">@Localizer["lbReports"]</h3>
-                <p class="feature-description">@Localizer["lbReportsDesc"]</p>
-                @if (isAdmin)
-                {
+            @if (isAdmin)
+            {
+                <article class="feature-card animate-fade-in-up animate-delay-6">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3 class="feature-title">@Localizer["lbReports"]</h3>
+                    <p class="feature-description">@Localizer["lbReportsDesc"]</p>
                     <a asp-area="Admin" asp-controller="Reports" asp-action="Index" class="feature-link">
                         @Localizer["lbViewReport"]
                         <i class="fas fa-arrow-right"></i>
                     </a>
-                }
-            </article>
+                </article>
+            }
         </div>
     </div>
 </section>

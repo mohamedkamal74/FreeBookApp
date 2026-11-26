@@ -201,6 +201,7 @@ public class AuthorizationMatrixTests : IClassFixture<CustomWebApplicationFactor
         var html = await CreateClient().GetStringAsync("/?culture=en");
 
         AssertPublicAdminLinks(html, expected: false);
+        Assert.Equal(1, CountFeatureCards(html));
     }
 
     [Fact]
@@ -212,6 +213,7 @@ public class AuthorizationMatrixTests : IClassFixture<CustomWebApplicationFactor
         var html = await client.GetStringAsync("/?culture=en");
 
         AssertPublicAdminLinks(html, expected: false);
+        Assert.Equal(1, CountFeatureCards(html));
         Assert.Contains("/Admin/Accounts/ChangePassword", html);
     }
 
@@ -224,6 +226,7 @@ public class AuthorizationMatrixTests : IClassFixture<CustomWebApplicationFactor
         var html = await client.GetStringAsync("/?culture=en");
 
         AssertPublicAdminLinks(html, expected: true);
+        Assert.Equal(6, CountFeatureCards(html));
     }
 
     [Fact]
@@ -244,6 +247,8 @@ public class AuthorizationMatrixTests : IClassFixture<CustomWebApplicationFactor
         Assert.DoesNotContain("/Admin/Categories/Categories", userHtml);
         Assert.Contains("/Admin/Accounts/ChangePassword", userHtml);
     }
+
+    private static int CountFeatureCards(string html) => Regex.Matches(html, "class=\"feature-card").Count;
 
     private static void AssertPublicAdminLinks(string html, bool expected)
     {
