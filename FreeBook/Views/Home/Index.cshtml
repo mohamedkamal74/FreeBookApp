@@ -1,4 +1,5 @@
-﻿@inject IStringLocalizer<ResourceWeb> Localizer
+﻿@model PublicHomeViewModel
+@inject IStringLocalizer<ResourceWeb> Localizer
 @inject SignInManager<ApplicationUser> SignInManager
 @using Microsoft.AspNetCore.Identity
 @{
@@ -152,6 +153,70 @@
                 </a>
             </article>
         </div>
+    </div>
+</section>
+
+<!-- ============================================================
+     AVAILABLE BOOKS
+     ============================================================ -->
+<section class="available-books" id="availableBooks" aria-labelledby="available-books-title">
+    <div class="container-custom">
+        <header class="available-books-header animate-fade-in-up">
+            <span class="available-books-eyebrow">
+                <i class="fas fa-book-open" aria-hidden="true"></i>
+                @Localizer["lbAvailableForRental"]
+            </span>
+            <h2 id="available-books-title">@Localizer["lbAvailableBooks"]</h2>
+            <p>@Localizer["lbAvailableBooksDesc"]</p>
+        </header>
+
+        @if (Model.AvailableBooks.Count == 0)
+        {
+            <div class="available-books-empty" role="status">
+                <i class="fas fa-book-open" aria-hidden="true"></i>
+                <p>@Localizer["lbNoBooksAvailable"]</p>
+            </div>
+        }
+        else
+        {
+            <div class="available-books-grid">
+                @foreach (var book in Model.AvailableBooks)
+                {
+                    var coverUrl = !string.IsNullOrWhiteSpace(book.ImageThumbnailUrl)
+                        ? book.ImageThumbnailUrl
+                        : book.ImageUrl;
+                    <article class="available-book-card animate-fade-in-up" data-book-id="@book.BookId">
+                        <div class="available-book-cover">
+                            @if (!string.IsNullOrWhiteSpace(coverUrl))
+                            {
+                                <img src="@coverUrl" alt="@Localizer["lbCoverImage"]" loading="lazy" />
+                            }
+                            else
+                            {
+                                <i class="fas fa-image available-book-placeholder" role="img" title="@Localizer["lbCoverImage"]" aria-label="@Localizer["lbCoverImage"]"></i>
+                            }
+                            <span class="available-book-badge">
+                                <i class="fas fa-check-circle" aria-hidden="true"></i>
+                                @Localizer["lbAvailable"]
+                            </span>
+                        </div>
+                        <div class="available-book-body">
+                            <h3 class="available-book-title">@book.Title</h3>
+                            <dl class="available-book-meta">
+                                <div>
+                                    <dt>@Localizer["lbAuthor"]</dt>
+                                    <dd>@(string.IsNullOrWhiteSpace(book.AuthorName) ? "—" : book.AuthorName)</dd>
+                                </div>
+                                <div>
+                                    <dt>@Localizer["lbCategory"]</dt>
+                                    <dd>@(string.IsNullOrWhiteSpace(book.CategoryName) ? "—" : book.CategoryName)</dd>
+                                </div>
+                            </dl>
+                        </div>
+                    </article>
+                }
+            </div>
+        }
     </div>
 </section>
 

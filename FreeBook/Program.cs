@@ -135,6 +135,7 @@ try
     builder.Services.AddScoped<IAccountQueryService, ServicesAccount>();
     builder.Services.AddScoped<IDashboardRepository, ServicesDashboard>();
     builder.Services.AddScoped<IReportRepository, ServicesReports>();
+    builder.Services.AddScoped<IPublicHomeQueryService, ServicesPublicHome>();
 
     // Core services
     builder.Services.AddHttpContextAccessor();

@@ -588,6 +588,15 @@
   <data name="lbAvailableForRental" xml:space="preserve">
     <value>Available for rental</value>
   </data>
+  <data name="lbAvailableBooks" xml:space="preserve">
+    <value>Available books</value>
+  </data>
+  <data name="lbAvailableBooksDesc" xml:space="preserve">
+    <value>Browse books currently available for rental.</value>
+  </data>
+  <data name="lbNoBooksAvailable" xml:space="preserve">
+    <value>No books are available right now.</value>
+  </data>
   <data name="lbSelectOption" xml:space="preserve">
     <value>Select...</value>
   </data>

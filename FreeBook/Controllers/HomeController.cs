@@ -1,5 +1,8 @@
 using System.Diagnostics;
 using FreeBook.Models;
+using Infrastructure.Common;
+using Infrastructure.IRepository;
+using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FreeBook.Controllers
@@ -7,15 +10,22 @@ namespace FreeBook.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IPublicHomeQueryService _publicHomeQueries;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IPublicHomeQueryService publicHomeQueries)
         {
             _logger = logger;
+            _publicHomeQueries = publicHomeQueries;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var result = await _publicHomeQueries.GetAvailableBooksAsync();
+            var model = new PublicHomeViewModel
+            {
+                AvailableBooks = result.ValueOr(new List<AvailableBookCardDto>())
+            };
+            return View(model);
         }
 
         public IActionResult Privacy()

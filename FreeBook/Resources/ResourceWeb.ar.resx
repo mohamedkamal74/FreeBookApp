@@ -585,6 +585,15 @@
   <data name="lbAvailableForRental" xml:space="preserve">
     <value>متاح للإعارة</value>
   </data>
+  <data name="lbAvailableBooks" xml:space="preserve">
+    <value>الكتب المتاحة</value>
+  </data>
+  <data name="lbAvailableBooksDesc" xml:space="preserve">
+    <value>تصفح الكتب المتاحة للإعارة حاليًا.</value>
+  </data>
+  <data name="lbNoBooksAvailable" xml:space="preserve">
+    <value>لا توجد كتب متاحة حاليًا.</value>
+  </data>
   <data name="lbSelectOption" xml:space="preserve">
     <value>اختر...</value>
   </data>
