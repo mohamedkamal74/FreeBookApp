@@ -1,6 +1,9 @@
 @inject UserManager<ApplicationUser> usermanager
 @inject SignInManager<ApplicationUser> signinmanager
 @inject IStringLocalizer<ResourceWeb> Localizer
+@{
+    var isAdmin = User.IsInRole("Admin");
+}
 <!DOCTYPE html>
 <html lang="@CultureInfo.CurrentUICulture.Name" dir="@(CultureInfo.CurrentUICulture.Name == "ar" ? "rtl" : "ltr")">
 <head>
@@ -55,7 +58,14 @@
                     <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
                 </li>
                 <li class="nav-item d-none d-sm-inline-block">
-                    <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="nav-link">@Localizer["lbHomePage"]</a>
+                    @if (isAdmin)
+                    {
+                        <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="nav-link">@Localizer["lbHomePage"]</a>
+                    }
+                    else
+                    {
+                        <a asp-area="" asp-controller="Home" asp-action="Index" class="nav-link">@Localizer["lbHomePage"]</a>
+                    }
                 </li>
             </ul>
 
@@ -99,6 +109,7 @@
                     </div>
                     <div class="info">
                         <a href="#" class="d-block">@(currentUser?.Name)</a>
+                        <a asp-area="Admin" asp-controller="Accounts" asp-action="ChangePassword" class="d-block">@Localizer["lbbtnChangePassword"]</a>
 
                         <form asp-action="LogOut" asp-controller="Accounts" method="post">
                         <input type="submit" style="border:none;background-color:#343a40;color:orange" value="@Localizer["lbLogout"]"/>
@@ -110,6 +121,8 @@
                 </div>
 
                 <!-- Sidebar Menu -->
+                @if (isAdmin)
+                {
                 <nav class="mt-2 mr-6">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="true">
                         <!-- Dashboard -->
@@ -237,6 +250,7 @@
                         }
                     </ul>
                 </nav>
+                }
                 <!-- /.sidebar-menu -->
             </div>
             <!-- /.sidebar -->

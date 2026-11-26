@@ -143,15 +143,60 @@ public class AuthorizationMatrixTests : IClassFixture<CustomWebApplicationFactor
     }
 
     [Fact]
-    public async Task AnonymousPublicLayout_CurrentlyExposesOpsLinks()
+    public async Task AnonymousPublicLayout_HidesOpsLinksButKeepsHealth()
     {
         var client = CreateClient();
+
+        var html = await client.GetStringAsync("/?culture=en");
+
+        Assert.DoesNotContain("href=\"/hangfire\"", html);
+        Assert.DoesNotContain("href=\"/swagger\"", html);
+        Assert.Contains("href=\"/health\"", html);
+    }
+
+    [Fact]
+    public async Task NormalUserPublicLayout_HidesOpsLinksButKeepsHealth()
+    {
+        var email = await SeedUserAsync("User");
+        var client = await CreateLoggedInClientAsync(email);
+
+        var html = await client.GetStringAsync("/?culture=en");
+
+        Assert.DoesNotContain("href=\"/hangfire\"", html);
+        Assert.DoesNotContain("href=\"/swagger\"", html);
+        Assert.Contains("href=\"/health\"", html);
+    }
+
+    [Fact]
+    public async Task AdminPublicLayout_ShowsOpsLinksInDevelopment()
+    {
+        var email = await SeedUserAsync("Admin");
+        var client = await CreateLoggedInClientAsync(email);
 
         var html = await client.GetStringAsync("/?culture=en");
 
         Assert.Contains("href=\"/hangfire\"", html);
         Assert.Contains("href=\"/swagger\"", html);
         Assert.Contains("href=\"/health\"", html);
+    }
+
+    [Fact]
+    public async Task AdminLayoutSidebar_IsAdminOnly()
+    {
+        var adminEmail = await SeedUserAsync("Admin");
+        var adminClient = await CreateLoggedInClientAsync(adminEmail);
+
+        var adminHtml = await adminClient.GetStringAsync("/Admin/Home/Denied?culture=en");
+        Assert.Contains("class=\"mt-2 mr-6\"", adminHtml);
+        Assert.Contains("/Admin/Categories/Categories", adminHtml);
+
+        var userEmail = await SeedUserAsync("User");
+        var userClient = await CreateLoggedInClientAsync(userEmail);
+
+        var userHtml = await userClient.GetStringAsync("/Admin/Home/Denied?culture=en");
+        Assert.DoesNotContain("class=\"mt-2 mr-6\"", userHtml);
+        Assert.DoesNotContain("/Admin/Categories/Categories", userHtml);
+        Assert.Contains("/Admin/Accounts/ChangePassword", userHtml);
     }
 
     private HttpClient CreateClient() => _factory.CreateClient(new WebApplicationFactoryClientOptions
