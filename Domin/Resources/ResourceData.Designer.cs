@@ -97,6 +97,15 @@ namespace Domin.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to يجب ادخال كلمة المرور الحالية.
+        /// </summary>
+        public static string CurrentPassword {
+            get {
+                return ResourceManager.GetString("CurrentPassword", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to هدا الحقل مطلوب.
         /// </summary>
         public static string CtegoryName {

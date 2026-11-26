@@ -1,6 +1,5 @@
 using System.Net;
 using System.Text.RegularExpressions;
-using Domin.Entity;
 using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -32,17 +31,13 @@ public class AuthorizationMatrixTests : IClassFixture<CustomWebApplicationFactor
         "/Admin/Reports/Books?culture=en"
     };
 
-    private static readonly string[] UserStillAllowedAdminUrls =
-    {
-        "/Admin/Accounts/Register?culture=en"
-    };
-
     private static readonly string[] AdminOnlyUrls =
     {
         "/Admin/Dashboard/Index?culture=en",
         "/Admin/BooksDashboard/Index?culture=en",
         "/Admin/SubscribersDashboard/Index?culture=en",
         "/Admin/Categories/Categories?culture=en",
+        "/Admin/Accounts/Register?culture=en",
         "/Admin/Accounts/Roles?culture=en",
         "/Admin/Reports/Books?culture=en",
         "/Admin/Books/Books?culture=en",
@@ -84,12 +79,6 @@ public class AuthorizationMatrixTests : IClassFixture<CustomWebApplicationFactor
         var email = await SeedUserAsync("User");
         var client = await CreateLoggedInClientAsync(email);
 
-        foreach (var url in UserStillAllowedAdminUrls)
-        {
-            var response = await client.GetAsync(url);
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        }
-
         foreach (var url in AdminOnlyUrls)
         {
             var response = await client.GetAsync(url);
@@ -104,7 +93,7 @@ public class AuthorizationMatrixTests : IClassFixture<CustomWebApplicationFactor
         var email = await SeedUserAsync("Admin");
         var client = await CreateLoggedInClientAsync(email);
 
-        foreach (var url in UserStillAllowedAdminUrls.Concat(AdminOnlyUrls))
+        foreach (var url in AdminOnlyUrls)
         {
             var response = await client.GetAsync(url);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -112,17 +101,20 @@ public class AuthorizationMatrixTests : IClassFixture<CustomWebApplicationFactor
     }
 
     [Fact]
-    public async Task NormalUser_SeesAdminSidebarInAdminLayout_ButNotPublicAdminLinks()
+    public async Task AdminLayout_ShowsAdminLinks_ButPublicNavHidesThemForNormalUser()
     {
-        var email = await SeedUserAsync("User");
-        var client = await CreateLoggedInClientAsync(email);
+        var adminEmail = await SeedUserAsync("Admin");
+        var adminClient = await CreateLoggedInClientAsync(adminEmail);
 
-        var adminLayout = await client.GetStringAsync("/Admin/Accounts/Register?culture=en");
+        var adminLayout = await adminClient.GetStringAsync("/Admin/Accounts/Register?culture=en");
         Assert.Contains("/Admin/Accounts/Register", adminLayout);
         Assert.Contains("/Admin/Categories/Categories", adminLayout);
         Assert.Contains("/Admin/Reports/Index", adminLayout);
 
-        var publicLayout = await client.GetStringAsync("/?culture=en");
+        var userEmail = await SeedUserAsync("User");
+        var userClient = await CreateLoggedInClientAsync(userEmail);
+
+        var publicLayout = await userClient.GetStringAsync("/?culture=en");
         var navMatch = Regex.Match(
             publicLayout,
             "<nav[^>]*class=\"main-nav\"[^>]*>[\\s\\S]*?</nav>",
@@ -139,38 +131,15 @@ public class AuthorizationMatrixTests : IClassFixture<CustomWebApplicationFactor
     }
 
     [Fact]
-    public async Task NormalUser_RegisterPageCurrentlyOffersAdminRole()
+    public async Task RegisterPage_OffersRoleDropdownToAdminOnly()
     {
-        var email = await SeedUserAsync("User");
-        var client = await CreateLoggedInClientAsync(email);
+        var adminEmail = await SeedUserAsync("Admin");
+        var adminClient = await CreateLoggedInClientAsync(adminEmail);
 
-        var html = await client.GetStringAsync("/Admin/Accounts/Register?culture=en");
+        var html = await adminClient.GetStringAsync("/Admin/Accounts/Register?culture=en");
 
         Assert.Contains("id=\"ddluserRole\"", html);
         Assert.Contains("value=\"Admin\"", html);
-    }
-
-    [Fact]
-    public async Task NormalUser_CanCurrentlyReachChangePasswordAction_WithoutTargetOwnershipCheck()
-    {
-        var email = await SeedUserAsync("User");
-        var client = await CreateLoggedInClientAsync(email);
-        var token = ExtractToken(
-            await client.GetStringAsync("/Admin/Accounts/Register?culture=en"));
-
-        // No password is supplied and the id does not exist, so this only proves the
-        // action is reachable; it does not mutate any account.
-        var response = await client.PostAsync("/Admin/Accounts/ChangePassword?culture=en",
-            new FormUrlEncodedContent(new Dictionary<string, string>
-            {
-                ["changePassword.Id"] = Guid.NewGuid().ToString(),
-                ["changePassword.NewPassword"] = string.Empty,
-                ["changePassword.ConfirmPassword"] = string.Empty,
-                ["__RequestVerificationToken"] = token
-            }));
-
-        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
-        Assert.Contains("/Admin/Accounts/Register", response.Headers.Location!.OriginalString);
     }
 
     [Fact]

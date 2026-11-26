@@ -70,7 +70,3 @@ Rest = () => {
     document.getElementById('userConfirm').value = "";
     document.getElementById('image').hidden = true;
 }
-
-function ChangePassword(id) {
-    document.getElementById('userPassId').value = id;
-}

@@ -131,7 +131,7 @@ namespace FreeBook.Areas.Admin.Controllers
 
 
         }
-        [Authorize(Roles = "Admin,User")]
+        [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> Register()
         {
@@ -146,7 +146,7 @@ namespace FreeBook.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin,User")]
+        [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
@@ -156,6 +156,7 @@ namespace FreeBook.Areas.Admin.Controllers
             // The user form only posts NewRegister. The ChangePassword fields live in a
             // different modal/form, but they are part of RegisterViewModel and their
             // [Required] attributes would otherwise make every Register POST invalid.
+            ModelState.Remove("changePassword.CurrentPassword");
             ModelState.Remove("changePassword.NewPassword");
             ModelState.Remove("changePassword.ConfirmPassword");
 
@@ -284,25 +285,47 @@ namespace FreeBook.Areas.Admin.Controllers
 
         }
 
+        [Authorize]
+        [HttpGet]
+        public IActionResult ChangePassword()
+        {
+            return View(new ChangePasswordViewModel());
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin,User")]
-
-        public async Task<IActionResult> ChangePassword(RegisterViewModel model)
+        [Authorize]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
-            var user = await _userManager.FindByIdAsync(model.changePassword.Id);
-            if (user != null)
-            {
-                await _userManager.RemovePasswordAsync(user);
-                var AddNewPassword = await _userManager.AddPasswordAsync(user, model.changePassword.NewPassword);
-                if (AddNewPassword.Succeeded)
-                    Flash.Success(Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbMsgSaveChangePassword);
-                else
-                    Flash.Error(Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSaveChangePassword);
-                return RedirectToAction("Register");
-            }
-            return RedirectToAction("Register");
+            if (!ModelState.IsValid)
+                return View(model);
 
+            // Self-service only: the signed-in user is the target and any posted id
+            // is deliberately ignored.
+            var userId = _userManager.GetUserId(User);
+            var user = string.IsNullOrWhiteSpace(userId)
+                ? null
+                : await _userManager.FindByIdAsync(userId);
+
+            if (user is null)
+                return Challenge();
+
+            var result = await _userManager.ChangePasswordAsync(
+                user,
+                model.CurrentPassword!,
+                model.NewPassword!);
+
+            if (result.Succeeded)
+            {
+                await _signInManager.RefreshSignInAsync(user);
+                Flash.Success(_localizer["lbSave"].Value, _localizer["lbMsgSaveChangePassword"].Value);
+            }
+            else
+            {
+                Flash.Error(_localizer["lbNotSave"].Value, _localizer["lbMsgNotSaveChangePassword"].Value);
+            }
+
+            return RedirectToAction(nameof(ChangePassword));
         }
 
 

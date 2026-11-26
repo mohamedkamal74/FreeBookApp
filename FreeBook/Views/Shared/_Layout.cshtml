@@ -75,6 +75,11 @@
                         <li class="main-nav-item"><a asp-area="Admin" asp-controller="Accounts" asp-action="Login">@Localizer["lbAdminLogin"]</a></li>
                     }
 
+                    @if (isSignedIn)
+                    {
+                        <li class="main-nav-item"><a asp-area="Admin" asp-controller="Accounts" asp-action="ChangePassword">@Localizer["lbbtnChangePassword"]</a></li>
+                    }
+
                     <li class="main-nav-item"><a href="/hangfire" target="_blank" rel="noopener">@Localizer["lbHangfire"]</a></li>
                     <li class="main-nav-item"><a href="/swagger" target="_blank" rel="noopener">@Localizer["lbSwagger"]</a></li>
                     <li class="main-nav-item"><a href="/health">@Localizer["lbHealth"]</a></li>

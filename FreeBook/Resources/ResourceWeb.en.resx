@@ -21,6 +21,12 @@
   <data name="lbbtnChangePassword" xml:space="preserve">
     <value>Change Password</value>
   </data>
+  <data name="lbChangePasswordDesc" xml:space="preserve">
+    <value>Update your account password.</value>
+  </data>
+  <data name="lbCurrentPassword" xml:space="preserve">
+    <value>Current password</value>
+  </data>
   <data name="lbbtnDelete" xml:space="preserve">
     <value>Delete</value>
   </data>

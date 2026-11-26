@@ -90,11 +90,6 @@
                 title="@Localizer["lbbtnDelete"]" aria-label="@Localizer["lbbtnDelete"]">
             <i class="fas fa-trash" aria-hidden="true"></i>
         </button>
-        <button type="button" class="btn btn-dark" onclick="ChangePassword('@user.Id')"
-                title="@Localizer["lbbtnChangePassword"]" aria-label="@Localizer["lbbtnChangePassword"]"
-                data-bs-toggle="modal" data-bs-target="#ChangePasswordModal">
-            <i class="fas fa-key" aria-hidden="true"></i>
-        </button>
     </div>
 </td>
 
@@ -169,30 +164,6 @@ asp-items="@(new SelectList(Model.Roles,"Name","Name"))">
      </form>
 </modal>
 
-
-<!--Modal Change Password-->
-
-<modal id="ChangePasswordModal" title-id="changePasswordModalTitle" title="@Localizer["lbbtnChangePassword"]">
-    <form asp-action="ChangePassword" asp-controller="Accounts" method="post" enctype="multipart/form-data">
-         <div class="form-group">
-        <input type="text" asp-for="changePassword.Id" hidden class="form-control" id="userPassId"/>
-
-         <label class="control-label" asp-for="changePassword.NewPassword">@Localizer["lbPassword"]</label>
-         <input type="password" asp-for="changePassword.NewPassword" class="form-control" />
-         <span asp-validation-for="changePassword.NewPassword" class="text-danger"></span>
-         </div>
-<div class="form-group">
-          <label class="control-label" asp-for="changePassword.ConfirmPassword">@Localizer["lbConfirmpassword"]</label>
-          <input type="password" asp-for="changePassword.ConfirmPassword" class="form-control" />
-          <span asp-validation-for="changePassword.ConfirmPassword" class="text-danger"></span>
-          </div>
-
-
-           <input  type="submit" class="btn btn-success" value="@Localizer["lbBtnSave"]" id="changePasswordModalBtnSave"/>
-           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["lbClose"]</button>
-
-     </form>
-</modal>
 </div>
 
 <form id="deleteForm" method="post" class="d-none">

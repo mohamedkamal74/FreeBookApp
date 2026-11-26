@@ -21,6 +21,12 @@
   <data name="lbbtnChangePassword" xml:space="preserve">
     <value>تغيير كلمة المرور</value>
   </data>
+  <data name="lbChangePasswordDesc" xml:space="preserve">
+    <value>حدّث كلمة مرور حسابك.</value>
+  </data>
+  <data name="lbCurrentPassword" xml:space="preserve">
+    <value>كلمة المرور الحالية</value>
+  </data>
   <data name="lbbtnDelete" xml:space="preserve">
     <value>مسح</value>
   </data>

@@ -129,6 +129,9 @@
   <data name="ConfirmPasswordError" xml:space="preserve">
     <value>كلمة المرور غير متطابقة</value>
   </data>
+  <data name="CurrentPassword" xml:space="preserve">
+    <value>يجب ادخال كلمة المرور الحالية</value>
+  </data>
   <data name="CtegoryName" xml:space="preserve">
     <value>هدا الحقل مطلوب</value>
   </data>

@@ -24,6 +24,9 @@
   <data name="ConfirmPasswordError" xml:space="preserve">
     <value>Passwords do not match</value>
   </data>
+  <data name="CurrentPassword" xml:space="preserve">
+    <value>Current password is required</value>
+  </data>
   <data name="CtegoryName" xml:space="preserve">
     <value>This field is required</value>
   </data>
