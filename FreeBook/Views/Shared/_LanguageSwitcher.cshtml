@@ -3,6 +3,7 @@
 @inject IStringLocalizer<ResourceWeb> Localizer
 
 <form asp-area="" asp-controller="Localization" asp-action="SetCulture" method="post" class="lang-switcher">
+    @Html.AntiForgeryToken()
     <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
     <select name="culture" aria-label="@Localizer["lbLanguage"]" onchange="this.form.submit()">
         @if (CultureInfo.CurrentUICulture.Name == "ar")

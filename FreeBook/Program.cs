@@ -106,7 +106,7 @@ try
                 options.ClientId = googleClientId!;
                 options.ClientSecret = googleClientSecret!;
                 options.CallbackPath = "/signin-google";
-                options.AccessDeniedPath = "/Admin/Accounts/Login";
+                options.AccessDeniedPath = "/Admin/Home/Denied";
                 options.SignInScheme = IdentityConstants.ExternalScheme;
                 options.SaveTokens = true;
             });

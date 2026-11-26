@@ -14,6 +14,7 @@ namespace FreeBook.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult SetCulture(string culture, string returnUrl)
         {
             var supportedCultures = _localizationOptions.SupportedUICultures?.Select(c => c.Name).ToArray()
