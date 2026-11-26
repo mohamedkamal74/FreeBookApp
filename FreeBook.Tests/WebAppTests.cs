@@ -344,6 +344,20 @@ public class WebAppTests : IClassFixture<CustomWebApplicationFactory>
         Assert.DoesNotContain("lbLoginWithFacebook", html);
     }
 
+    [Theory]
+    [InlineData("en", "Register a new membership")]
+    [InlineData("ar", "تسجيل عضوية جديدة")]
+    public async Task LoginPage_DoesNotShowRegistrationLink(string culture, string registrationText)
+    {
+        var client = _factory.CreateClient();
+
+        var html = WebUtility.HtmlDecode(
+            await client.GetStringAsync($"/Admin/Accounts/Login?culture={culture}"));
+
+        Assert.DoesNotContain(registrationText, html);
+        Assert.DoesNotContain("href=\"#\"", html);
+    }
+
     [Fact]
     public async Task GoogleLogin_IsHiddenAndRejected_WithoutCredentials()
     {
