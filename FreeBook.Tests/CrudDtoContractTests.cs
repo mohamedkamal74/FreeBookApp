@@ -26,6 +26,8 @@ public class CrudDtoContractTests
         typeof(SubscriptionDto), typeof(SubscriptionCommand),
         typeof(RentalDto), typeof(RentalCommand), typeof(RentalCopyDto), typeof(RentalCopyCommand),
         typeof(RentalRequestDto), typeof(RentalRequestCommand),
+        typeof(MemberOrdersViewModel), typeof(MemberRentalsViewModel),
+        typeof(MemberOrderCommand), typeof(MemberRequestAction), typeof(MemberRentalAction),
         typeof(LogCategoryDto),
         typeof(NotificationDto), typeof(NotificationCommand)
     };

@@ -1,0 +1,106 @@
+@model MemberRentalsViewModel
+@inject IStringLocalizer<ResourceWeb> Localizer
+
+@await Html.PartialAsync("_FlashMessage")
+
+<div class="container-custom py-5">
+    <header class="text-center mb-5">
+        <span class="available-books-eyebrow">
+            <i class="fas fa-book-reader" aria-hidden="true"></i>
+            @Localizer["lbMemberArea"]
+        </span>
+        <h1 id="my-rentals-title">@Localizer["lbMyRentals"]</h1>
+        <p class="lead">@Localizer["lbMyRentalsDesc"]</p>
+    </header>
+
+    <section class="mt-5" id="myRentals" aria-labelledby="my-rentals-title">
+        @if (Model.Rentals.Count == 0 || !Model.Rentals.Any(r => r.RentalCopies.Count > 0))
+        {
+            <div class="available-books-empty" role="status">
+                <i class="fas fa-book-open" aria-hidden="true"></i>
+                <p>@Localizer["lbNoRentals"]</p>
+            </div>
+        }
+        else
+        {
+            <table id="tableMyRentals" class="table table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">@Localizer["lbRequestedBook"]</th>
+                        <th scope="col">@Localizer["lbCopy"]</th>
+                        <th scope="col">@Localizer["lbRentalDate"]</th>
+                        <th scope="col">@Localizer["lbEndDate"]</th>
+                        <th scope="col">@Localizer["lbStatus"]</th>
+                        <th scope="col">@Localizer["lbActions"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var rental in Model.Rentals)
+                    {
+                        foreach (var copy in rental.RentalCopies)
+                        {
+                            var bookTitle = copy.BookCopy?.Book?.Name ?? string.Empty;
+                            var copyLabel = copy.BookCopy is null
+                                ? string.Empty
+                                : $"{copy.BookCopy.EditionNumber}/{copy.BookCopy.SerialNumber}";
+                            var isReturned = copy.ReturnDate.HasValue;
+                            var isOverdue = !isReturned && copy.EndDate < DateTime.UtcNow;
+                            <tr>
+                                <td>@bookTitle</td>
+                                <td>@copyLabel</td>
+                                <td>@copy.RentalDate.ToString("yyyy-MM-dd")</td>
+                                <td>@copy.EndDate.ToString("yyyy-MM-dd")</td>
+                                <td>
+                                    @if (isReturned)
+                                    {
+                                        <span class="badge badge-secondary">@Localizer["lbReturned"]</span>
+                                    }
+                                    else if (isOverdue)
+                                    {
+                                        <span class="badge badge-danger">@Localizer["lbOverdue"]</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-success">@Localizer["lbActive"]</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (!isReturned)
+                                    {
+                                        <form asp-action="ReturnCopy" asp-controller="Member" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="RentalId" value="@rental.Id" />
+                                            <input type="hidden" name="BookCopyId" value="@copy.BookCopyId" />
+                                            <button type="submit" class="btn btn-outline-primary btn-sm"
+                                                    id="returnCopy_@(rental.Id)_@(copy.BookCopyId)">
+                                                @Localizer["lbReturn"]
+                                            </button>
+                                        </form>
+                                        <form asp-action="ExtendCopy" asp-controller="Member" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="RentalId" value="@rental.Id" />
+                                            <input type="hidden" name="BookCopyId" value="@copy.BookCopyId" />
+                                            <label class="sr-only" for="newEndDate_@(rental.Id)_@(copy.BookCopyId)">
+                                                @Localizer["lbNewEndDate"]
+                                            </label>
+                                            <input type="date" name="NewEndDate" class="form-control form-control-sm d-inline-block w-auto"
+                                                   id="newEndDate_@(rental.Id)_@(copy.BookCopyId)" />
+                                            <button type="submit" class="btn btn-outline-secondary btn-sm"
+                                                    id="extendCopy_@(rental.Id)_@(copy.BookCopyId)">
+                                                @Localizer["lbExtend"]
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span aria-hidden="true">—</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        }
+    </section>
+</div>

@@ -8,6 +8,7 @@ using Infrastructure.Data;
 using Infrastructure.IRepository;
 using Infrastructure.ViewModel;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.IRepository.ServiceRepository
@@ -220,6 +221,119 @@ namespace Infrastructure.IRepository.ServiceRepository
             }
         }
 
+        public async Task<Result<List<RentalDto>>> GetByApplicationUserIdAsync(string applicationUserId)
+        {
+            if (string.IsNullOrWhiteSpace(applicationUserId))
+                return Result.Failure<List<RentalDto>>("USER_REQUIRED", "A linked user is required");
+
+            try
+            {
+                var rentals = await RentalsWithDetails()
+                    .Where(x => x.Subscriber != null && x.Subscriber.ApplicationUserId == applicationUserId)
+                    .OrderByDescending(x => x.StartDate)
+                    .ToListAsync();
+                return Result.Success(rentals.Select(CrudMapping.ToDto).ToList());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting rentals for user {UserId}", applicationUserId);
+                return Result.Failure<List<RentalDto>>("GET_USER_RENTALS_ERROR", "Failed to get rentals", ex.Message);
+            }
+        }
+
+        public async Task<Result<bool>> ReturnCopyForUserAsync(Guid rentalId, Guid bookCopyId, string applicationUserId)
+        {
+            if (rentalId == Guid.Empty || bookCopyId == Guid.Empty)
+                return Result.Failure<bool>("INVALID_COPY", "Invalid rental copy");
+            if (string.IsNullOrWhiteSpace(applicationUserId))
+                return Result.Failure<bool>("USER_REQUIRED", "A linked user is required");
+
+            IDbContextTransaction? transaction = null;
+            try
+            {
+                var rental = await OwnedRentalsQuery(applicationUserId)
+                    .FirstOrDefaultAsync(x => x.Id == rentalId);
+                if (rental is null)
+                    return Result.Failure<bool>("NOT_FOUND", "Rental not found for this user");
+
+                var rentalCopy = rental.RentalCopies.FirstOrDefault(x => x.BookCopyId == bookCopyId);
+                if (rentalCopy is null)
+                    return Result.Failure<bool>("COPY_NOT_FOUND", "Rental copy not found");
+                if (rentalCopy.ReturnDate.HasValue)
+                    return Result.Failure<bool>("ALREADY_RETURNED", "Rental copy already returned");
+
+                if (_context.Database.IsRelational())
+                    transaction = await _context.Database.BeginTransactionAsync();
+
+                rentalCopy.ReturnDate = DateTime.UtcNow;
+                var bookCopy = await _context.BookCopies.FirstOrDefaultAsync(x => x.Id == bookCopyId);
+                if (bookCopy is not null)
+                    bookCopy.IsAvailableForRental = true;
+
+                await _context.SaveChangesAsync();
+                if (transaction is not null)
+                    await transaction.CommitAsync();
+                return Result.Success(true);
+            }
+            catch (Exception ex)
+            {
+                if (transaction is not null)
+                    await transaction.RollbackAsync();
+                _logger.LogError(ex, "Error returning copy {CopyId} for user {UserId}", bookCopyId, applicationUserId);
+                return Result.Failure<bool>("RETURN_ERROR", "Failed to return book copy", ex.Message);
+            }
+            finally
+            {
+                if (transaction is not null)
+                    await transaction.DisposeAsync();
+            }
+        }
+
+        public async Task<Result<bool>> ExtendCopyForUserAsync(
+            Guid rentalId,
+            Guid bookCopyId,
+            string applicationUserId,
+            DateTime? requestedEndDateUtc = null)
+        {
+            if (rentalId == Guid.Empty || bookCopyId == Guid.Empty)
+                return Result.Failure<bool>("INVALID_COPY", "Invalid rental copy");
+            if (string.IsNullOrWhiteSpace(applicationUserId))
+                return Result.Failure<bool>("USER_REQUIRED", "A linked user is required");
+
+            try
+            {
+                var rental = await OwnedRentalsQuery(applicationUserId)
+                    .FirstOrDefaultAsync(x => x.Id == rentalId);
+                if (rental is null)
+                    return Result.Failure<bool>("NOT_FOUND", "Rental not found for this user");
+
+                var rentalCopy = rental.RentalCopies.FirstOrDefault(x => x.BookCopyId == bookCopyId);
+                if (rentalCopy is null)
+                    return Result.Failure<bool>("COPY_NOT_FOUND", "Rental copy not found");
+                if (rentalCopy.ReturnDate.HasValue)
+                    return Result.Failure<bool>("ALREADY_RETURNED", "Rental copy already returned");
+
+                var requested = requestedEndDateUtc?.ToUniversalTime()
+                    ?? rentalCopy.EndDate.AddDays((int)RentalsConfigurations.RentalDuration);
+                if (requested <= rentalCopy.EndDate)
+                    requested = rentalCopy.EndDate.AddDays((int)RentalsConfigurations.RentalDuration);
+
+                var capped = RentalRules.CapEndDate(rentalCopy.RentalDate, requested);
+                if (capped <= rentalCopy.EndDate)
+                    return Result.Failure<bool>("MAX_DURATION_REACHED", "Rental has reached the maximum duration");
+
+                rentalCopy.EndDate = capped;
+                rentalCopy.ExtendedOn = DateTime.UtcNow;
+                await _context.SaveChangesAsync();
+                return Result.Success(true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error extending copy {CopyId} for user {UserId}", bookCopyId, applicationUserId);
+                return Result.Failure<bool>("EXTEND_ERROR", "Failed to extend rental", ex.Message);
+            }
+        }
+
         public async Task<Result<List<RentalDto>>> GetOverdueRentalsAsync()
         {
             try
@@ -241,5 +355,14 @@ namespace Infrastructure.IRepository.ServiceRepository
                 return Result.Failure<List<RentalDto>>("GET_OVERDUE_ERROR", "Failed to get overdue rentals", ex.Message);
             }
         }
+
+        private IQueryable<Rental> RentalsWithDetails() => _context.Rentals
+            .Include(x => x.Subscriber)
+            .Include(x => x.RentalCopies)
+                .ThenInclude(rc => rc.BookCopy)
+                    .ThenInclude(bc => bc.Book);
+
+        private IQueryable<Rental> OwnedRentalsQuery(string applicationUserId) => RentalsWithDetails()
+            .Where(x => x.Subscriber != null && x.Subscriber.ApplicationUserId == applicationUserId);
     }
 }

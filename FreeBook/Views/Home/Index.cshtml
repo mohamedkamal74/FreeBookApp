@@ -43,9 +43,13 @@
             }
             else if (isNormalUser)
             {
-                <a asp-controller="Home" asp-action="Index" asp-fragment="availableBooks" class="btn btn-primary btn-lg">
-                    <i class="fas fa-book"></i>
-                    @Localizer["lbBooks"]
+                <a asp-controller="Member" asp-action="Orders" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus"></i>
+                    @Localizer["lbOrderBooks"]
+                </a>
+                <a asp-controller="Member" asp-action="MyRentals" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-book-reader"></i>
+                    @Localizer["lbMyRentals"]
                 </a>
                 <form asp-area="Admin" asp-controller="Accounts" asp-action="LogOut" method="post" class="d-inline">
                     @Html.AntiForgeryToken()
@@ -258,9 +262,13 @@
                 }
                 else if (isNormalUser)
                 {
-                    <a asp-controller="Home" asp-action="Index" asp-fragment="availableBooks" class="btn btn-primary btn-lg">
-                        <i class="fas fa-book"></i>
-                        @Localizer["lbBooks"]
+                    <a asp-controller="Member" asp-action="Orders" class="btn btn-primary btn-lg">
+                        <i class="fas fa-plus"></i>
+                        @Localizer["lbOrderBooks"]
+                    </a>
+                    <a asp-controller="Member" asp-action="MyRentals" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-book-reader"></i>
+                        @Localizer["lbMyRentals"]
                     </a>
                     <form asp-area="Admin" asp-controller="Accounts" asp-action="LogOut" method="post" class="d-inline">
                         @Html.AntiForgeryToken()

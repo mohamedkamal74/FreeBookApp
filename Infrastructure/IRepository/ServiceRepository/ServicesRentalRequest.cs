@@ -164,6 +164,26 @@ namespace Infrastructure.IRepository.ServiceRepository
             }
         }
 
+        public async Task<Result<List<RentalRequestDto>>> GetByApplicationUserIdAsync(string applicationUserId)
+        {
+            if (string.IsNullOrWhiteSpace(applicationUserId))
+                return Result.Failure<List<RentalRequestDto>>("USER_REQUIRED", "A linked user is required");
+
+            try
+            {
+                var requests = await QueryWithDetails()
+                    .Where(x => x.Subscriber != null && x.Subscriber.ApplicationUserId == applicationUserId)
+                    .OrderByDescending(x => x.CreatedOn)
+                    .ToListAsync();
+                return Result.Success(requests.Select(CrudMapping.ToDto).ToList());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting rental requests for user {UserId}", applicationUserId);
+                return Result.Failure<List<RentalRequestDto>>("GET_USER_REQUESTS_ERROR", "Failed to get rental requests", ex.Message);
+            }
+        }
+
         public async Task<Result<RentalRequestDto?>> FindByApplicationUserIdAsync(string applicationUserId)
         {
             try

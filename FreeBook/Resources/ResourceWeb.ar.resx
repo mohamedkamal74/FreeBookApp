@@ -1053,6 +1053,78 @@
   <data name="msgRentalRequestDuplicate" xml:space="preserve">
     <value>يوجد طلب معلق بالفعل لهذا الكتاب</value>
   </data>
+  <data name="lbMemberArea" xml:space="preserve">
+    <value>منطقة العضو</value>
+  </data>
+  <data name="lbOrderBooks" xml:space="preserve">
+    <value>طلب الكتب</value>
+  </data>
+  <data name="lbOrderBooksDesc" xml:space="preserve">
+    <value>اطلب كتاباً لاعتماده من حسابك في المكتبة.</value>
+  </data>
+  <data name="lbOrderBook" xml:space="preserve">
+    <value>طلب الكتاب</value>
+  </data>
+  <data name="lbMyRequests" xml:space="preserve">
+    <value>طلباتي</value>
+  </data>
+  <data name="lbNoRequests" xml:space="preserve">
+    <value>لم تطلب أي كتب بعد.</value>
+  </data>
+  <data name="lbMyRentals" xml:space="preserve">
+    <value>استعاراتي</value>
+  </data>
+  <data name="lbMyRentalsDesc" xml:space="preserve">
+    <value>راجع النسخ المستعارة وأعدها أو اطلب تمديداً.</value>
+  </data>
+  <data name="lbNoRentals" xml:space="preserve">
+    <value>لا توجد لديك استعارات بعد.</value>
+  </data>
+  <data name="lbCancelRequest" xml:space="preserve">
+    <value>إلغاء الطلب</value>
+  </data>
+  <data name="lbNewEndDate" xml:space="preserve">
+    <value>تاريخ الإرجاع المطلوب</value>
+  </data>
+  <data name="lbCopy" xml:space="preserve">
+    <value>النسخة</value>
+  </data>
+  <data name="lbApproved" xml:space="preserve">
+    <value>معتمد</value>
+  </data>
+  <data name="lbCancelled" xml:space="preserve">
+    <value>ملغي</value>
+  </data>
+  <data name="lbActions" xml:space="preserve">
+    <value>الإجراءات</value>
+  </data>
+  <data name="msgOrderCreated" xml:space="preserve">
+    <value>تم إرسال طلب الاستعارة للاعتماد من المشرف</value>
+  </data>
+  <data name="msgOrderFailed" xml:space="preserve">
+    <value>تعذر إكمال الطلب</value>
+  </data>
+  <data name="msgOrderNotLinked" xml:space="preserve">
+    <value>حسابك غير مرتبط بعضوية مكتبة باشتراك سارٍ</value>
+  </data>
+  <data name="msgOrderBookNotFound" xml:space="preserve">
+    <value>الكتاب غير موجود أو غير متاح</value>
+  </data>
+  <data name="msgOrderCancelled" xml:space="preserve">
+    <value>تم إلغاء طلب الاستعارة</value>
+  </data>
+  <data name="msgOrderRequestNotFound" xml:space="preserve">
+    <value>طلب الاستعارة غير موجود لحسابك</value>
+  </data>
+  <data name="msgOrderRequestNotPending" xml:space="preserve">
+    <value>يمكن إلغاء الطلبات المعلقة فقط</value>
+  </data>
+  <data name="msgOrderInvalidDate" xml:space="preserve">
+    <value>أدخل تاريخ إرجاع صالحاً</value>
+  </data>
+  <data name="msgRentalMaxDurationReached" xml:space="preserve">
+    <value>وصلت الاستعارة إلى الحد الأقصى لفترة التمديد</value>
+  </data>
   <data name="msgAreaHasSubscribers" xml:space="preserve">
     <value>لا يمكن حذف منطقة مرتبطة بمشتركين</value>
   </data>

@@ -1,0 +1,14 @@
+@using Infrastructure.Common.Interfaces
+@using Infrastructure.ViewModel
+@inject IFlashMessageService Flash
+@{
+    var message = Flash.Consume();
+}
+@if (message is not null)
+{
+    var cssClass = message.Type == FlashMessageDto.SuccessType ? "alert-success" : "alert-danger";
+    <div class="alert @cssClass member-flash" role="status" aria-live="polite">
+        <strong>@message.Title</strong>
+        <span>@message.Text</span>
+    </div>
+}

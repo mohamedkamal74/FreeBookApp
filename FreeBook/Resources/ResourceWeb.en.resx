@@ -1053,6 +1053,78 @@
   <data name="msgRentalRequestDuplicate" xml:space="preserve">
     <value>A pending request already exists for this book</value>
   </data>
+  <data name="lbMemberArea" xml:space="preserve">
+    <value>Member Area</value>
+  </data>
+  <data name="lbOrderBooks" xml:space="preserve">
+    <value>Order Books</value>
+  </data>
+  <data name="lbOrderBooksDesc" xml:space="preserve">
+    <value>Request a book for approval from your library account.</value>
+  </data>
+  <data name="lbOrderBook" xml:space="preserve">
+    <value>Request Book</value>
+  </data>
+  <data name="lbMyRequests" xml:space="preserve">
+    <value>My Requests</value>
+  </data>
+  <data name="lbNoRequests" xml:space="preserve">
+    <value>You have not requested any books yet.</value>
+  </data>
+  <data name="lbMyRentals" xml:space="preserve">
+    <value>My Rentals</value>
+  </data>
+  <data name="lbMyRentalsDesc" xml:space="preserve">
+    <value>Review your rented copies, return them, or request an extension.</value>
+  </data>
+  <data name="lbNoRentals" xml:space="preserve">
+    <value>You do not have any rentals yet.</value>
+  </data>
+  <data name="lbCancelRequest" xml:space="preserve">
+    <value>Cancel Request</value>
+  </data>
+  <data name="lbNewEndDate" xml:space="preserve">
+    <value>Requested return date</value>
+  </data>
+  <data name="lbCopy" xml:space="preserve">
+    <value>Copy</value>
+  </data>
+  <data name="lbApproved" xml:space="preserve">
+    <value>Approved</value>
+  </data>
+  <data name="lbCancelled" xml:space="preserve">
+    <value>Cancelled</value>
+  </data>
+  <data name="lbActions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="msgOrderCreated" xml:space="preserve">
+    <value>Rental request sent for admin approval</value>
+  </data>
+  <data name="msgOrderFailed" xml:space="preserve">
+    <value>Failed to complete the request</value>
+  </data>
+  <data name="msgOrderNotLinked" xml:space="preserve">
+    <value>Your account is not linked to a library membership with an active subscription</value>
+  </data>
+  <data name="msgOrderBookNotFound" xml:space="preserve">
+    <value>Book not found or unavailable</value>
+  </data>
+  <data name="msgOrderCancelled" xml:space="preserve">
+    <value>Rental request cancelled</value>
+  </data>
+  <data name="msgOrderRequestNotFound" xml:space="preserve">
+    <value>Rental request not found for your account</value>
+  </data>
+  <data name="msgOrderRequestNotPending" xml:space="preserve">
+    <value>Only pending requests can be cancelled</value>
+  </data>
+  <data name="msgOrderInvalidDate" xml:space="preserve">
+    <value>Enter a valid return date</value>
+  </data>
+  <data name="msgRentalMaxDurationReached" xml:space="preserve">
+    <value>Rental has reached the maximum extension period</value>
+  </data>
   <data name="msgAreaHasSubscribers" xml:space="preserve">
     <value>Cannot delete area with associated subscribers</value>
   </data>

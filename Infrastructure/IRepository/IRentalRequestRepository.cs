@@ -9,6 +9,7 @@ namespace Infrastructure.IRepository
     public interface IRentalRequestRepository : IServiceRepository<RentalRequestDto, RentalRequestCommand>
     {
         Task<Result<List<RentalRequestDto>>> GetPendingAsync();
+        Task<Result<List<RentalRequestDto>>> GetByApplicationUserIdAsync(string applicationUserId);
         Task<Result<RentalRequestDto?>> FindByApplicationUserIdAsync(string applicationUserId);
         Task<Result<Guid>> CreateForUserAsync(string applicationUserId, Guid bookId, Guid? bookCopyId = null);
         Task<Result<Guid?>> ApproveAsync(Guid requestId, IReadOnlyCollection<Guid> selectedCopyIds, string? reviewedById);

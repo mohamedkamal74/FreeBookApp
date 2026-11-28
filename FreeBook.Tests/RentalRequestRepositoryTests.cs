@@ -164,6 +164,26 @@ public class RentalRequestRepositoryTests
         Assert.Single(await context.Subscribers.ToListAsync());
     }
 
+    [Fact]
+    public async Task GetByApplicationUserIdAsync_ReturnsOnlyLinkedUsersRequests()
+    {
+        using var context = CreateContext();
+        var first = await SeedAsync(context);
+        var second = await SeedAsync(context);
+        var requests = new ServicesRentalRequest(context, Mock.Of<ILogger<ServicesRentalRequest>>());
+
+        var firstRequestId = (await requests.CreateForUserAsync(first.UserId, first.BookId)).Value;
+        var secondRequestId = (await requests.CreateForUserAsync(second.UserId, second.BookId)).Value;
+
+        var result = await requests.GetByApplicationUserIdAsync(first.UserId);
+
+        Assert.True(result.IsSuccess, result.Error?.Message);
+        var request = Assert.Single(result.Value!);
+        Assert.Equal(firstRequestId, request.Id);
+        Assert.Equal(first.UserId, request.ApplicationUserId);
+        Assert.DoesNotContain(secondRequestId, result.Value!.Select(x => x.Id));
+    }
+
     private static FreeBookDbContext CreateContext() => new(new DbContextOptionsBuilder<FreeBookDbContext>()
         .UseInMemoryDatabase($"RentalRequestTests_{Guid.NewGuid():N}")
         .Options);
