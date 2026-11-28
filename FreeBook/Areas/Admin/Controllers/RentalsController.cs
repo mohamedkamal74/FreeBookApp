@@ -37,9 +37,9 @@ namespace FreeBook.Areas.Admin.Controllers
             Flash = flash;
         }
 
-        public async Task<IActionResult> Rentals(RentalViewModel model)
+        public async Task<IActionResult> Rentals(RentalViewModel model, string? filter = null)
         {
-            var rentalsResult = await _serviceRental.GetAllAsync();
+            var rentalsResult = await _serviceRental.GetFilteredAsync(filter);
             var subsResult = await _serviceSubscriber.GetAllAsync();
             var copiesResult = await _serviceBookCopy.GetAllAsync();
             return View(new RentalViewModel

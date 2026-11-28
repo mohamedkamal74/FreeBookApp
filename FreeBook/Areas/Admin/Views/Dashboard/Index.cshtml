@@ -175,7 +175,7 @@
             </a>
         </div>
         <div class="col-lg-3 col-6">
-            <a asp-area="Admin" asp-controller="Rentals" asp-action="Rentals" class="small-box-link">
+            <a asp-area="Admin" asp-controller="Rentals" asp-action="Rentals" asp-route-filter="active" class="small-box-link">
                 <div class="small-box bg-danger">
                     <div class="inner">
                         <h3>@Model.ActiveRentals</h3>

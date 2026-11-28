@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.IRepository.ServiceRepository
 {
-    public class ServicesSubscriber : IServiceRepository<SubscriberDto, SubscriberCommand>
+    public class ServicesSubscriber : ISubscriberRepository
     {
         private readonly FreeBookDbContext _context;
         private readonly ILogger<ServicesSubscriber> _logger;
@@ -99,6 +99,34 @@ namespace Infrastructure.IRepository.ServiceRepository
                 _logger.LogError(ex, "Error getting all subscribers");
                 return Result.Failure<List<SubscriberDto>>("GET_ALL_ERROR", "Failed to get subscribers", ex.Message);
             }
+        }
+
+        public async Task<Result<List<SubscriberDto>>> GetBlacklistedSubscribersAsync()
+        {
+            try
+            {
+                var subscribers = await _context.Subscribers
+                    .Include(x => x.Area)
+                    .Include(x => x.Governorate)
+                    .Include(x => x.Subscriptions)
+                    .Where(x => x.IsBlackListed)
+                    .OrderBy(x => x.FirstName)
+                    .ThenBy(x => x.LastName)
+                    .ToListAsync();
+                return Result.Success(subscribers.Select(CrudMapping.ToDto).ToList());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting blacklisted subscribers");
+                return Result.Failure<List<SubscriberDto>>("GET_BLACKLISTED_ERROR", "Failed to get blacklisted subscribers", ex.Message);
+            }
+        }
+
+        public async Task<Result<List<SubscriberDto>>> GetFilteredAsync(string? filter)
+        {
+            return ListFilters.Matches(filter, ListFilters.Blacklisted)
+                ? await GetBlacklistedSubscribersAsync()
+                : await GetAllAsync();
         }
 
         public async Task<Result<bool>> SaveAsync(SubscriberCommand command, Guid? id = null)

@@ -123,6 +123,21 @@ namespace Infrastructure.IRepository.ServiceRepository
             }
         }
 
+        public async Task<Result<List<SubscriptionDto>>> GetFilteredAsync(string? filter)
+        {
+            if (ListFilters.Matches(filter, ListFilters.Active))
+            {
+                return await GetActiveSubscriptionsAsync();
+            }
+
+            if (ListFilters.Matches(filter, ListFilters.Expiring))
+            {
+                return await GetExpiringSubscriptionsAsync(Helper.ExpiringSubscriptionWindowDays);
+            }
+
+            return await GetAllAsync();
+        }
+
         public async Task<Result<List<SubscriptionDto>>> GetBySubscriberAsync(Guid subscriberId)
         {
             try

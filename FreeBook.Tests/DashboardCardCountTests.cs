@@ -36,9 +36,13 @@ public class DashboardCardCountTests : IClassFixture<CustomWebApplicationFactory
         AssertCard(general, "Active Subscriptions", "2");
         AssertCard(general, "Expiring Subscriptions", "1");
         AssertCard(general, "Blacklisted Subscribers", "1");
+        AssertCard(general, "Active Rentals", "2");
+        AssertCard(general, "Overdue Books", "1");
         AssertCardLink(general, "Subscriptions", "active");
         AssertCardLink(general, "Subscriptions", "expiring");
         AssertCardLink(general, "Subscribers", "blacklisted");
+        AssertCardLink(general, "Rentals", "active");
+        AssertCardLink(general, "Rentals", "overdue");
 
         var subscribersDashboard = await client.GetStringAsync("/Admin/SubscribersDashboard/Index?culture=en");
         AssertCard(subscribersDashboard, "Total Subscribers", "4");
@@ -70,6 +74,23 @@ public class DashboardCardCountTests : IClassFixture<CustomWebApplicationFactory
         Assert.DoesNotContain("AActive", expiringBody);
         Assert.DoesNotContain("ZBlacklisted", expiringBody);
         Assert.DoesNotContain("CExpired", expiringBody);
+
+        var overdueRentals = await client.GetStringAsync("/Admin/Rentals/Rentals?culture=en&filter=overdue");
+        var overdueRentalsBody = GetTableBody(overdueRentals, "tableRentals");
+        Assert.Equal(1, CountRows(overdueRentalsBody));
+        Assert.Contains("BExpiring", overdueRentalsBody);
+        Assert.DoesNotContain("AActive", overdueRentalsBody);
+        Assert.DoesNotContain("CExpired", overdueRentalsBody);
+
+        var activeRentals = await client.GetStringAsync("/Admin/Rentals/Rentals?culture=en&filter=active");
+        var activeRentalsBody = GetTableBody(activeRentals, "tableRentals");
+        Assert.Equal(2, CountRows(activeRentalsBody));
+        Assert.Contains("AActive", activeRentalsBody);
+        Assert.Contains("BExpiring", activeRentalsBody);
+        Assert.DoesNotContain("CExpired", activeRentalsBody);
+
+        var arabicOverdueRentals = await client.GetStringAsync("/Admin/Rentals/Rentals?culture=ar&filter=overdue");
+        Assert.Equal(1, CountRows(GetTableBody(arabicOverdueRentals, "tableRentals")));
     }
 
     private HttpClient CreateClient() => _factory.CreateClient(new WebApplicationFactoryClientOptions
@@ -168,6 +189,76 @@ public class DashboardCardCountTests : IClassFixture<CustomWebApplicationFactory
                 StartDate = now.AddDays(-200),
                 EndDate = now.AddDays(-50)
             });
+
+        var activeCopy = new BookCopy
+        {
+            Id = Guid.NewGuid(),
+            BookId = book.Id,
+            EditionNumber = 1,
+            SerialNumber = 1,
+            IsAvailableForRental = false
+        };
+        var overdueCopy = new BookCopy
+        {
+            Id = Guid.NewGuid(),
+            BookId = book.Id,
+            EditionNumber = 1,
+            SerialNumber = 2,
+            IsAvailableForRental = false
+        };
+        var returnedCopy = new BookCopy
+        {
+            Id = Guid.NewGuid(),
+            BookId = book.Id,
+            EditionNumber = 1,
+            SerialNumber = 3,
+            IsAvailableForRental = false
+        };
+
+        var activeRental = new Rental
+        {
+            Id = Guid.NewGuid(),
+            SubscriberId = active.Id,
+            StartDate = now.AddDays(-1)
+        };
+        activeRental.RentalCopies.Add(new RentalCopy
+        {
+            RentalId = activeRental.Id,
+            BookCopyId = activeCopy.Id,
+            RentalDate = now.AddDays(-1),
+            EndDate = now.AddDays(5)
+        });
+
+        var overdueRental = new Rental
+        {
+            Id = Guid.NewGuid(),
+            SubscriberId = expiring.Id,
+            StartDate = now.AddDays(-10)
+        };
+        overdueRental.RentalCopies.Add(new RentalCopy
+        {
+            RentalId = overdueRental.Id,
+            BookCopyId = overdueCopy.Id,
+            RentalDate = now.AddDays(-10),
+            EndDate = now.AddDays(-1)
+        });
+
+        var returnedRental = new Rental
+        {
+            Id = Guid.NewGuid(),
+            SubscriberId = expired.Id,
+            StartDate = now.AddDays(-20)
+        };
+        returnedRental.RentalCopies.Add(new RentalCopy
+        {
+            RentalId = returnedRental.Id,
+            BookCopyId = returnedCopy.Id,
+            RentalDate = now.AddDays(-20),
+            EndDate = now.AddDays(-10),
+            ReturnDate = now.AddDays(-9)
+        });
+
+        context.AddRange(activeCopy, overdueCopy, returnedCopy, activeRental, overdueRental, returnedRental);
         await context.SaveChangesAsync();
     }
 

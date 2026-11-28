@@ -11,5 +11,6 @@ namespace Infrastructure.IRepository
         Task<Result<List<SubscriptionDto>>> GetExpiringSubscriptionsAsync(int days);
         Task<Result<List<SubscriptionDto>>> GetBySubscriberAsync(Guid subscriberId);
         Task<Result<List<SubscriptionDto>>> GetActiveSubscriptionsAsync();
+        Task<Result<List<SubscriptionDto>>> GetFilteredAsync(string? filter);
     }
 }

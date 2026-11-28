@@ -12,14 +12,14 @@ namespace FreeBook.Areas.Admin.Controllers
     [Authorize(Roles = "Admin")]
     public class SubscribersController : Controller
     {
-        private readonly IServiceRepository<SubscriberDto, SubscriberCommand> _serviceSubscriber;
+        private readonly ISubscriberRepository _serviceSubscriber;
         private readonly IServiceRepository<AreaDto, AreaCommand> _serviceArea;
         private readonly IServiceRepository<GovernorateDto, GovernorateCommand> _serviceGovernorate;
         private readonly UserManager<ApplicationUser> _userManager;
         private IFlashMessageService Flash { get; }
 
         public SubscribersController(
-            IServiceRepository<SubscriberDto, SubscriberCommand> serviceSubscriber,
+            ISubscriberRepository serviceSubscriber,
             IServiceRepository<AreaDto, AreaCommand> serviceArea,
             IServiceRepository<GovernorateDto, GovernorateCommand> serviceGovernorate,
             UserManager<ApplicationUser> userManager,
@@ -34,18 +34,12 @@ namespace FreeBook.Areas.Admin.Controllers
 
         public async Task<IActionResult> Subscribers(SubscriberViewModel model, string? filter = null)
         {
-            var subsResult = await _serviceSubscriber.GetAllAsync();
+            var subsResult = await _serviceSubscriber.GetFilteredAsync(filter);
             var areasResult = await _serviceArea.GetAllAsync();
             var govResult = await _serviceGovernorate.GetAllAsync();
-            var subscribers = subsResult.IsSuccess ? subsResult.Value ?? new List<SubscriberDto>() : new List<SubscriberDto>();
-            if (string.Equals(filter, "blacklisted", StringComparison.OrdinalIgnoreCase))
-            {
-                subscribers = subscribers.Where(subscriber => subscriber.IsBlackListed).ToList();
-            }
-
             return View(new SubscriberViewModel
             {
-                Subscribers = subscribers,
+                Subscribers = subsResult.IsSuccess ? subsResult.Value ?? new List<SubscriberDto>() : new List<SubscriberDto>(),
                 Areas = areasResult.IsSuccess ? areasResult.Value ?? new List<AreaDto>() : new List<AreaDto>(),
                 Governorates = govResult.IsSuccess ? govResult.Value ?? new List<GovernorateDto>() : new List<GovernorateDto>(),
                 NewSubscriber = new NewSubscriber()

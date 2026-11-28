@@ -143,6 +143,7 @@ try
     builder.Services.AddScoped<IServiceRepository<BookDto, BookCommand>, ServicesBook>();
     builder.Services.AddScoped<IServiceRepository<BookCopyDto, BookCopyCommand>, ServicesBookCopy>();
     builder.Services.AddScoped<IRentalRepository, ServicesRental>();
+    builder.Services.AddScoped<ISubscriberRepository, ServicesSubscriber>();
     builder.Services.AddScoped<IServiceRepository<SubscriberDto, SubscriberCommand>, ServicesSubscriber>();
     builder.Services.AddScoped<ISubscriptionRepository, ServicesSubscription>();
     builder.Services.AddScoped<IServiceRepository<GovernorateDto, GovernorateCommand>, ServicesGovernorate>();

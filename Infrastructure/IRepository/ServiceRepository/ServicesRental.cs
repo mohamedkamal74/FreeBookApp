@@ -164,6 +164,42 @@ namespace Infrastructure.IRepository.ServiceRepository
             }
         }
 
+        public async Task<Result<List<RentalDto>>> GetActiveRentalsAsync()
+        {
+            try
+            {
+                var rentals = await _context.Rentals
+                    .Include(x => x.Subscriber)
+                    .Include(x => x.RentalCopies)
+                        .ThenInclude(rc => rc.BookCopy)
+                            .ThenInclude(bc => bc.Book)
+                    .Where(x => x.RentalCopies.Any(rc => rc.ReturnDate == null))
+                    .OrderByDescending(x => x.StartDate)
+                    .ToListAsync();
+                return Result.Success(rentals.Select(CrudMapping.ToDto).ToList());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting active rentals");
+                return Result.Failure<List<RentalDto>>("GET_ACTIVE_ERROR", "Failed to get active rentals", ex.Message);
+            }
+        }
+
+        public async Task<Result<List<RentalDto>>> GetFilteredAsync(string? filter)
+        {
+            if (ListFilters.Matches(filter, ListFilters.Overdue))
+            {
+                return await GetOverdueRentalsAsync();
+            }
+
+            if (ListFilters.Matches(filter, ListFilters.Active))
+            {
+                return await GetActiveRentalsAsync();
+            }
+
+            return await GetAllAsync();
+        }
+
         public async Task<Result<RentalDto?>> GetActiveRentalBySubscriberAsync(Guid subscriberId)
         {
             try
