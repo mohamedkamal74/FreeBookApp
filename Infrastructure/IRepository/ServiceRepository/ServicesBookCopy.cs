@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.IRepository.ServiceRepository
 {
-    public class ServicesBookCopy : IServiceRepository<BookCopyDto, BookCopyCommand>
+    public class ServicesBookCopy : IBookCopyRepository
     {
         private readonly FreeBookDbContext _context;
         private readonly ILogger<ServicesBookCopy> _logger;
@@ -90,6 +90,33 @@ namespace Infrastructure.IRepository.ServiceRepository
             {
                 _logger.LogError(ex, "Error getting all book copies");
                 return Result.Failure<List<BookCopyDto>>("GET_ALL_ERROR", "Failed to get book copies", ex.Message);
+            }
+        }
+
+        public async Task<Result<List<BookCopyDto>>> GetFilteredAsync(Guid? authorId, Guid? categoryId, string? filter)
+        {
+            try
+            {
+                var query = DashboardReportQueries.ActiveBookCopies(_context, authorId, categoryId);
+                if (ListFilters.Matches(filter, ListFilters.Available))
+                {
+                    query = query.Where(copy => copy.IsAvailableForRental);
+                }
+                else if (ListFilters.Matches(filter, ListFilters.Rented))
+                {
+                    query = query.Where(copy => !copy.IsAvailableForRental);
+                }
+
+                var bookCopies = await query
+                    .Include(copy => copy.Book)
+                    .OrderBy(copy => copy.Book != null ? copy.Book.Name : "")
+                    .ToListAsync();
+                return Result.Success(bookCopies.Select(CrudMapping.ToDto).ToList());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting filtered book copies");
+                return Result.Failure<List<BookCopyDto>>("GET_FILTERED_ERROR", "Failed to get filtered book copies", ex.Message);
             }
         }
 

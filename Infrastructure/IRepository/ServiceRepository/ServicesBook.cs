@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.IRepository.ServiceRepository
 {
-    public class ServicesBook : IServiceRepository<BookDto, BookCommand>
+    public class ServicesBook : IBookRepository
     {
         private readonly FreeBookDbContext _context;
         private readonly ILogger<ServicesBook> _logger;
@@ -98,6 +98,31 @@ namespace Infrastructure.IRepository.ServiceRepository
             {
                 _logger.LogError(ex, "Error getting all books");
                 return Result.Failure<List<BookDto>>("GET_ALL_ERROR", "Failed to get books", ex.Message);
+            }
+        }
+
+        public async Task<Result<List<BookDto>>> GetFilteredAsync(Guid? authorId, Guid? categoryId, string? filter)
+        {
+            try
+            {
+                var query = DashboardReportQueries.ActiveBooks(_context, authorId, categoryId);
+                if (ListFilters.Matches(filter, ListFilters.WithoutCopies))
+                {
+                    query = query.Where(book => !book.Copies.Any());
+                }
+
+                var books = await query
+                    .Include(book => book.Author)
+                    .Include(book => book.Category)
+                    .Include(book => book.SubCategory)
+                    .OrderBy(book => book.Name)
+                    .ToListAsync();
+                return Result.Success(books.Select(CrudMapping.ToDto).ToList());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting filtered books");
+                return Result.Failure<List<BookDto>>("GET_FILTERED_ERROR", "Failed to get filtered books", ex.Message);
             }
         }
 

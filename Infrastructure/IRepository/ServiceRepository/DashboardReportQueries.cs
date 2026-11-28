@@ -17,8 +17,24 @@ namespace Infrastructure.IRepository.ServiceRepository
         internal static IQueryable<Book> ActiveBooks(FreeBookDbContext context) =>
             Books(context).Where(book => book.CurrentState > 0);
 
+        internal static IQueryable<Book> ActiveBooks(
+            FreeBookDbContext context,
+            Guid? authorId,
+            Guid? categoryId) =>
+            ActiveBooks(context)
+                .Where(book => !authorId.HasValue || book.AuthorId == authorId.Value)
+                .Where(book => !categoryId.HasValue || book.CategoryId == categoryId.Value);
+
         internal static IQueryable<BookCopy> BookCopies(FreeBookDbContext context) =>
             context.BookCopies.AsNoTracking();
+
+        internal static IQueryable<BookCopy> ActiveBookCopies(
+            FreeBookDbContext context,
+            Guid? authorId,
+            Guid? categoryId) =>
+            from copy in BookCopies(context)
+            join book in ActiveBooks(context, authorId, categoryId) on copy.BookId equals book.Id
+            select copy;
 
         internal static IQueryable<RecentRentalRow> RecentRentals(FreeBookDbContext context, int take) =>
             context.Rentals.AsNoTracking()
@@ -137,9 +153,7 @@ namespace Infrastructure.IRepository.ServiceRepository
             FreeBookDbContext context,
             Guid? authorId,
             Guid? categoryId) =>
-            from book in ActiveBooks(context)
-                .Where(book => !authorId.HasValue || book.AuthorId == authorId.Value)
-                .Where(book => !categoryId.HasValue || book.CategoryId == categoryId.Value)
+            from book in ActiveBooks(context, authorId, categoryId)
             group book by book.Category != null ? book.Category.Name : "—" into grouped
             select new NamedCount
             {
@@ -151,9 +165,7 @@ namespace Infrastructure.IRepository.ServiceRepository
             FreeBookDbContext context,
             Guid? authorId,
             Guid? categoryId) =>
-            from book in ActiveBooks(context)
-                .Where(book => !authorId.HasValue || book.AuthorId == authorId.Value)
-                .Where(book => !categoryId.HasValue || book.CategoryId == categoryId.Value)
+            from book in ActiveBooks(context, authorId, categoryId)
             group book by book.Author != null ? book.Author.Name : "—" into grouped
             select new NamedCount
             {

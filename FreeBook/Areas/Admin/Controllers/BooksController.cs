@@ -17,7 +17,7 @@ namespace FreeBook.Areas.Admin.Controllers
     [Authorize(Roles = "Admin")]
     public class BooksController : Controller
     {
-        private readonly IServiceRepository<BookDto, BookCommand> _serviceBook;
+        private readonly IBookRepository _serviceBook;
         private readonly IServiceRepository<AuthorDto, AuthorCommand> _serviceAuthor;
         private readonly IServiceRepository<CategoryDto, CategoryCommand> _serviceCategory;
         private readonly IServiceRepository<SubCategoryDto, SubCategoryCommand> _serviceSubCategory;
@@ -26,7 +26,7 @@ namespace FreeBook.Areas.Admin.Controllers
         private IFlashMessageService Flash { get; }
 
         public BooksController(
-            IServiceRepository<BookDto, BookCommand> serviceBook,
+            IBookRepository serviceBook,
             IServiceRepository<AuthorDto, AuthorCommand> serviceAuthor,
             IServiceRepository<CategoryDto, CategoryCommand> serviceCategory,
             IServiceRepository<SubCategoryDto, SubCategoryCommand> serviceSubCategory,
@@ -43,9 +43,9 @@ namespace FreeBook.Areas.Admin.Controllers
             Flash = flash;
         }
 
-        public async Task<IActionResult> Books()
+        public async Task<IActionResult> Books(Guid? authorId = null, Guid? categoryId = null, string? filter = null)
         {
-            var booksResult = await _serviceBook.GetAllAsync();
+            var booksResult = await _serviceBook.GetFilteredAsync(authorId, categoryId, filter);
             var authorsResult = await _serviceAuthor.GetAllAsync();
             var categoriesResult = await _serviceCategory.GetAllAsync();
             var subCategoriesResult = await _serviceSubCategory.GetAllAsync();

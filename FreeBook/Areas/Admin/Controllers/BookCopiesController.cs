@@ -11,12 +11,12 @@ namespace FreeBook.Areas.Admin.Controllers
     [Authorize(Roles = "Admin")]
     public class BookCopiesController : Controller
     {
-        private readonly IServiceRepository<BookCopyDto, BookCopyCommand> _serviceBookCopy;
+        private readonly IBookCopyRepository _serviceBookCopy;
         private readonly IServiceRepository<BookDto, BookCommand> _serviceBook;
         private IFlashMessageService Flash { get; }
 
         public BookCopiesController(
-            IServiceRepository<BookCopyDto, BookCopyCommand> serviceBookCopy,
+            IBookCopyRepository serviceBookCopy,
             IServiceRepository<BookDto, BookCommand> serviceBook,
             IFlashMessageService flash)
         {
@@ -25,9 +25,9 @@ namespace FreeBook.Areas.Admin.Controllers
             Flash = flash;
         }
 
-        public async Task<IActionResult> BookCopies(BookCopyViewModel model)
+        public async Task<IActionResult> BookCopies(BookCopyViewModel model, Guid? authorId = null, Guid? categoryId = null, string? filter = null)
         {
-            var copiesResult = await _serviceBookCopy.GetAllAsync();
+            var copiesResult = await _serviceBookCopy.GetFilteredAsync(authorId, categoryId, filter);
             var booksResult = await _serviceBook.GetAllAsync();
             return View(new BookCopyViewModel
             {

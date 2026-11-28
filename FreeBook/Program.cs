@@ -140,7 +140,9 @@ try
 
     builder.Services.AddScoped<IAuthorRepository, ServicesAuthor>();
     builder.Services.AddScoped<IServiceRepository<AuthorDto, AuthorCommand>, ServicesAuthor>();
+    builder.Services.AddScoped<IBookRepository, ServicesBook>();
     builder.Services.AddScoped<IServiceRepository<BookDto, BookCommand>, ServicesBook>();
+    builder.Services.AddScoped<IBookCopyRepository, ServicesBookCopy>();
     builder.Services.AddScoped<IServiceRepository<BookCopyDto, BookCopyCommand>, ServicesBookCopy>();
     builder.Services.AddScoped<IRentalRepository, ServicesRental>();
     builder.Services.AddScoped<ISubscriberRepository, ServicesSubscriber>();

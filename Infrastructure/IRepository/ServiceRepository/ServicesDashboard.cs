@@ -28,9 +28,10 @@ namespace Infrastructure.IRepository.ServiceRepository
                 var now = DateTime.UtcNow;
                 var warningTo = now.AddDays(Helper.ExpiringSubscriptionWindowDays);
 
+                var generalCopies = DashboardReportQueries.ActiveBookCopies(_context, null, null);
                 var totalBooks = await DashboardReportQueries.ActiveBooks(_context).CountAsync();
-                var totalCopies = await DashboardReportQueries.BookCopies(_context).CountAsync();
-                var availableCopies = await DashboardReportQueries.BookCopies(_context)
+                var totalCopies = await generalCopies.CountAsync();
+                var availableCopies = await generalCopies
                     .CountAsync(copy => copy.IsAvailableForRental);
                 var totalSubscribers = await _context.Subscribers.AsNoTracking().CountAsync();
                 var activeSubscriptions = await _context.Subscriptions.AsNoTracking()
@@ -205,20 +206,18 @@ namespace Infrastructure.IRepository.ServiceRepository
                 var authorId = query.AuthorId;
                 var categoryId = query.CategoryId;
 
-                var bookIds = await DashboardReportQueries.ActiveBooks(_context)
-                    .Where(book => !authorId.HasValue || book.AuthorId == authorId.Value)
-                    .Where(book => !categoryId.HasValue || book.CategoryId == categoryId.Value)
+                var bookIds = await DashboardReportQueries
+                    .ActiveBooks(_context, authorId, categoryId)
                     .Select(book => book.Id)
                     .ToListAsync();
-                var copyBookIds = await DashboardReportQueries.BookCopies(_context)
-                    .Where(copy => bookIds.Contains(copy.BookId))
+                var scopedCopies = DashboardReportQueries.ActiveBookCopies(_context, authorId, categoryId);
+                var copyBookIds = await scopedCopies
                     .Select(copy => copy.BookId)
                     .Distinct()
                     .ToListAsync();
-                var totalCopies = await DashboardReportQueries.BookCopies(_context)
-                    .CountAsync(copy => bookIds.Contains(copy.BookId));
-                var availableCopies = await DashboardReportQueries.BookCopies(_context)
-                    .CountAsync(copy => bookIds.Contains(copy.BookId) && copy.IsAvailableForRental);
+                var totalCopies = await scopedCopies.CountAsync();
+                var availableCopies = await scopedCopies
+                    .CountAsync(copy => copy.IsAvailableForRental);
 
                 var byCategory = await DashboardReportQueries.BooksByCategory(_context, authorId, categoryId)
                     .ToListAsync();

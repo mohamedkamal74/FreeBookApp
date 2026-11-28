@@ -12,6 +12,9 @@ namespace Infrastructure.Common
         public const string Active = "active";
         public const string Expiring = "expiring";
         public const string Overdue = "overdue";
+        public const string Available = "available";
+        public const string Rented = "rented";
+        public const string WithoutCopies = "without-copies";
 
         public static bool Matches(string? value, string filter) =>
             string.Equals(value, filter, StringComparison.OrdinalIgnoreCase);

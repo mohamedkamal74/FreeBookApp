@@ -16,7 +16,7 @@ public class BookCoverUploadTests
     [Fact]
     public async Task Save_WithValidCover_UploadsImageAndStoresCloudinaryFields()
     {
-        var books = new Mock<IServiceRepository<BookDto, BookCommand>>();
+        var books = new Mock<IBookRepository>();
         var images = new Mock<IImageService>();
         var flash = new Mock<IFlashMessageService>();
         BookCommand? saved = null;
@@ -54,7 +54,7 @@ public class BookCoverUploadTests
     [Fact]
     public async Task Save_WithInvalidCoverExtension_DoesNotUploadOrSave()
     {
-        var books = new Mock<IServiceRepository<BookDto, BookCommand>>();
+        var books = new Mock<IBookRepository>();
         var images = new Mock<IImageService>();
         var flash = new Mock<IFlashMessageService>();
         var controller = CreateController(books, images, flash);
@@ -73,7 +73,7 @@ public class BookCoverUploadTests
     [Fact]
     public async Task Save_WhenCloudinaryUploadFails_DoesNotSaveBook()
     {
-        var books = new Mock<IServiceRepository<BookDto, BookCommand>>();
+        var books = new Mock<IBookRepository>();
         var images = new Mock<IImageService>();
         var flash = new Mock<IFlashMessageService>();
         books.Setup(x => x.FindByAsync(It.IsAny<string>()))
@@ -95,7 +95,7 @@ public class BookCoverUploadTests
     [Fact]
     public async Task Save_ReplaceCover_DeletesOldImageOnlyAfterSuccessfulSave()
     {
-        var books = new Mock<IServiceRepository<BookDto, BookCommand>>();
+        var books = new Mock<IBookRepository>();
         var images = new Mock<IImageService>();
         var events = new List<string>();
         var existing = new BookDto
@@ -143,7 +143,7 @@ public class BookCoverUploadTests
     [Fact]
     public async Task Save_ReplaceCover_KeepsOldImageWhenAnotherBookUsesIt()
     {
-        var books = new Mock<IServiceRepository<BookDto, BookCommand>>();
+        var books = new Mock<IBookRepository>();
         var images = new Mock<IImageService>();
         var existing = new BookDto
         {
@@ -191,7 +191,7 @@ public class BookCoverUploadTests
     [Fact]
     public async Task Save_WhenSaveFails_DeletesNewlyUploadedImage()
     {
-        var books = new Mock<IServiceRepository<BookDto, BookCommand>>();
+        var books = new Mock<IBookRepository>();
         var images = new Mock<IImageService>();
         var flash = new Mock<IFlashMessageService>();
         books.Setup(x => x.FindByAsync(It.IsAny<string>()))
@@ -218,7 +218,7 @@ public class BookCoverUploadTests
     }
 
     private static BooksController CreateController(
-        Mock<IServiceRepository<BookDto, BookCommand>> books,
+        Mock<IBookRepository> books,
         Mock<IImageService> images,
         Mock<IFlashMessageService> flash)
     {

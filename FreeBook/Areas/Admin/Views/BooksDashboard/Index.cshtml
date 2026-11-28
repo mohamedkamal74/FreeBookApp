@@ -69,7 +69,7 @@
 
     <div class="row">
         <div class="col-lg-3 col-6">
-            <a asp-area="Admin" asp-controller="Books" asp-action="Books" class="small-box-link">
+            <a asp-area="Admin" asp-controller="Books" asp-action="Books" asp-route-authorId="@filter.AuthorId" asp-route-categoryId="@filter.CategoryId" class="small-box-link">
                 <div class="small-box bg-info">
                     <div class="inner">
                         <h3>@dashboard.TotalBooks</h3>
@@ -80,7 +80,7 @@
             </a>
         </div>
         <div class="col-lg-3 col-6">
-            <a asp-area="Admin" asp-controller="BookCopies" asp-action="BookCopies" class="small-box-link">
+            <a asp-area="Admin" asp-controller="BookCopies" asp-action="BookCopies" asp-route-authorId="@filter.AuthorId" asp-route-categoryId="@filter.CategoryId" class="small-box-link">
                 <div class="small-box bg-primary">
                     <div class="inner">
                         <h3>@dashboard.TotalCopies</h3>
@@ -91,7 +91,7 @@
             </a>
         </div>
         <div class="col-lg-3 col-6">
-            <a asp-area="Admin" asp-controller="BookCopies" asp-action="BookCopies" class="small-box-link">
+            <a asp-area="Admin" asp-controller="BookCopies" asp-action="BookCopies" asp-route-authorId="@filter.AuthorId" asp-route-categoryId="@filter.CategoryId" asp-route-filter="available" class="small-box-link">
                 <div class="small-box bg-success">
                     <div class="inner">
                         <h3>@dashboard.AvailableCopies</h3>
@@ -102,7 +102,7 @@
             </a>
         </div>
         <div class="col-lg-3 col-6">
-            <a asp-area="Admin" asp-controller="Rentals" asp-action="Rentals" class="small-box-link">
+            <a asp-area="Admin" asp-controller="BookCopies" asp-action="BookCopies" asp-route-authorId="@filter.AuthorId" asp-route-categoryId="@filter.CategoryId" asp-route-filter="rented" class="small-box-link">
                 <div class="small-box bg-warning">
                     <div class="inner">
                         <h3>@dashboard.RentedCopies</h3>
@@ -113,7 +113,7 @@
             </a>
         </div>
         <div class="col-lg-3 col-6">
-            <a asp-area="Admin" asp-controller="Books" asp-action="Books" class="small-box-link">
+            <a asp-area="Admin" asp-controller="Books" asp-action="Books" asp-route-authorId="@filter.AuthorId" asp-route-categoryId="@filter.CategoryId" asp-route-filter="without-copies" class="small-box-link">
                 <div class="small-box bg-secondary">
                     <div class="inner">
                         <h3>@dashboard.BooksWithoutCopies</h3>

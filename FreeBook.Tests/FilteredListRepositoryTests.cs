@@ -54,6 +54,95 @@ public class FilteredListRepositoryTests
         Assert.Single(overdueRentals.Value!);
     }
 
+    [Fact]
+    public async Task BookAndCopyRepositories_ApplyAuthorCategoryAndCopyFilters()
+    {
+        using var context = new FreeBookDbContext(new DbContextOptionsBuilder<FreeBookDbContext>()
+            .UseInMemoryDatabase($"FreeBookBookFilters_{Guid.NewGuid():N}")
+            .Options);
+        var authorId = Guid.NewGuid();
+        var otherAuthorId = Guid.NewGuid();
+        var categoryId = Guid.NewGuid();
+        var otherCategoryId = Guid.NewGuid();
+
+        var scopedWithCopies = CreateFilterBook("Scoped Book With Copies", authorId, categoryId, active: true);
+        var scopedWithoutCopies = CreateFilterBook("Scoped Book Without Copies", authorId, categoryId, active: true);
+        var otherAuthor = CreateFilterBook("Other Author Book", otherAuthorId, categoryId, active: true);
+        var otherCategory = CreateFilterBook("Other Category Book", authorId, otherCategoryId, active: true);
+        var deleted = CreateFilterBook("Deleted Book", authorId, categoryId, active: false);
+
+        context.AddRange(
+            new Author { Id = authorId, Name = "Book Filter Author" },
+            new Author { Id = otherAuthorId, Name = "Book Filter Other Author" },
+            new Category { Id = categoryId, Name = "Book Filter Category" },
+            new Category { Id = otherCategoryId, Name = "Book Filter Other Category" },
+            scopedWithCopies,
+            scopedWithoutCopies,
+            otherAuthor,
+            otherCategory,
+            deleted,
+            CreateFilterCopy(scopedWithCopies.Id, 1, available: true),
+            CreateFilterCopy(scopedWithCopies.Id, 2, available: false),
+            CreateFilterCopy(otherAuthor.Id, 1, available: true),
+            CreateFilterCopy(otherAuthor.Id, 2, available: false),
+            CreateFilterCopy(otherCategory.Id, 1, available: false),
+            CreateFilterCopy(deleted.Id, 1, available: true),
+            CreateFilterCopy(deleted.Id, 2, available: false));
+        await context.SaveChangesAsync();
+
+        var books = new ServicesBook(context, Mock.Of<ILogger<ServicesBook>>());
+        var copies = new ServicesBookCopy(context, Mock.Of<ILogger<ServicesBookCopy>>());
+
+        var allBooks = await books.GetFilteredAsync(null, null, null);
+        var scopedBooks = await books.GetFilteredAsync(authorId, categoryId, null);
+        var withoutCopies = await books.GetFilteredAsync(authorId, categoryId, ListFilters.WithoutCopies);
+        Assert.True(allBooks.IsSuccess);
+        Assert.True(scopedBooks.IsSuccess);
+        Assert.True(withoutCopies.IsSuccess);
+        Assert.Equal(4, allBooks.Value!.Count);
+        Assert.DoesNotContain(allBooks.Value!, book => book.Name == "Deleted Book");
+        Assert.Equal(2, scopedBooks.Value!.Count);
+        Assert.Single(withoutCopies.Value!);
+        Assert.Equal("Scoped Book Without Copies", withoutCopies.Value![0].Name);
+
+        var allCopies = await copies.GetFilteredAsync(null, null, null);
+        var scopedCopies = await copies.GetFilteredAsync(authorId, categoryId, null);
+        var availableCopies = await copies.GetFilteredAsync(authorId, categoryId, ListFilters.Available);
+        var rentedCopies = await copies.GetFilteredAsync(authorId, categoryId, ListFilters.Rented);
+        var otherAuthorCopies = await copies.GetFilteredAsync(otherAuthorId, null, null);
+        Assert.True(allCopies.IsSuccess);
+        Assert.True(scopedCopies.IsSuccess);
+        Assert.True(availableCopies.IsSuccess);
+        Assert.True(rentedCopies.IsSuccess);
+        Assert.True(otherAuthorCopies.IsSuccess);
+        Assert.Equal(5, allCopies.Value!.Count);
+        Assert.Equal(2, scopedCopies.Value!.Count);
+        Assert.Single(availableCopies.Value!);
+        Assert.Single(rentedCopies.Value!);
+        Assert.Equal(2, otherAuthorCopies.Value!.Count);
+    }
+
+    private static Book CreateFilterBook(string name, Guid authorId, Guid categoryId, bool active) => new()
+    {
+        Id = Guid.NewGuid(),
+        Name = name,
+        AuthorId = authorId,
+        CategoryId = categoryId,
+        IsAvailableForRental = true,
+        CurrentState = (int)(active
+            ? Domin.Entity.Helper.ECurrentState.Active
+            : Domin.Entity.Helper.ECurrentState.Delete)
+    };
+
+    private static BookCopy CreateFilterCopy(Guid bookId, int serialNumber, bool available) => new()
+    {
+        Id = Guid.NewGuid(),
+        BookId = bookId,
+        EditionNumber = 1,
+        SerialNumber = serialNumber,
+        IsAvailableForRental = available
+    };
+
     private static async Task SeedAsync(FreeBookDbContext context, DateTime now)
     {
         var governorate = new Governorate { Id = Guid.NewGuid(), Name = "Filter Governorate" };

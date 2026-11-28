@@ -123,7 +123,7 @@
 
     <div class="row">
         <div class="col-lg-3 col-6">
-            <a asp-area="Admin" asp-controller="Categories" asp-action="Categories" class="small-box-link">
+            <a asp-area="Admin" asp-controller="Books" asp-action="Books" class="small-box-link">
                 <div class="small-box bg-info">
                     <div class="inner">
                         <h3>@Model.TotalBooks</h3>
@@ -136,7 +136,7 @@
             </a>
         </div>
         <div class="col-lg-3 col-6">
-            <a asp-area="Admin" asp-controller="BookCopies" asp-action="BookCopies" class="small-box-link">
+            <a asp-area="Admin" asp-controller="BookCopies" asp-action="BookCopies" asp-route-filter="available" class="small-box-link">
                 <div class="small-box bg-success">
                     <div class="inner">
                         <h3>@Model.AvailableCopies</h3>
