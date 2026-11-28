@@ -128,6 +128,7 @@ namespace Infrastructure.IRepository.ServiceRepository
             Address = entity.Address,
             IsBlackListed = entity.IsBlackListed,
             CreatedOn = entity.CreatedOn,
+            ApplicationUserId = entity.ApplicationUserId,
             Subscriptions = entity.Subscriptions
                 .Select(s => ToDto(s, includeSubscriber: false))
                 .ToList()
@@ -165,6 +166,28 @@ namespace Infrastructure.IRepository.ServiceRepository
             ReturnDate = entity.ReturnDate,
             ExtendedOn = entity.ExtendedOn
         };
+
+        internal static RentalRequestDto ToDto(RentalRequest entity) => new()
+        {
+            Id = entity.Id,
+            SubscriberId = entity.SubscriberId,
+            SubscriberName = entity.Subscriber?.FullName ?? string.Empty,
+            ApplicationUserId = entity.Subscriber?.ApplicationUserId,
+            BookId = entity.BookId,
+            BookTitle = entity.Book?.Name ?? string.Empty,
+            BookCopyId = entity.BookCopyId,
+            BookCopyLabel = entity.BookCopy is null
+                ? null
+                : $"{entity.BookCopy.EditionNumber}/{entity.BookCopy.SerialNumber}",
+            Status = ToDto(entity.Status),
+            CreatedOn = entity.CreatedOn,
+            ReviewedOn = entity.ReviewedOn,
+            RejectionReason = entity.RejectionReason
+        };
+
+        internal static RentalRequestStatusDto ToDto(RentalRequestStatus status) => (RentalRequestStatusDto)(int)status;
+
+        internal static RentalRequestStatus ToEntity(RentalRequestStatusDto status) => (RentalRequestStatus)(int)status;
 
         internal static LogCategoryDto ToDto(LogCategory entity) => new()
         {

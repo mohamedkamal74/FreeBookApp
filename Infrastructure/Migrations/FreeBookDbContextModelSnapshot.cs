@@ -412,6 +412,50 @@ namespace Infrastructure.Migrations
                     b.ToTable("RentalCopies");
                 });
 
+            modelBuilder.Entity("Domin.Entity.RentalRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("(newid())");
+
+                    b.Property<Guid?>("BookCopyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RejectionReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReviewedById")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ReviewedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("SubscriberId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookCopyId");
+
+                    b.HasIndex("BookId");
+
+                    b.HasIndex("Status", "CreatedOn");
+
+                    b.HasIndex("SubscriberId", "BookId", "Status");
+
+                    b.ToTable("RentalRequests");
+                });
+
             modelBuilder.Entity("Domin.Entity.SubCategory", b =>
                 {
                     b.Property<Guid>("Id")
@@ -447,6 +491,10 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Address")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("ApplicationUserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<Guid>("AreaId")
                         .HasColumnType("uniqueidentifier");
@@ -500,6 +548,10 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId")
+                        .IsUnique()
+                        .HasFilter("[ApplicationUserId] IS NOT NULL");
 
                     b.HasIndex("AreaId");
 
@@ -917,6 +969,32 @@ namespace Infrastructure.Migrations
                     b.Navigation("Rental");
                 });
 
+            modelBuilder.Entity("Domin.Entity.RentalRequest", b =>
+                {
+                    b.HasOne("Domin.Entity.BookCopy", "BookCopy")
+                        .WithMany()
+                        .HasForeignKey("BookCopyId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Domin.Entity.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Domin.Entity.Subscriber", "Subscriber")
+                        .WithMany()
+                        .HasForeignKey("SubscriberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("BookCopy");
+
+                    b.Navigation("Subscriber");
+                });
+
             modelBuilder.Entity("Domin.Entity.SubCategory", b =>
                 {
                     b.HasOne("Domin.Entity.Category", "categry")
@@ -930,6 +1008,11 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domin.Entity.Subscriber", b =>
                 {
+                    b.HasOne("Infrastructure.ViewModel.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Domin.Entity.Area", "Area")
                         .WithMany("Subscribers")
                         .HasForeignKey("AreaId")

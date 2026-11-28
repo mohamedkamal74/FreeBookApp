@@ -25,6 +25,7 @@ public class CrudDtoContractTests
         typeof(SubscriberDto), typeof(SubscriberCommand),
         typeof(SubscriptionDto), typeof(SubscriptionCommand),
         typeof(RentalDto), typeof(RentalCommand), typeof(RentalCopyDto), typeof(RentalCopyCommand),
+        typeof(RentalRequestDto), typeof(RentalRequestCommand),
         typeof(LogCategoryDto),
         typeof(NotificationDto), typeof(NotificationCommand)
     };
@@ -37,6 +38,7 @@ public class CrudDtoContractTests
         typeof(IAuthorRepository),
         typeof(ISubscriptionRepository),
         typeof(IRentalRepository),
+        typeof(IRentalRequestRepository),
         typeof(INotificationRepository)
     };
 

@@ -14,6 +14,7 @@ namespace Infrastructure.ViewModel
         public List<SubscriberDto> Subscribers { get; set; } = new();
         public List<AreaDto> Areas { get; set; } = new();
         public List<GovernorateDto> Governorates { get; set; } = new();
+        public List<UserDto> ApplicationUsers { get; set; } = new();
         public NewSubscriber NewSubscriber { get; set; } = new();
     }
 
@@ -61,6 +62,9 @@ namespace Infrastructure.ViewModel
         public string? Address { get; set; }
 
         public bool IsBlackListed { get; set; }
+
+        /// <summary>Optional Identity account link; must be a user in the User role.</summary>
+        public string? ApplicationUserId { get; set; }
 
         public DateTime DateOfBirth { get; set; } = DateTime.Now.AddYears(-18);
     }

@@ -65,7 +65,7 @@
                                         : "fas fa-user-times";
                                 }
                                 <div class="btn-group btn-group-sm" role="group">
-                                    <button type="button" class="btn btn-info" onclick="Edit('@subscriber.Id','@Js.Encode(subscriber.FirstName)','@Js.Encode(subscriber.LastName)','@Js.Encode(subscriber.NationalId)','@Js.Encode(subscriber.MobileNumber)','@(subscriber.HasWhatsApp ? "true" : "false")','@Js.Encode(subscriber.Email)','@subscriber.AreaId','@subscriber.GovernorateId','@Js.Encode(subscriber.Address)','@(subscriber.IsBlackListed ? "true" : "false")','@subscriber.DateOfBirth.ToString("yyyy-MM-dd")')"
+                                    <button type="button" class="btn btn-info" onclick="Edit('@subscriber.Id','@Js.Encode(subscriber.FirstName)','@Js.Encode(subscriber.LastName)','@Js.Encode(subscriber.NationalId)','@Js.Encode(subscriber.MobileNumber)','@(subscriber.HasWhatsApp ? "true" : "false")','@Js.Encode(subscriber.Email)','@subscriber.AreaId','@subscriber.GovernorateId','@Js.Encode(subscriber.Address)','@(subscriber.IsBlackListed ? "true" : "false")','@subscriber.DateOfBirth.ToString("yyyy-MM-dd")','@subscriber.ApplicationUserId')"
                                             title="@Localizer["lbBtnEdit"]" aria-label="@Localizer["lbBtnEdit"]"
                                             data-bs-toggle="modal" data-bs-target="#exampleModal">
                                         <i class="fas fa-edit" aria-hidden="true"></i>
@@ -152,6 +152,16 @@
                             <option value="">@Localizer["lbSelectUserRole"]</option>
                         </select>
                         <span asp-validation-for="NewSubscriber.GovernorateId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="control-label" asp-for="NewSubscriber.ApplicationUserId">@Localizer["lbLinkedUser"]</label>
+                        <select asp-for="NewSubscriber.ApplicationUserId" class="form-control" id="applicationUserId"
+                                asp-items="@(new SelectList(Model.ApplicationUsers,"Id","Name"))">
+                            <option value="">@Localizer["lbNoLinkedUser"]</option>
+                        </select>
+                        <span asp-validation-for="NewSubscriber.ApplicationUserId" class="text-danger"></span>
                     </div>
                     <div class="col-md-6">
                         <label class="control-label" asp-for="NewSubscriber.IsBlackListed">@Localizer["lbIsBlackListed"]</label>

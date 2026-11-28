@@ -193,6 +193,7 @@ namespace Infrastructure.ViewModel
         public string? Address { get; set; }
         public bool IsBlackListed { get; set; }
         public DateTime CreatedOn { get; set; }
+        public string? ApplicationUserId { get; set; }
         public List<SubscriptionDto> Subscriptions { get; set; } = new();
     }
 
@@ -211,6 +212,7 @@ namespace Infrastructure.ViewModel
         public Guid GovernorateId { get; set; }
         public string? Address { get; set; }
         public bool IsBlackListed { get; set; }
+        public string? ApplicationUserId { get; set; }
     }
 
     public class SubscriptionDto
@@ -271,6 +273,42 @@ namespace Infrastructure.ViewModel
         public bool PenaltyPaid { get; set; }
         public decimal? TotalFine { get; set; }
         public List<RentalCopyCommand> RentalCopies { get; set; } = new();
+    }
+
+    /// <summary>DTO-owned status so contracts and views never expose Domin entities.</summary>
+    public enum RentalRequestStatusDto
+    {
+        Pending = 1,
+        Approved = 2,
+        Rejected = 3,
+        Cancelled = 4
+    }
+
+    public class RentalRequestDto
+    {
+        public Guid Id { get; set; }
+        public Guid SubscriberId { get; set; }
+        public string SubscriberName { get; set; } = string.Empty;
+        public string? ApplicationUserId { get; set; }
+        public Guid BookId { get; set; }
+        public string BookTitle { get; set; } = string.Empty;
+        public Guid? BookCopyId { get; set; }
+        public string? BookCopyLabel { get; set; }
+        public RentalRequestStatusDto Status { get; set; } = RentalRequestStatusDto.Pending;
+        public DateTime CreatedOn { get; set; }
+        public DateTime? ReviewedOn { get; set; }
+        public string? RejectionReason { get; set; }
+    }
+
+    public class RentalRequestCommand
+    {
+        public Guid SubscriberId { get; set; }
+        public Guid BookId { get; set; }
+        public Guid? BookCopyId { get; set; }
+        public RentalRequestStatusDto Status { get; set; } = RentalRequestStatusDto.Pending;
+        public DateTime? ReviewedOn { get; set; }
+        public string? ReviewedById { get; set; }
+        public string? RejectionReason { get; set; }
     }
 
     public class LogCategoryDto

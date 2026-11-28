@@ -1104,6 +1104,60 @@
   <data name="msgRentalPenaltyPaid" xml:space="preserve">
     <value>تم دفع الغرامة</value>
   </data>
+  <data name="lbLinkedUser" xml:space="preserve">
+    <value>المستخدم المرتبط</value>
+  </data>
+  <data name="lbNoLinkedUser" xml:space="preserve">
+    <value>بدون مستخدم مرتبط</value>
+  </data>
+  <data name="msgSubscriberUserInvalid" xml:space="preserve">
+    <value>يرجى اختيار مستخدم من دور المستخدم</value>
+  </data>
+  <data name="msgSubscriberUserAlreadyLinked" xml:space="preserve">
+    <value>هذا المستخدم مرتبط بمشترك آخر بالفعل</value>
+  </data>
+  <data name="lbRentalRequests" xml:space="preserve">
+    <value>طلبات الاستعارة</value>
+  </data>
+  <data name="lbRequestedBook" xml:space="preserve">
+    <value>الكتاب المطلوب</value>
+  </data>
+  <data name="lbRequestedCopy" xml:space="preserve">
+    <value>النسخة المطلوبة</value>
+  </data>
+  <data name="lbApprove" xml:space="preserve">
+    <value>اعتماد</value>
+  </data>
+  <data name="lbReject" xml:space="preserve">
+    <value>رفض</value>
+  </data>
+  <data name="lbNoPendingRequests" xml:space="preserve">
+    <value>لا توجد طلبات استعارة معلقة</value>
+  </data>
+  <data name="msgRentalMaxDuration" xml:space="preserve">
+    <value>لا يمكن أن تتجاوز الاستعارة {0} يوماً</value>
+  </data>
+  <data name="msgRentalRequestSelectCopy" xml:space="preserve">
+    <value>يرجى اختيار نسخة كتاب واحدة على الأقل</value>
+  </data>
+  <data name="msgRentalRequestNotFound" xml:space="preserve">
+    <value>طلب الاستعارة غير موجود</value>
+  </data>
+  <data name="msgRentalRequestApproved" xml:space="preserve">
+    <value>تم اعتماد طلب الاستعارة بنجاح</value>
+  </data>
+  <data name="msgRentalRequestApproveFailed" xml:space="preserve">
+    <value>تعذر اعتماد طلب الاستعارة</value>
+  </data>
+  <data name="msgRentalRequestRejected" xml:space="preserve">
+    <value>تم رفض طلب الاستعارة</value>
+  </data>
+  <data name="msgRentalRequestRejectFailed" xml:space="preserve">
+    <value>تعذر رفض طلب الاستعارة</value>
+  </data>
+  <data name="msgRentalRequestDuplicate" xml:space="preserve">
+    <value>يوجد طلب معلق بالفعل لهذا الكتاب</value>
+  </data>
   <data name="msgAreaHasSubscribers" xml:space="preserve">
     <value>لا يمكن حذف منطقة مرتبطة بمشتركين</value>
   </data>

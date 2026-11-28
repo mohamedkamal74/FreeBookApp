@@ -58,6 +58,13 @@ namespace Domin.Entity
 
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
 
+        /// <summary>
+        /// Optional link to the Identity account that may place rental requests.
+        /// The navigation is configured in Infrastructure to keep Domin free of
+        /// Identity/Infrastructure references.
+        /// </summary>
+        public string? ApplicationUserId { get; set; }
+
         public ICollection<Subscription> Subscriptions { get; set; } = new List<Subscription>();
 
         public ICollection<Rental> Rentals { get; set; } = new List<Rental>();

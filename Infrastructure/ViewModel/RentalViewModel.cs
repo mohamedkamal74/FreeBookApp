@@ -14,6 +14,7 @@ namespace Infrastructure.ViewModel
         public List<RentalDto> Rentals { get; set; } = new();
         public List<SubscriberDto> Subscribers { get; set; } = new();
         public List<BookCopyDto> AvailableCopies { get; set; } = new();
+        public List<RentalRequestDto> PendingRequests { get; set; } = new();
         public NewRental NewRental { get; set; } = new();
         public Guid[] SelectedCopyIds { get; set; } = Array.Empty<Guid>();
 
@@ -37,6 +38,14 @@ namespace Infrastructure.ViewModel
         public bool PenaltyPaid { get; set; }
 
         public List<Guid> BookCopyIds { get; set; } = new();
+    }
+
+    /// <summary>Input for Admin approval/rejection of a member rental request.</summary>
+    public class RentalRequestViewModel
+    {
+        public Guid RequestId { get; set; }
+        public Guid[] SelectedCopyIds { get; set; } = Array.Empty<Guid>();
+        public string? RejectionReason { get; set; }
     }
 
     public class RentalReturnViewModel

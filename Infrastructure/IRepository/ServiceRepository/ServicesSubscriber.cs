@@ -133,6 +133,17 @@ namespace Infrastructure.IRepository.ServiceRepository
         {
             try
             {
+                if (!string.IsNullOrWhiteSpace(command.ApplicationUserId))
+                {
+                    if (!await _context.Users.AnyAsync(u => u.Id == command.ApplicationUserId))
+                        return Result.Failure<bool>("USER_NOT_FOUND", "Linked user not found");
+
+                    var alreadyLinked = await _context.Subscribers.AnyAsync(s =>
+                        s.ApplicationUserId == command.ApplicationUserId && s.Id != (id ?? Guid.Empty));
+                    if (alreadyLinked)
+                        return Result.Failure<bool>("USER_ALREADY_LINKED", "Linked user already belongs to another subscriber");
+                }
+
                 if (id is null || id == Guid.Empty)
                 {
                     var subscriber = new Subscriber
@@ -150,7 +161,10 @@ namespace Infrastructure.IRepository.ServiceRepository
                         AreaId = command.AreaId,
                         GovernorateId = command.GovernorateId,
                         Address = command.Address,
-                        IsBlackListed = command.IsBlackListed
+                        IsBlackListed = command.IsBlackListed,
+                        ApplicationUserId = string.IsNullOrWhiteSpace(command.ApplicationUserId)
+                            ? null
+                            : command.ApplicationUserId
                     };
                     _context.Subscribers.Add(subscriber);
                 }
@@ -174,6 +188,9 @@ namespace Infrastructure.IRepository.ServiceRepository
                     subscriber.GovernorateId = command.GovernorateId;
                     subscriber.Address = command.Address;
                     subscriber.IsBlackListed = command.IsBlackListed;
+                    subscriber.ApplicationUserId = string.IsNullOrWhiteSpace(command.ApplicationUserId)
+                        ? null
+                        : command.ApplicationUserId;
                     _context.Subscribers.Update(subscriber);
                 }
 

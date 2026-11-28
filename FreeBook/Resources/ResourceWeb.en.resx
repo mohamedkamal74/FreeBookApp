@@ -999,6 +999,60 @@
   <data name="msgRentalPenaltyPaid" xml:space="preserve">
     <value>Penalty paid</value>
   </data>
+  <data name="lbLinkedUser" xml:space="preserve">
+    <value>Linked User</value>
+  </data>
+  <data name="lbNoLinkedUser" xml:space="preserve">
+    <value>No linked user</value>
+  </data>
+  <data name="msgSubscriberUserInvalid" xml:space="preserve">
+    <value>Select a user with the User role</value>
+  </data>
+  <data name="msgSubscriberUserAlreadyLinked" xml:space="preserve">
+    <value>This user is already linked to another subscriber</value>
+  </data>
+  <data name="lbRentalRequests" xml:space="preserve">
+    <value>Rental Requests</value>
+  </data>
+  <data name="lbRequestedBook" xml:space="preserve">
+    <value>Requested Book</value>
+  </data>
+  <data name="lbRequestedCopy" xml:space="preserve">
+    <value>Requested Copy</value>
+  </data>
+  <data name="lbApprove" xml:space="preserve">
+    <value>Approve</value>
+  </data>
+  <data name="lbReject" xml:space="preserve">
+    <value>Reject</value>
+  </data>
+  <data name="lbNoPendingRequests" xml:space="preserve">
+    <value>No pending rental requests</value>
+  </data>
+  <data name="msgRentalMaxDuration" xml:space="preserve">
+    <value>Rental cannot exceed {0} days</value>
+  </data>
+  <data name="msgRentalRequestSelectCopy" xml:space="preserve">
+    <value>Please select at least one book copy</value>
+  </data>
+  <data name="msgRentalRequestNotFound" xml:space="preserve">
+    <value>Rental request not found</value>
+  </data>
+  <data name="msgRentalRequestApproved" xml:space="preserve">
+    <value>Rental request approved successfully</value>
+  </data>
+  <data name="msgRentalRequestApproveFailed" xml:space="preserve">
+    <value>Failed to approve rental request</value>
+  </data>
+  <data name="msgRentalRequestRejected" xml:space="preserve">
+    <value>Rental request rejected</value>
+  </data>
+  <data name="msgRentalRequestRejectFailed" xml:space="preserve">
+    <value>Failed to reject rental request</value>
+  </data>
+  <data name="msgRentalRequestDuplicate" xml:space="preserve">
+    <value>A pending request already exists for this book</value>
+  </data>
   <data name="msgAreaHasSubscribers" xml:space="preserve">
     <value>Cannot delete area with associated subscribers</value>
   </data>

@@ -15,6 +15,7 @@ namespace FreeBook.Areas.Admin.Controllers
     public class RentalsController : Controller
     {
         private readonly IRentalRepository _serviceRental;
+        private readonly IRentalRequestRepository _serviceRentalRequest;
         private readonly IServiceRepository<SubscriberDto, SubscriberCommand> _serviceSubscriber;
         private readonly IServiceRepository<BookCopyDto, BookCopyCommand> _serviceBookCopy;
         private readonly UserManager<ApplicationUser> _userManager;
@@ -23,6 +24,7 @@ namespace FreeBook.Areas.Admin.Controllers
 
         public RentalsController(
             IRentalRepository serviceRental,
+            IRentalRequestRepository serviceRentalRequest,
             IServiceRepository<SubscriberDto, SubscriberCommand> serviceSubscriber,
             IServiceRepository<BookCopyDto, BookCopyCommand> serviceBookCopy,
             UserManager<ApplicationUser> userManager,
@@ -30,6 +32,7 @@ namespace FreeBook.Areas.Admin.Controllers
             IFlashMessageService flash)
         {
             _serviceRental = serviceRental;
+            _serviceRentalRequest = serviceRentalRequest;
             _serviceSubscriber = serviceSubscriber;
             _serviceBookCopy = serviceBookCopy;
             _userManager = userManager;
@@ -42,11 +45,13 @@ namespace FreeBook.Areas.Admin.Controllers
             var rentalsResult = await _serviceRental.GetFilteredAsync(filter);
             var subsResult = await _serviceSubscriber.GetAllAsync();
             var copiesResult = await _serviceBookCopy.GetAllAsync();
+            var pendingResult = await _serviceRentalRequest.GetPendingAsync();
             return View(new RentalViewModel
             {
                 Rentals = rentalsResult.IsSuccess ? rentalsResult.Value ?? new List<RentalDto>() : new List<RentalDto>(),
                 Subscribers = subsResult.IsSuccess ? subsResult.Value ?? new List<SubscriberDto>() : new List<SubscriberDto>(),
                 AvailableCopies = copiesResult.IsSuccess ? copiesResult.Value ?? new List<BookCopyDto>() : new List<BookCopyDto>(),
+                PendingRequests = pendingResult.IsSuccess ? pendingResult.Value ?? new List<RentalRequestDto>() : new List<RentalRequestDto>(),
                 NewRental = new NewRental()
             });
         }
@@ -88,20 +93,9 @@ namespace FreeBook.Areas.Admin.Controllers
             }
 
             var subscriberResult = await _serviceSubscriber.FindByIdAsync(model.NewRental.SubscriberId);
-            if (!subscriberResult.IsSuccess || subscriberResult.Value is null || subscriberResult.Value.IsBlackListed)
+            if (!subscriberResult.IsSuccess || subscriberResult.Value is null)
             {
                 Flash.Error(Resources.ResourceWeb.lbNotSave, _localizer["msgRentalSubscriberUnavailable"]);
-                return RedirectToAction(nameof(Rentals));
-            }
-
-            var subscriber = subscriberResult.Value;
-
-            // Check active subscription
-            var now = DateTime.UtcNow;
-            var hasActiveSubscription = subscriber.Subscriptions?.Any(s => s.StartDate <= now && s.EndDate >= now) ?? false;
-            if (!hasActiveSubscription)
-            {
-                Flash.Error(Resources.ResourceWeb.lbNotSave, _localizer["msgRentalNoActiveSubscription"]);
                 return RedirectToAction(nameof(Rentals));
             }
 
@@ -114,29 +108,17 @@ namespace FreeBook.Areas.Admin.Controllers
             }
 
             var availableCopies = copiesResult.Value ?? new List<BookCopyDto>();
-            var selectedCopies = availableCopies.Where(c => model.SelectedCopyIds.Contains(c.Id) && c.IsAvailableForRental).ToList();
-            if (selectedCopies.Count != model.SelectedCopyIds.Length)
+            var rule = RentalRules.BuildCommand(subscriberResult.Value, model.SelectedCopyIds, availableCopies);
+            if (!rule.IsSuccess)
             {
-                Flash.Error(Resources.ResourceWeb.lbNotSave, _localizer["msgRentalCopyUnavailable"]);
+                Flash.Error(Resources.ResourceWeb.lbNotSave, LocalizeRentalRule(rule.Error));
                 return RedirectToAction(nameof(Rentals));
             }
 
-            var command = new RentalCommand
+            var command = rule.Command!;
+            var selectedIds = command.RentalCopies.Select(c => c.BookCopyId).ToHashSet();
+            foreach (var copy in availableCopies.Where(c => selectedIds.Contains(c.Id)))
             {
-                SubscriberId = model.NewRental.SubscriberId,
-                StartDate = DateTime.UtcNow,
-                PenaltyPaid = false,
-                RentalCopies = new List<RentalCopyCommand>()
-            };
-
-            foreach (var copy in selectedCopies)
-            {
-                command.RentalCopies.Add(new RentalCopyCommand
-                {
-                    BookCopyId = copy.Id,
-                    RentalDate = DateTime.UtcNow,
-                    EndDate = DateTime.UtcNow.AddDays((int)Domin.Entity.RentalsConfigurations.RentalDuration)
-                });
                 copy.IsAvailableForRental = false;
                 await _serviceBookCopy.SaveAsync(ToCommand(copy), copy.Id);
             }
@@ -216,11 +198,8 @@ namespace FreeBook.Areas.Admin.Controllers
                 return RedirectToAction(nameof(Rentals));
             }
 
-            var maxExtensionDate = rentalCopy.RentalDate.AddDays((int)Domin.Entity.RentalsConfigurations.MaxRentalDuration);
             var newEndDate = model.NewEndDate > rentalCopy.EndDate ? model.NewEndDate : rentalCopy.EndDate.AddDays(7);
-
-            if (newEndDate > maxExtensionDate)
-                newEndDate = maxExtensionDate;
+            newEndDate = RentalRules.CapEndDate(rentalCopy.RentalDate, newEndDate);
 
             rentalCopy.EndDate = newEndDate;
             rentalCopy.ExtendedOn = DateTime.UtcNow;
@@ -243,6 +222,83 @@ namespace FreeBook.Areas.Admin.Controllers
                 Flash.Success(Resources.ResourceWeb.lbSave, _localizer["msgRentalPenaltyPaid"]);
             }
             return RedirectToAction(nameof(Rentals));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApproveRequest(RentalRequestViewModel model)
+        {
+            if (model.RequestId == Guid.Empty || model.SelectedCopyIds is null || model.SelectedCopyIds.Length == 0)
+            {
+                Flash.Error(Resources.ResourceWeb.lbNotSave, _localizer["msgRentalRequestSelectCopy"]);
+                return RedirectToAction(nameof(Rentals));
+            }
+
+            var result = await _serviceRentalRequest.ApproveAsync(
+                model.RequestId,
+                model.SelectedCopyIds,
+                _userManager.GetUserId(User));
+            if (result.IsSuccess)
+                Flash.Success(Resources.ResourceWeb.lbSave, _localizer["msgRentalRequestApproved"]);
+            else
+                Flash.Error(Resources.ResourceWeb.lbNotSave, LocalizeRequestError(result.Error?.Code));
+
+            return RedirectToAction(nameof(Rentals));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RejectRequest(RentalRequestViewModel model)
+        {
+            if (model.RequestId == Guid.Empty)
+            {
+                Flash.Error(Resources.ResourceWeb.lbNotSave, _localizer["msgRentalRequestNotFound"]);
+                return RedirectToAction(nameof(Rentals));
+            }
+
+            var result = await _serviceRentalRequest.RejectAsync(
+                model.RequestId,
+                _userManager.GetUserId(User),
+                model.RejectionReason);
+            if (result.IsSuccess)
+                Flash.Success(Resources.ResourceWeb.lbUpdate, _localizer["msgRentalRequestRejected"]);
+            else
+                Flash.Error(Resources.ResourceWeb.lbNotUpdate, _localizer["msgRentalRequestRejectFailed"]);
+
+            return RedirectToAction(nameof(Rentals));
+        }
+
+        private string LocalizeRentalRule(RentalRuleError error) => error switch
+        {
+            RentalRuleError.SubscriberNotFound or RentalRuleError.SubscriberBlacklisted =>
+                _localizer["msgRentalSubscriberUnavailable"].Value,
+            RentalRuleError.NoActiveSubscription => _localizer["msgRentalNoActiveSubscription"].Value,
+            RentalRuleError.NoCopiesSelected => _localizer["msgRentalSelectCopy"].Value,
+            RentalRuleError.TooManyCopies => string.Format(
+                _localizer["msgRentalMaxCopies"].Value,
+                (int)Domin.Entity.RentalsConfigurations.MaxAllowedCopies),
+            RentalRuleError.CopyUnavailable => _localizer["msgRentalCopyUnavailable"].Value,
+            RentalRuleError.DurationExceeded => string.Format(
+                _localizer["msgRentalMaxDuration"].Value,
+                (int)Domin.Entity.RentalsConfigurations.MaxRentalDuration),
+            _ => _localizer["msgRentalCreateFailed"].Value
+        };
+
+        private string LocalizeRequestError(string? code)
+        {
+            if (code?.StartsWith("RULE_", StringComparison.Ordinal) == true &&
+                Enum.TryParse<RentalRuleError>(code["RULE_".Length..], out var ruleError))
+            {
+                return LocalizeRentalRule(ruleError);
+            }
+
+            return code switch
+            {
+                "NOT_FOUND" or "INVALID_REQUEST" or "INVALID_STATUS" => _localizer["msgRentalRequestNotFound"].Value,
+                "COPY_BOOK_MISMATCH" or "COPY_UNAVAILABLE" => _localizer["msgRentalCopyUnavailable"].Value,
+                "DUPLICATE_PENDING" => _localizer["msgRentalRequestDuplicate"].Value,
+                _ => _localizer["msgRentalRequestApproveFailed"].Value
+            };
         }
 
         private static RentalCommand ToCommand(RentalDto rental)

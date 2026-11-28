@@ -36,7 +36,7 @@ function ToggleBlacklist(id) {
     })
 }
 
-Edit = (id, firstName, lastName, nationalId, mobileNumber, hasWhatsApp, email, areaId, governorateId, address, isBlackListed, dateOfBirth) => {
+Edit = (id, firstName, lastName, nationalId, mobileNumber, hasWhatsApp, email, areaId, governorateId, address, isBlackListed, dateOfBirth, applicationUserId) => {
     clearValidation(document.getElementById('exampleModal'));
     document.getElementById('subscriberModalTitle').innerHTML = lbTitleEditSubscriber;
     document.getElementById('subscriberModalBtnSave').value = bookify.ui.edit;
@@ -52,6 +52,7 @@ Edit = (id, firstName, lastName, nationalId, mobileNumber, hasWhatsApp, email, a
     document.getElementById('hasWhatsApp').checked = (hasWhatsApp === 'true' || hasWhatsApp === 'True');
     document.getElementById('isBlackListed').checked = (isBlackListed === 'true' || isBlackListed === 'True');
     document.getElementById('dateOfBirth').value = dateOfBirth;
+    document.getElementById('applicationUserId').value = applicationUserId || '';
 }
 
 Rest = () => {
@@ -70,4 +71,5 @@ Rest = () => {
     document.getElementById('hasWhatsApp').checked = false;
     document.getElementById('isBlackListed').checked = false;
     document.getElementById('dateOfBirth').value = "";
+    document.getElementById('applicationUserId').value = "";
 }

@@ -121,6 +121,71 @@
         </div>
     </div>
 
+    <!-- Pending member requests -->
+    <div class="card" id="pendingRentalRequests">
+        <div class="card-header d-flex align-items-center justify-content-start">
+            <h3 class="card-title">@Localizer["lbRentalRequests"]</h3>
+        </div>
+        <div class="card-body">
+            <table id="tableRentalRequests" class="table table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">@Localizer["lbSubscriber"]</th>
+                        <th scope="col">@Localizer["lbRequestedBook"]</th>
+                        <th scope="col">@Localizer["lbRequestedCopy"]</th>
+                        <th scope="col">@Localizer["lbRentalDate"]</th>
+                        <th scope="col">@Localizer["lbApprove"]</th>
+                        <th scope="col">@Localizer["lbReject"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.PendingRequests.Any())
+                    {
+                        <tr><td colspan="6">@Localizer["lbNoPendingRequests"]</td></tr>
+                    }
+                    @foreach (var request in Model.PendingRequests)
+                    {
+                        <tr>
+                            <td>@request.SubscriberName</td>
+                            <td>@request.BookTitle</td>
+                            <td>@(request.BookCopyLabel ?? "-")</td>
+                            <td>@request.CreatedOn.ToString("yyyy-MM-dd")</td>
+                            <td>
+                                <form asp-action="ApproveRequest" asp-controller="Rentals" method="post" style="display:inline;">
+                                    <input type="hidden" name="RequestId" value="@request.Id" />
+                                    @foreach (var copy in Model.AvailableCopies.Where(c => c.BookId == request.BookId && c.IsAvailableForRental))
+                                    {
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="SelectedCopyIds" value="@copy.Id"
+                                                   id="requestCopy_@(request.Id)_@(copy.Id)" />
+                                            <label class="form-check-label" for="requestCopy_@(request.Id)_@(copy.Id)">
+                                                @Localizer["lbEditionNumber"]: @copy.EditionNumber, @Localizer["lbSerialNumber"]: @copy.SerialNumber
+                                            </label>
+                                        </div>
+                                    }
+                                    <button type="submit" class="btn btn-success btn-sm" id="btnApproveRequest_@request.Id"
+                                            title="@Localizer["lbApprove"]" aria-label="@Localizer["lbApprove"]">
+                                        <i class="fas fa-check" aria-hidden="true"></i>
+                                    </button>
+                                </form>
+                            </td>
+                            <td>
+                                <form asp-action="RejectRequest" asp-controller="Rentals" method="post" style="display:inline;">
+                                    <input type="hidden" name="RequestId" value="@request.Id" />
+                                    <input type="hidden" name="RejectionReason" value="" />
+                                    <button type="submit" class="btn btn-danger btn-sm" id="btnRejectRequest_@request.Id"
+                                            title="@Localizer["lbReject"]" aria-label="@Localizer["lbReject"]">
+                                        <i class="fas fa-times" aria-hidden="true"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <!-- Create Rental Modal -->
     <modal id="createRentalModal" size="lg" title-id="createRentalModalLabel" title="@Localizer["lbCreateRental"]">
         <form asp-action="CreateRental" asp-controller="Rentals" method="post">

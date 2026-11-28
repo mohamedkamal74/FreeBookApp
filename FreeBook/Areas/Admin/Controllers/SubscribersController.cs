@@ -1,3 +1,4 @@
+using FreeBook.Resources;
 using Infrastructure.Common;
 using Infrastructure.Common.Interfaces;
 using Infrastructure.IRepository;
@@ -5,6 +6,7 @@ using Infrastructure.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace FreeBook.Areas.Admin.Controllers
 {
@@ -16,6 +18,7 @@ namespace FreeBook.Areas.Admin.Controllers
         private readonly IServiceRepository<AreaDto, AreaCommand> _serviceArea;
         private readonly IServiceRepository<GovernorateDto, GovernorateCommand> _serviceGovernorate;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IStringLocalizer<ResourceWeb> _localizer;
         private IFlashMessageService Flash { get; }
 
         public SubscribersController(
@@ -23,12 +26,14 @@ namespace FreeBook.Areas.Admin.Controllers
             IServiceRepository<AreaDto, AreaCommand> serviceArea,
             IServiceRepository<GovernorateDto, GovernorateCommand> serviceGovernorate,
             UserManager<ApplicationUser> userManager,
+            IStringLocalizer<ResourceWeb> localizer,
             IFlashMessageService flash)
         {
             _serviceSubscriber = serviceSubscriber;
             _serviceArea = serviceArea;
             _serviceGovernorate = serviceGovernorate;
             _userManager = userManager;
+            _localizer = localizer;
             Flash = flash;
         }
 
@@ -37,11 +42,15 @@ namespace FreeBook.Areas.Admin.Controllers
             var subsResult = await _serviceSubscriber.GetFilteredAsync(filter);
             var areasResult = await _serviceArea.GetAllAsync();
             var govResult = await _serviceGovernorate.GetAllAsync();
+            var users = await _userManager.GetUsersInRoleAsync("User");
             return View(new SubscriberViewModel
             {
                 Subscribers = subsResult.IsSuccess ? subsResult.Value ?? new List<SubscriberDto>() : new List<SubscriberDto>(),
                 Areas = areasResult.IsSuccess ? areasResult.Value ?? new List<AreaDto>() : new List<AreaDto>(),
                 Governorates = govResult.IsSuccess ? govResult.Value ?? new List<GovernorateDto>() : new List<GovernorateDto>(),
+                ApplicationUsers = users.Select(ToUserDto)
+                    .OrderBy(u => u.Name, StringComparer.CurrentCultureIgnoreCase)
+                    .ToList(),
                 NewSubscriber = new NewSubscriber()
             });
         }
@@ -83,6 +92,19 @@ namespace FreeBook.Areas.Admin.Controllers
             if (userId is null)
                 return RedirectToAction(nameof(Subscribers));
 
+            var selectedUserId = string.IsNullOrWhiteSpace(model.NewSubscriber.ApplicationUserId)
+                ? null
+                : model.NewSubscriber.ApplicationUserId;
+            if (selectedUserId is not null)
+            {
+                var eligibleUsers = await _userManager.GetUsersInRoleAsync("User");
+                if (!eligibleUsers.Any(u => u.Id == selectedUserId))
+                {
+                    Flash.Error(Resources.ResourceWeb.lbNotSave, _localizer["msgSubscriberUserInvalid"]);
+                    return RedirectToAction(nameof(Subscribers));
+                }
+            }
+
             if (model.NewSubscriber.SubscriberId == null || model.NewSubscriber.SubscriberId == Guid.Empty.ToString())
             {
                 // create
@@ -105,13 +127,18 @@ namespace FreeBook.Areas.Admin.Controllers
                         AreaId = model.NewSubscriber.AreaId,
                         GovernorateId = model.NewSubscriber.GovernorateId,
                         Address = model.NewSubscriber.Address,
-                        IsBlackListed = model.NewSubscriber.IsBlackListed
+                        IsBlackListed = model.NewSubscriber.IsBlackListed,
+                        ApplicationUserId = selectedUserId
                     };
                     var saveResult = await _serviceSubscriber.SaveAsync(command);
                     if (saveResult.IsSuccess)
                         Flash.Success(Resources.ResourceWeb.lbSave, Resources.ResourceWeb.lbMsgSavedOk);
                     else
-                        Flash.Error(Resources.ResourceWeb.lbNotSave, Resources.ResourceWeb.lbMsgNotSavedOk);
+                        Flash.Error(
+                            Resources.ResourceWeb.lbNotSave,
+                            saveResult.Error?.Code == "USER_ALREADY_LINKED"
+                                ? _localizer["msgSubscriberUserAlreadyLinked"]
+                                : Resources.ResourceWeb.lbMsgNotSavedOk);
                 }
             }
             else
@@ -142,13 +169,18 @@ namespace FreeBook.Areas.Admin.Controllers
                             AreaId = model.NewSubscriber.AreaId,
                             GovernorateId = model.NewSubscriber.GovernorateId,
                             Address = model.NewSubscriber.Address,
-                            IsBlackListed = model.NewSubscriber.IsBlackListed
+                            IsBlackListed = model.NewSubscriber.IsBlackListed,
+                            ApplicationUserId = selectedUserId
                         };
                         var saveResult = await _serviceSubscriber.SaveAsync(command, existingResult.Value.Id);
                         if (saveResult.IsSuccess)
                             Flash.Success(Resources.ResourceWeb.lbUpdate, Resources.ResourceWeb.lbMsgUpdatedOk);
                         else
-                            Flash.Error(Resources.ResourceWeb.lbNotUpdate, Resources.ResourceWeb.lbMsgNotUpdatedOk);
+                            Flash.Error(
+                                Resources.ResourceWeb.lbNotUpdate,
+                                saveResult.Error?.Code == "USER_ALREADY_LINKED"
+                                    ? _localizer["msgSubscriberUserAlreadyLinked"]
+                                    : Resources.ResourceWeb.lbMsgNotUpdatedOk);
                     }
                 }
             }
@@ -170,7 +202,16 @@ namespace FreeBook.Areas.Admin.Controllers
             AreaId = subscriber.AreaId,
             GovernorateId = subscriber.GovernorateId,
             Address = subscriber.Address,
-            IsBlackListed = subscriber.IsBlackListed
+            IsBlackListed = subscriber.IsBlackListed,
+            ApplicationUserId = subscriber.ApplicationUserId
+        };
+
+        private static UserDto ToUserDto(ApplicationUser user) => new()
+        {
+            Id = user.Id,
+            Name = string.IsNullOrWhiteSpace(user.Name) ? user.Email ?? user.UserName ?? user.Id : user.Name,
+            Email = user.Email ?? user.UserName ?? string.Empty,
+            ActiveUser = user.ActiveUser
         };
     }
 }

@@ -47,6 +47,7 @@ namespace Infrastructure.Data
             builder.Entity<Subscriber>().Property(x => x.Id).HasDefaultValueSql("(newid())");
             builder.Entity<Subscription>().Property(x => x.Id).HasDefaultValueSql("(newid())");
             builder.Entity<Notification>().Property(x => x.Id).HasDefaultValueSql("(newid())");
+            builder.Entity<RentalRequest>().Property(x => x.Id).HasDefaultValueSql("(newid())");
 
             // One row per underlying event even when a recurring job runs daily.
             builder.Entity<Notification>()
@@ -136,6 +137,47 @@ namespace Infrastructure.Data
                 .WithMany(s => s.Subscriptions)
                 .HasForeignKey(s => s.SubscriberId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Optional login-to-membership link. One Identity account can belong
+            // to at most one subscriber; NULL is allowed for legacy rows.
+            builder.Entity<Subscriber>()
+                .Property(s => s.ApplicationUserId)
+                .HasMaxLength(450);
+
+            builder.Entity<Subscriber>()
+                .HasIndex(s => s.ApplicationUserId)
+                .IsUnique()
+                .HasFilter("[ApplicationUserId] IS NOT NULL");
+
+            builder.Entity<Subscriber>()
+                .HasOne<ApplicationUser>()
+                .WithMany()
+                .HasForeignKey(s => s.ApplicationUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<RentalRequest>()
+                .HasOne(r => r.Subscriber)
+                .WithMany()
+                .HasForeignKey(r => r.SubscriberId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<RentalRequest>()
+                .HasOne(r => r.Book)
+                .WithMany()
+                .HasForeignKey(r => r.BookId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<RentalRequest>()
+                .HasOne(r => r.BookCopy)
+                .WithMany()
+                .HasForeignKey(r => r.BookCopyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<RentalRequest>()
+                .HasIndex(r => new { r.Status, r.CreatedOn });
+
+            builder.Entity<RentalRequest>()
+                .HasIndex(r => new { r.SubscriberId, r.BookId, r.Status });
         }
 
         public DbSet<Category> categories { get; set; }
@@ -154,6 +196,7 @@ namespace Infrastructure.Data
         public DbSet<Subscriber> Subscribers { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<RentalRequest> RentalRequests { get; set; }
         public DbSet<VwUser> VwUsers { get; set; }
     }
 }

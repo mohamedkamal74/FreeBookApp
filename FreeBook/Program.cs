@@ -145,6 +145,7 @@ try
     builder.Services.AddScoped<IBookCopyRepository, ServicesBookCopy>();
     builder.Services.AddScoped<IServiceRepository<BookCopyDto, BookCopyCommand>, ServicesBookCopy>();
     builder.Services.AddScoped<IRentalRepository, ServicesRental>();
+    builder.Services.AddScoped<IRentalRequestRepository, ServicesRentalRequest>();
     builder.Services.AddScoped<ISubscriberRepository, ServicesSubscriber>();
     builder.Services.AddScoped<IServiceRepository<SubscriberDto, SubscriberCommand>, ServicesSubscriber>();
     builder.Services.AddScoped<ISubscriptionRepository, ServicesSubscription>();
