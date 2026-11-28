@@ -63,6 +63,16 @@ public class AuthorizationMatrixTests : IClassFixture<CustomWebApplicationFactor
         "/Admin/Reports/BooksByAuthor"
     };
 
+    private static readonly (string Url, (string Key, string Value)[] Form)[] AdminOnlyPostEndpoints =
+    {
+        ("/Admin/Notifications/MarkAllRead?culture=en", Array.Empty<(string, string)>()),
+        ("/Admin/Notifications/DeleteRead?culture=en", Array.Empty<(string, string)>()),
+        ("/Admin/Notifications/MarkRead?culture=en", new[] { ("id", Guid.NewGuid().ToString()) }),
+        ("/Admin/Subscribers/ToggleBlacklist?culture=en", new[] { ("Id", Guid.NewGuid().ToString()) }),
+        ("/Admin/Rentals/PayPenalty?culture=en", new[] { ("rentalId", Guid.NewGuid().ToString()) }),
+        ("/Admin/Categories/Delete?culture=en", new[] { ("Id", Guid.NewGuid().ToString()) })
+    };
+
     private readonly CustomWebApplicationFactory _factory;
 
     public AuthorizationMatrixTests(CustomWebApplicationFactory factory)
@@ -113,6 +123,38 @@ public class AuthorizationMatrixTests : IClassFixture<CustomWebApplicationFactor
         {
             var response = await client.GetAsync(url);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+    }
+
+    [Fact]
+    public async Task NormalUser_IsDeniedFromAdminWriteEndpoints()
+    {
+        var email = await SeedUserAsync("User");
+        var client = await CreateLoggedInClientAsync(email);
+        var token = ExtractToken(await client.GetStringAsync("/Admin/Accounts/ChangePassword?culture=en"));
+
+        foreach (var (url, fields) in AdminOnlyPostEndpoints)
+        {
+            var response = await client.PostAsync(url, BuildForm(fields, token));
+            Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+            Assert.Contains("/Admin/Home/Denied", response.Headers.Location!.OriginalString);
+        }
+    }
+
+    [Fact]
+    public async Task Admin_CanReachAdminWriteEndpoints()
+    {
+        var email = await SeedUserAsync("Admin");
+        var client = await CreateLoggedInClientAsync(email);
+        var token = ExtractToken(await client.GetStringAsync("/Admin/Accounts/ChangePassword?culture=en"));
+
+        foreach (var (url, fields) in AdminOnlyPostEndpoints)
+        {
+            var response = await client.PostAsync(url, BuildForm(fields, token));
+            Assert.True(
+                response.StatusCode is HttpStatusCode.Redirect or HttpStatusCode.OK,
+                $"Unexpected status {response.StatusCode} for {url}");
+            Assert.DoesNotContain("/Admin/Home/Denied", response.Headers.Location?.OriginalString ?? string.Empty);
         }
     }
 
@@ -246,6 +288,16 @@ public class AuthorizationMatrixTests : IClassFixture<CustomWebApplicationFactor
         Assert.DoesNotContain("class=\"mt-2 mr-6\"", userHtml);
         Assert.DoesNotContain("/Admin/Categories/Categories", userHtml);
         Assert.Contains("/Admin/Accounts/ChangePassword", userHtml);
+    }
+
+    private static FormUrlEncodedContent BuildForm((string Key, string Value)[] fields, string token)
+    {
+        var values = new Dictionary<string, string> { ["__RequestVerificationToken"] = token };
+        foreach (var field in fields)
+        {
+            values[field.Key] = field.Value;
+        }
+        return new FormUrlEncodedContent(values);
     }
 
     private static int CountFeatureCards(string html) => Regex.Matches(html, "class=\"feature-card").Count;
