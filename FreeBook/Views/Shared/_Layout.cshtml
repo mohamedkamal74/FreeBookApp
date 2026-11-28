@@ -139,7 +139,10 @@
                 <h3 class="footer-column-title">@Localizer["lbCategories"]</h3>
                 <ul class="footer-links">
                     <li><a asp-controller="Home" asp-action="Index">@Localizer["lbHome"]</a></li>
-                    <li><a asp-area="Admin" asp-controller="Accounts" asp-action="Login">@Localizer["lbAdminLogin"]</a></li>
+                    @if (!isSignedIn)
+                    {
+                        <li><a asp-area="Admin" asp-controller="Accounts" asp-action="Login">@Localizer["lbAdminLogin"]</a></li>
+                    }
                     @if (isAdmin)
                     {
                         <li><a asp-area="Admin" asp-controller="Categories" asp-action="Categories">@Localizer["lbCategories"]</a></li>

@@ -244,6 +244,7 @@ public class AuthorizationMatrixTests : IClassFixture<CustomWebApplicationFactor
 
         AssertPublicAdminLinks(html, expected: false);
         Assert.Equal(1, CountFeatureCards(html));
+        Assert.Contains("href=\"/Admin\"", ExtractFooter(html));
     }
 
     [Fact]
@@ -256,6 +257,7 @@ public class AuthorizationMatrixTests : IClassFixture<CustomWebApplicationFactor
 
         AssertPublicAdminLinks(html, expected: false);
         Assert.Equal(1, CountFeatureCards(html));
+        Assert.DoesNotContain("href=\"/Admin\"", ExtractFooter(html));
         Assert.Contains("/Admin/Accounts/ChangePassword", html);
     }
 
@@ -269,6 +271,7 @@ public class AuthorizationMatrixTests : IClassFixture<CustomWebApplicationFactor
 
         AssertPublicAdminLinks(html, expected: true);
         Assert.Equal(6, CountFeatureCards(html));
+        Assert.DoesNotContain("href=\"/Admin\"", ExtractFooter(html));
     }
 
     [Fact]
@@ -288,6 +291,13 @@ public class AuthorizationMatrixTests : IClassFixture<CustomWebApplicationFactor
         Assert.DoesNotContain("class=\"mt-2 mr-6\"", userHtml);
         Assert.DoesNotContain("/Admin/Categories/Categories", userHtml);
         Assert.Contains("/Admin/Accounts/ChangePassword", userHtml);
+    }
+
+    private static string ExtractFooter(string html)
+    {
+        var match = Regex.Match(html, "<footer[^>]*>[\\s\\S]*?</footer>", RegexOptions.IgnoreCase);
+        Assert.True(match.Success, "Public footer not found");
+        return match.Value;
     }
 
     private static FormUrlEncodedContent BuildForm((string Key, string Value)[] fields, string token)
