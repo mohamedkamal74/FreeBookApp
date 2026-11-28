@@ -41,7 +41,7 @@ namespace FreeBook.Areas.Admin.Controllers
             return View(result.ValueOr(new List<ActiveSubscriberReport>()));
         }
 
-        public async Task<IActionResult> ExpiringSubscriptions(int days = 30)
+        public async Task<IActionResult> ExpiringSubscriptions(int days = Helper.ExpiringSubscriptionWindowDays)
         {
             var result = await _reportRepository.GetExpiringSubscriptionsAsync(days);
             return View(result.ValueOr(new ExpiringSubscriptionsData { Days = days }));

@@ -29,13 +29,30 @@ namespace FreeBook.Areas.Admin.Controllers
             Flash = flash;
         }
 
-        public async Task<IActionResult> Subscriptions(SubscriptionViewModel model)
+        public async Task<IActionResult> Subscriptions(SubscriptionViewModel model, string? filter = null)
         {
             var subsResult = await _serviceSubscription.GetAllAsync();
             var subsResult2 = await _serviceSubscriber.GetAllAsync();
+            var subscriptions = subsResult.IsSuccess ? subsResult.Value ?? new List<SubscriptionDto>() : new List<SubscriptionDto>();
+            var now = DateTime.UtcNow;
+
+            if (string.Equals(filter, "active", StringComparison.OrdinalIgnoreCase))
+            {
+                subscriptions = subscriptions
+                    .Where(subscription => subscription.StartDate <= now && subscription.EndDate >= now)
+                    .ToList();
+            }
+            else if (string.Equals(filter, "expiring", StringComparison.OrdinalIgnoreCase))
+            {
+                var warningTo = now.AddDays(Domin.Entity.Helper.ExpiringSubscriptionWindowDays);
+                subscriptions = subscriptions
+                    .Where(subscription => subscription.EndDate >= now && subscription.EndDate <= warningTo)
+                    .ToList();
+            }
+
             return View(new SubscriptionViewModel
             {
-                Subscriptions = subsResult.IsSuccess ? subsResult.Value ?? new List<SubscriptionDto>() : new List<SubscriptionDto>(),
+                Subscriptions = subscriptions,
                 Subscribers = subsResult2.IsSuccess ? subsResult2.Value ?? new List<SubscriberDto>() : new List<SubscriberDto>(),
                 NewSubscription = new NewSubscription()
             });

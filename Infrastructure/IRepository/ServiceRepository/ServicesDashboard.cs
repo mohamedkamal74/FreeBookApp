@@ -1,3 +1,4 @@
+using Domin.Entity;
 using Infrastructure.Common;
 using Infrastructure.Data;
 using Infrastructure.IRepository;
@@ -9,8 +10,6 @@ namespace Infrastructure.IRepository.ServiceRepository
 {
     public class ServicesDashboard : IDashboardRepository
     {
-        private const int ExpiryWarningDays = 30;
-
         private readonly FreeBookDbContext _context;
         private readonly ILogger<ServicesDashboard> _logger;
 
@@ -27,7 +26,7 @@ namespace Infrastructure.IRepository.ServiceRepository
                 var (rangeFrom, rangeTo) = ReportQueryHelpers.NormalizeRange(query.From, query.To);
                 var toExclusive = rangeTo.AddDays(1);
                 var now = DateTime.UtcNow;
-                var warningTo = now.AddDays(ExpiryWarningDays);
+                var warningTo = now.AddDays(Helper.ExpiringSubscriptionWindowDays);
 
                 var totalBooks = await DashboardReportQueries.ActiveBooks(_context).CountAsync();
                 var totalCopies = await DashboardReportQueries.BookCopies(_context).CountAsync();
@@ -114,7 +113,7 @@ namespace Infrastructure.IRepository.ServiceRepository
                 var (rangeFrom, rangeTo) = ReportQueryHelpers.NormalizeRange(query.From, query.To);
                 var toExclusive = rangeTo.AddDays(1);
                 var now = DateTime.UtcNow;
-                var warningTo = now.AddDays(ExpiryWarningDays);
+                var warningTo = now.AddDays(Helper.ExpiringSubscriptionWindowDays);
                 var governorateId = query.GovernorateId;
 
                 var scopedSubscribers = _context.Subscribers.AsNoTracking()

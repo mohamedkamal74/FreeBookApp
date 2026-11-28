@@ -129,7 +129,7 @@
             </a>
         </div>
         <div class="col-lg-3 col-6">
-            <a asp-area="Admin" asp-controller="Subscriptions" asp-action="Subscriptions" class="small-box-link">
+            <a asp-area="Admin" asp-controller="Subscriptions" asp-action="Subscriptions" asp-route-filter="active" class="small-box-link">
                 <div class="small-box bg-success">
                     <div class="inner">
                         <h3>@dashboard.ActiveSubscriptions</h3>

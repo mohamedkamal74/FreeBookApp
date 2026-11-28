@@ -32,14 +32,20 @@ namespace FreeBook.Areas.Admin.Controllers
             Flash = flash;
         }
 
-        public async Task<IActionResult> Subscribers(SubscriberViewModel model)
+        public async Task<IActionResult> Subscribers(SubscriberViewModel model, string? filter = null)
         {
             var subsResult = await _serviceSubscriber.GetAllAsync();
             var areasResult = await _serviceArea.GetAllAsync();
             var govResult = await _serviceGovernorate.GetAllAsync();
+            var subscribers = subsResult.IsSuccess ? subsResult.Value ?? new List<SubscriberDto>() : new List<SubscriberDto>();
+            if (string.Equals(filter, "blacklisted", StringComparison.OrdinalIgnoreCase))
+            {
+                subscribers = subscribers.Where(subscriber => subscriber.IsBlackListed).ToList();
+            }
+
             return View(new SubscriberViewModel
             {
-                Subscribers = subsResult.IsSuccess ? subsResult.Value ?? new List<SubscriberDto>() : new List<SubscriberDto>(),
+                Subscribers = subscribers,
                 Areas = areasResult.IsSuccess ? areasResult.Value ?? new List<AreaDto>() : new List<AreaDto>(),
                 Governorates = govResult.IsSuccess ? govResult.Value ?? new List<GovernorateDto>() : new List<GovernorateDto>(),
                 NewSubscriber = new NewSubscriber()

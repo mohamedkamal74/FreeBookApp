@@ -12,6 +12,7 @@ namespace Domin.Entity
         public const string PathSaveImageUser = "Images/Users";
 
         public const long MaxImageSizeBytes = 5 * 1024 * 1024;
+        public const int ExpiringSubscriptionWindowDays = 30;
         public static readonly IReadOnlySet<string> AllowedImageExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             ".jpg", ".jpeg", ".png", ".gif", ".webp"
